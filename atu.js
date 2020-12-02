@@ -1781,45 +1781,133 @@ window.$ === undefined && (window.$ = Atu)
 	};
 
 })(Atu);
-
-
-var ua = navigator.userAgent.toLowerCase()
-
-
-var isStorageSupport = localStorageSupported() //全局变量，判断是否支持
-var is_weixn = ua.match(/MicroMessenger/i) == "micromessenger" ? true : false
-var is_weibo = ua.match(/Weibo/i) == "weibo" ? true : false
-var is_iphone = ua.match(/iPhone|mac|iPod|iPad/i)
-var isMob = !isPc()
-var supportsOrientationChange = "onorientationchange" in window, //是否开启手机横竖屏
-	orientationEvent = supportsOrientationChange ? "orientationchange" : "resize";
-
-var touch = isMob ? "touchstart" : "click"
-//touch="click"
-;
-(function ($) {
+;(function ($) {
 	$.fn.extend({
 		inputIni: function () {
-
-			$(this).val($(this).attr("iniV"))
+			let placeholder=$(this).data("placeholder")
+			$(this).val(placeholder)
 			$(this).focus(function () {
-				v = $(this).attr("iniV")
-				if ($(this).val() == v) {
+				if ($(this).val() == placeholder) {
 					$(this).val("")
 				}
-
 				$(this).addClass("on")
 			})
 			$(this).focusout(function () {
 				if ($(this).val() == "") {
-					$(this).val($(this).attr("rData"))
+					$(this).val(placeholder)
 				}
+				$(this).removeClass("on")
 			})
 		}
 	})
 
-})(jQuery);
+})(Atu);
 
+(function (a) {
+	//实现对图片，script,css的加载，2015.12.12
+	a.loadFile = function (b, c) {
+
+		//b load Img ,c funciton
+		if ("string" == typeof b) {
+			b = new Array(b);
+		}
+		c = a.extend({}, a.fn.loadFile.defaults, c instanceof Function ? {
+			all: c
+		} : c);
+		var d = new Array;
+		a.each(b, function (index, file) {
+
+			var att = file.split('.');
+			var ext = att[att.length - 1].toLowerCase();
+			var isCSS = ext == "css";
+			var isJS = ext == "js";
+			var isIMG = ext == "jpg" || ext == "jpeg" || ext == "png" || ext == "gif";
+
+			if (isIMG) {
+				var g = new Image;
+				a(g).bind("load error", function (e) {
+					d.push(g);
+					a.checkLoad(b, c, d);
+					a(this).unbind("load error")
+				});
+
+				g.src = file
+			}
+			if (isCSS || isJS) {
+				var tag = isCSS ? "link" : "script";
+				var attr = isCSS ? " type='text/css' rel='stylesheet' " : "";
+				var link = (isCSS ? "href" : "src") + "='" + file + "'";
+				if ($(tag + "[" + link + "]").length == 0) {
+					$("head").append("<" + tag + attr + link + "></" + tag + ">");
+				}
+				d.push(file);
+				a.checkLoad(b, c, d);
+			}
+		})
+	};
+	a.checkLoad = function (b, c, d) {
+
+		if (c.each instanceof Function) {
+			c.each.call()
+		}
+		if (d.length >= b.length && c.all instanceof Function) {
+			c.all.call()
+		}
+	};
+	a.fn.loadFile = function (b) {
+		a.loadFile(this, b);
+		return this
+	};
+
+	a.fn.loadFile.defaults = {
+		each: null,
+		all: null
+	}
+})(Atu);
+
+
+var ua = navigator.userAgent.toLowerCase()
+
+var browser={
+    versions:function(){
+        var u = navigator.userAgent, app = navigator.appVersion;
+        return {         //移动终端浏览器版本信息
+            trident: u.indexOf('Trident') > -1, //IE内核
+            presto: u.indexOf('Presto') > -1, //opera内核
+            webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+            gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+            mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+            ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+            android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或uc浏览器
+            iPhone: u.indexOf('iPhone') > -1 , //是否为iPhone或者QQHD浏览器
+            iPad: u.indexOf('iPad') > -1, //是否iPad
+            webApp: u.indexOf('Safari') == -1 //是否web应该程序，没有头部与底部
+        };
+    }(),
+    language:(navigator.browserLanguage || navigator.language).toLowerCase()
+}
+
+
+var isStorageSupport=localStorageSupported()  //全局变量，判断是否支持
+var is_weixin=ua.match(/MicroMessenger/i)=="micromessenger"?true:false
+var is_weibo=ua.match(/Weibo/i)=="weibo"?true:false
+var is_iphone=ua.match(/iPhone|mac|iPod|iPad/i)
+var is_mob=!isPc()
+var is_pc =!is_mob
+var supportsOrientationChange = "onorientationchange" in window, //是否开启手机横竖屏
+	orientationEvent = supportsOrientationChange ? "orientationchange" : "resize";
+
+var touch=is_mob?"touchstart":"mousedown"
+var touchmove=is_mob?"touchmove":"mousemove"
+var touchend=is_mob?"touchend":"mouseup"
+var reqAnimationFrame = requestAnimationFrame = window.requestAnimationFrame ||
+window.mozRequestAnimationFrame ||
+window.webkitRequestAnimationFrame ||
+window.msRequestAnimationFrame ||
+window.oRequestAnimationFrame ||
+function(callback) { setTimeout(callback, 1000 / 60); };
+
+	
 
 
 //创建空console对象，避免JS报错  
@@ -1939,8 +2027,8 @@ var Sound = {
 };
 
 
-//获取Request
-function request(sProp) {
+
+function get(sProp) {
 	var re = new RegExp("[&,?]" + sProp + "=([^//&]*)", "i");
 	var a = re.exec(document.location.search);
 	if (a == null) {
@@ -1973,67 +2061,6 @@ function isPc() {
 };
 
 
-(function (a) {
-	//实现对图片，script,css的加载，2015.12.12
-	a.loadFile = function (b, c) {
-
-		//b load Img ,c funciton
-		if ("string" == typeof b) {
-			b = new Array(b);
-		}
-		c = a.extend({}, a.fn.loadFile.defaults, c instanceof Function ? {
-			all: c
-		} : c);
-		var d = new Array;
-		a.each(b, function (index, file) {
-
-			var att = file.split('.');
-			var ext = att[att.length - 1].toLowerCase();
-			var isCSS = ext == "css";
-			var isJS = ext == "js";
-			var isIMG = ext == "jpg" || ext == "jpeg" || ext == "png" || ext == "gif";
-
-			if (isIMG) {
-				var g = new Image;
-				a(g).bind("load error", function (e) {
-					d.push(g);
-					a.checkLoad(b, c, d);
-					a(this).unbind("load error")
-				});
-
-				g.src = file
-			}
-			if (isCSS || isJS) {
-				var tag = isCSS ? "link" : "script";
-				var attr = isCSS ? " type='text/css' rel='stylesheet' " : "";
-				var link = (isCSS ? "href" : "src") + "='" + file + "'";
-				if ($(tag + "[" + link + "]").length == 0) {
-					$("head").append("<" + tag + attr + link + "></" + tag + ">");
-				}
-				d.push(file);
-				a.checkLoad(b, c, d);
-			}
-		})
-	};
-	a.checkLoad = function (b, c, d) {
-
-		if (c.each instanceof Function) {
-			c.each.call()
-		}
-		if (d.length >= b.length && c.all instanceof Function) {
-			c.all.call()
-		}
-	};
-	a.fn.loadFile = function (b) {
-		a.loadFile(this, b);
-		return this
-	};
-
-	a.fn.loadFile.defaults = {
-		each: null,
-		all: null
-	}
-})(jQuery);
 
 function localStorageSupported() {
 
@@ -2048,36 +2075,68 @@ function localStorageSupported() {
 }
 
 
-function getCookie(cookiename) {
-	//注：只有数字型或者字符型，没有Boolean,空为false,有值哪怕是false都为true
-	if (isStorageSupport) {
-		v = localStorage.getItem(cookiename)
-		if (v == undefined) {
-			v = "";
-		}
+
+function localStorageSupported() {
+
+	try {
+	  localStorage.setItem("test", "test");
+	  localStorage.removeItem("test");
+	  return true;
+	} catch(e){
+	  return false;
+	}
+	
+  }
+  
+  function getData(name){ 
+  //注：只有数字型或者字符型，没有Boolean,空为false,有值哪怕是false都为true
+	 if(isStorageSupport){ 
+		 v=localStorage.getItem(name)
+		if(v==undefined){v="";}
 		return v;
-	}
-	var _cookie = document.cookie;
-	var firstchar = _cookie.indexOf(cookiename);
-	if (firstchar != -1) {
-		firstchar += cookiename.length + 1;
-		lastchar = _cookie.indexOf(";", firstchar);
-		lastchar = lastchar == -1 ? _cookie.length : lastchar;
-		return unescape(_cookie.substring(firstchar, lastchar));
-	}
-	return "";
-
-}
-
-function setCookie(cookiename, cookievalue) {
-	var date = new Date();
-	date.setTime(date.getTime() + 365 * 24 * 3600 * 1000);
-	if (isStorageSupport) {
-		localStorage.setItem(cookiename, cookievalue);
-	}
-	document.cookie = cookiename + '=' + escape(cookievalue) + '; expires=' + date.toGMTString()
-
-}
+	 }
+	  return ""; 
+	 
+  } 
+  function setData(name, cookievalue)
+  { 
+  var date = new Date();
+	 date.setTime(date.getTime() + 365*24* 3600 * 1000);
+	 if(isStorageSupport){ 
+		  localStorage.setItem(name,cookievalue);
+	 }	
+	  
+  }
+  var cookieBaseName="alextu_"
+  function getCookie(name){ 
+  //注：只有数字型或者字符型，没有Boolean,空为false,有值哪怕是false都为true
+	  name=cookieBaseName+name
+	  var _cookie = document.cookie;
+	  var firstchar = _cookie.indexOf(name);	 
+	  if (firstchar != -1) {
+		  firstchar += name.length + 1; 
+		  lastchar = _cookie.indexOf(";", firstchar);
+		  lastchar =lastchar == -1? _cookie.length:lastchar;
+		  return unescape(_cookie.substring(firstchar, lastchar));
+	  } 
+	  return ""; 
+	 
+  } 
+  function setCookie(name, value)
+  { 
+	  name=cookieBaseName+name
+	  var date = new Date();
+	  date.setTime(date.getTime() + 365*24* 3600 * 1000);
+	  document.cookie = name + '=' + escape(value)+ ';path=/;  expires=' + date.toGMTString()
+	  
+  }
+  
+  function delCookie(name)
+  {
+	  var exp = new Date();
+	  exp.setTime(exp.getTime() - 1);
+	  document.cookie= name + "=;path=/;expires="+exp.toGMTString();
+  }
 
 
 function sendMsgBack(act, callBack) {
@@ -2119,41 +2178,24 @@ function RandArr(arr) {
 	return return_array;
 }
 
-function getXY(e) {
-	var _x = 0,
-		_y = 0
-	//console.log(navigator.userAgent)
-	if (/(iPhone|iPad|iPod|iOS|Android)/i.test(navigator.userAgent)) {
-
-		if (e.targetTouches || e.changedTouches || e.touches) {
-
-			if (e.targetTouches[0] != undefined) {
-
-				_y = e.targetTouches[0].pageY
-				_x = e.targetTouches[0].pageX;
-			} else if (e.changedTouches[0] != undefined) {
-
-				_y = e.changedTouches[0].pageY
-				_x = e.changedTouches[0].pageX;
-			} else if (e.touches[0] != undefined) {
-
-				_y = e.touches[0].pageY
-				_x = e.touches[0].pageX
+function getXY(e){
+	
+	e=e.originalEvent||e
+	
+	var _x=0,_y=0,_cx=0,_cy=0,_e=false
+	if (/(iPhone|iPad|iPod|iOS|Android)/i.test(navigator.userAgent)){
+		if(e.targetTouches || e.changedTouches || e.touches){
+			if(e.targetTouches[0] != undefined){
+				_e=e.targetTouches[0]
+			}else if(e.changedTouches[0] != undefined){
+				_e=e.changedTouches[0]
+			}else if(e.touches[0] != undefined){
+				_e=e.touches[0]
 			}
-		} else {
-
-			_y = e.pageY
-			_x = e.pageX
 		}
-	} else {
-		_y = e.pageY
-		_x = e.pageX
 	}
-
-	return {
-		x: Math.floor(_x),
-		y: Math.floor(_y)
-	}
+	if(!_e){_e=e}
+	return {x:Math.floor(_e.pageX),y:Math.floor(_e.pageY),cx:Math.floor(_e.clientX),cy:Math.floor(_e.clientY)}
 }
 
 
@@ -2175,42 +2217,25 @@ function FormatNum(num, weishu) {
 
 	return s;
 }
-
-
-
-
-function isPhoneOrMobile(s) {
-	patrn = /(^[0-9]{3,4}\-[0-9]{7,8}$)|(^\([0-9]{3,4}\)[0-9]{3,8}$)|(^0{0,1}13[0-9]{9}$)|(13\d{9}$)|(14[5-8]\d{8}$)|(15\d{9}$)|(17[0-1]\d{8}$)|(17[6-8]\d{8}$)|(18\d{9}$)/
-	if (!patrn.exec(s)) return false;
-	return true
+function newImg(src) {
+	var obj = new Image();
+	obj.src = src;
+	obj.onload = function () {}
+	return obj;
+}
+function urlencode(url){
+	return encodeURIComponent(url);
+}
+function urldecode(url){
+	return decodeURIComponent(url);
 }
 
-function isMobile(s) {
-	var patrn = /^0{0,1}(13[0-9]|14(5|7|9)|15([0-3]|[5-9])|(17([0-1]|[6-8]))|(18[0-9]))+\d{8}$/
-	return patrn.test(s)
+
+window.onerror =function(errorMessage, scriptURI, lineNumber) {
+	//$(".log").html(lineNumber+":"+errorMessage)
+	console.log(lineNumber+":"+errorMessage)
 }
 
-function isEmail(s) {
-
-	var patrn = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
-	if (!patrn.exec(s)) return false;
-	return true
-}
-
-function isTime(s) {
-	var patrn = /^([\d]{4}-[\d]{1,2}-[\d]{1,2})|([\d]{4}-[\d]{1,2}-[\d]{1,2}\s[\d]{1,2}:[\d]{1,2}:[\d]{1,2})$/;
-	if (!patrn.exec(s)) return false;
-	return true
-}
-
-function isQQ(s) {
-	var patrn = /^[1-9][0-9]{4,10}$/;
-	if (!patrn.exec(s)) return false;
-	return true
-}
-window.onerror = function (errorMessage, scriptURI, lineNumber) {
-	//alert(lineNumber+":"+errorMessage)
-}
 
 function getRotate(obj) {
 	var ele = $(obj).get(0);
@@ -2334,24 +2359,16 @@ var ani = {
 	}
 }
 
-function newImg(src) {
-	var obj = new Image();
-	obj.src = src;
-	obj.onload = function () {}
-	return obj;
+
+
+var log={
+	ini:function(){
+		if($("#atu_log").length==0){
+			$("body").append('<div id="atu_log" style="position:fixed; top:0;z-index:999; padding:10px; background:#FFF; color:#000;"></div>')
+		}},
+	add:function(){ v=Array.prototype.slice.apply(arguments);this.ini();$("#atu_log").html(v.join(" ")+"<br/>"+$("#atu_log").html());},
+	val:function(){ v=Array.prototype.slice.apply(arguments);this.ini();$("#atu_log").html(v.join(" ")+"<br/>");}	
 }
-
-
-function encodeUrl(url) {
-	return encodeURIComponent(url);
-}
-
-var log = {
-	add: function (v) {
-		$(".log").html(v + "<br/>")
-	}
-}
-
 function getEvtUrl() {
 	var v = window.location.href,
 		u = v.split("/"),
@@ -2361,3 +2378,167 @@ function getEvtUrl() {
 	}
 	return s;
 }
+function getNowFormatDate() {
+	var date = new Date();
+	var curweek = "星期" + "日一二三四五六".charAt(new Date().getDay());
+	var year = date.getFullYear();
+	var month = FormatNum(date.getMonth() + 1);
+	var strDate = FormatNum(date.getDate());
+	var strHours=FormatNum(date.getHours(),2);
+	var strMin=FormatNum(date.getMinutes(),2);
+	var currentdate = curweek + " " + strHours + ":" + strMin;
+	return currentdate;
+}
+function newDate(dateStr) {
+	var dateArr = dateStr.split(/[- : \/]/);
+	 return new Date(dateArr[0], dateArr[1] - 1, dateArr[2], dateArr[3], dateArr[4], dateArr[5]);
+ }
+ //时间格式化
+ function format(time) {
+   var time = parseInt(time);
+   var m = parseInt(time / 60);
+   var s = parseInt(time % 60);
+   m = zero(m);
+   s = zero(s);
+   function zero(num) {
+	 if (num < 10) {
+	   num = "0" + num;
+	 }
+	 return num;
+   }
+   return m + ":" + s;
+ }
+ 
+function convertCanvasToImage(o) {
+    var t = new Image;
+    return t.src = o.toDataURL("image/png"),t
+}
+function convertCanvasToImgData(o) {
+
+    return  o.toDataURL("image/jpeg")
+}
+
+function getTime2Time( t)
+{
+	time1=new Date().getTime()/1000;
+    time2 = new Date(t).getTime()/1000
+    var time_ = time1 - time2;
+    return Math.floor((time_/(3600*24)));
+}
+
+Array.prototype.indexOf = function(o) {
+    for (var t = 0; t < this.length; t++) if (this[t] == o) return t;
+    return - 1
+},
+Array.prototype.remove = function(o) {
+    var t = this.indexOf(o);
+    t > -1 && this.splice(t, 1)
+	};
+
+	
+Atu.ini=function(){
+	var v=arguments
+	cookieBaseName+=v[0];
+  this.evtUrl = v[1] ? v[1] : location.href;
+  this.wxUrl = v[2] ?v[2]:"http://atuad.cn/wx/";
+
+  this.openid=getCookie("openid");
+  this.ua=""
+  this.site=""
+  //console.log(typeof wx)
+  if ("undefined" == typeof wx) {
+    $.loadFile("http://res.wx.qq.com/open/js/jweixin-1.4.0.js")
+   
+  }
+}
+
+Atu.iniUser=function(callback,callback2){
+	
+	if(!this.openid ){
+		var wx=get("wx")
+		var d={}
+		if(wx) {
+			
+			d.wx=wx
+			wxArr=wx.split("|")
+			console.log(wxArr)
+		}
+		this.sendDataBack("ini",d,function(p){
+	
+			if(p.openid){
+				callback && callback(p)
+				Atu.openid =p.openid
+				setCookie("openid",p.openid)
+				//if(wx){ location.replace(Atu.evtUrl);}
+			}else{
+				if(!wx && Atu.tokenUrl){location.replace(Atu.tokenUrl);}
+			}
+		})
+	}else{
+		
+		callback2 && callback2(this.openid)
+	}
+}
+Atu.act=Atu.sendDataBack=function(act,u,callback){
+	var d=u||{}
+		d.act=act
+		d.openid=this.openid
+	
+	$.get(this.api,d,function(p){
+		callback && callback(p)	
+	},"jsonp")
+		
+}
+
+Atu.iniWx=function(s){
+	
+	if(!this.wxUrl){
+		console.log("未设置wxUrl");return;
+	}
+	
+	$.get(this.wxUrl,"",function(d){
+		
+
+		  wx.config({
+			  appId: d.appId,timestamp: d.timestamp,nonceStr: d.nonceStr,signature: d.signature,
+        jsApiList: ['checkJsApi', 'onMenuShareTimeline', 'onMenuShareAppMessage', 'updateAppMessageShareData', 'updateTimelineShareData', 'startRecord', 'stopRecord', 'onVoiceRecordEnd', 'playVoice', 'pauseVoice', 'stopVoice', 'onVoicePlayEnd', 'translateVoice','previewImage']
+			  
+		  });
+		  wx.ready(function () {Atu.iniShare(s); });
+		  wx.error(function (res) { console.log("wxConfig Fail") });
+
+	},"jsonp")
+}
+Atu.iniShare=function(s){
+  //alert(s.title+":"+s.title2+":"+s.desc+":"+s.link+":"+s.imgUrl)
+	wx.updateAppMessageShareData({ title: s.title, desc: s.desc, link: s.link, imgUrl: s.imgUrl, }, function(res) {}); 
+	wx.updateTimelineShareData({ title: s.title2||s.title,  link: s.link, imgUrl: s.imgUrl, }, function(res) {});
+	
+	wx.onMenuShareAppMessage({title: s.title,desc: s.desc,link:s.link,imgUrl: s.imgUrl,success: function (res) {} }); 
+	wx.onMenuShareTimeline({title: s.title2||s.title,link: s.link,imgUrl: s.imgUrl,success: function (res) {} });
+
+}
+Atu.iniClick=function(site){
+  this.site=site
+  this.ua = ua
+  this.addClick()
+}
+Atu.addClick=function(str){
+  var d={}
+  d.url = location.href
+  d.type = (!str || str == document.title)?0:1;
+  d.title = str ? str : document.title
+  d.site=this.site
+  d.ua=this.ua
+  
+  $.get("http://atuad.cn/tongji", d, function (d) { 
+     console.log("atu tongji inied")
+  }, "jsonp")
+}
+
+window.onerror =function(errorMessage, scriptURI, lineNumber) {
+	//$(".log").html(lineNumber+":"+errorMessage)
+	console.log(lineNumber+":"+errorMessage)
+}
+
+
