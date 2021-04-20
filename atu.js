@@ -330,11 +330,11 @@ var Atu = (function () {
 		return str == null ? "" : String.prototype.trim.call(str)
 	}
 	$.isTel = function (s) {
-		patrn = /(^[0-9]{3,4}\-[0-9]{7,8}$)|(^\([0-9]{3,4}\)[0-9]{3,8}$)|(^0{0,1}13[0-9]{9}$)|(13\d{9}$)|(14[5-8]\d{8}$)|(15\d{9}$)|(17[0-1]\d{8}$)|(17[6-8]\d{8}$)|(18\d{9}$)/;
+		patrn = /(^[0-9]{3,4}\-[0-9]{7,8}$)|(^\([0-9]{3,4}\)[0-9]{3,8}$)|(^0{0,1}1[3-9]\d{9}$)|(1[3-9]\d{9}$)/;
 		return patrn.exec(s) ? true : false;
 	}
 	$.isMobile = function (s) {
-		var patrn = /^0{0,1}(13[0-9]|14(0|1|5|6|7|9)|15([0-3]|[5-9])|(17([0-3]|[5-9]))|(18[0-9]))+\d{8}$/
+		var patrn = /^0{0,1}(13[0-9]|14(0|1|[4-9])|15([0-3]|[5-9])|16(2|5|6|7)|17[0-8]|18[0-9]|19([0-3]|[5-9]))+\d{8}$/
 		return patrn.test(s)
 	}
 	$.isEmail = function (s) {
@@ -2501,7 +2501,8 @@ Atu.iniWx=function(s){
 
 		  wx.config({
 			  appId: d.appId,timestamp: d.timestamp,nonceStr: d.nonceStr,signature: d.signature,
-        jsApiList: ['checkJsApi', 'onMenuShareTimeline', 'onMenuShareAppMessage', 'updateAppMessageShareData', 'updateTimelineShareData', 'startRecord', 'stopRecord', 'onVoiceRecordEnd', 'playVoice', 'pauseVoice', 'stopVoice', 'onVoicePlayEnd', 'translateVoice','previewImage']
+        jsApiList: ['checkJsApi', 'onMenuShareTimeline', 'onMenuShareAppMessage', 'updateAppMessageShareData', 'updateTimelineShareData', 'startRecord', 'stopRecord', 'onVoiceRecordEnd', 'playVoice', 'pauseVoice', 'stopVoice', 'onVoicePlayEnd', 'translateVoice', 'previewImage','openLocation'],
+        openTagList: ['wx-open-launch-weapp','wx-open-launch-app'] 
 			  
 		  });
 		  wx.ready(function () {Atu.iniShare(s); });
@@ -2539,6 +2540,27 @@ Atu.addClick=function(str){
 window.onerror =function(errorMessage, scriptURI, lineNumber) {
 	//$(".log").html(lineNumber+":"+errorMessage)
 	console.log(lineNumber+":"+errorMessage)
+}
+
+
+function newDate(dateStr) {
+   var dateArr = dateStr.split(/[- : \/]/);
+    return new Date(dateArr[0], dateArr[1] - 1, dateArr[2], dateArr[3], dateArr[4], dateArr[5]);
+}
+//时间格式化
+function format(time) {
+  var time = parseInt(time);
+  var m = parseInt(time / 60);
+  var s = parseInt(time % 60);
+  m = zero(m);
+  s = zero(s);
+  function zero(num) {
+    if (num < 10) {
+      num = "0" + num;
+    }
+    return num;
+  }
+  return m + ":" + s;
 }
 
 

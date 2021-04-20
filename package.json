@@ -1,0 +1,22 @@
+{
+  "name": "atujs",
+  "version": "1.5.0",
+  "description": "a fast, small JavaScript library.",
+  "main": "atu.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alextus/atujs.git"
+  },
+  "keywords": [
+    "atujs"
+  ],
+  "author": "alextu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/alextus/atujs/issues"
+  },
+  "homepage": "https://github.com/alextus/atujs#readme"
+}
