@@ -1,0 +1,15 @@
+.project
+.settings
+*~
+*.diff
+*.patch
+/*.html
+.bower.json
+yarn.lock
+package-lock.json
+
+
+# Ignore everything in dist folder except for eslint config
+/dist/*
+/node_modules
+/test

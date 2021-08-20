@@ -1,0 +1,296 @@
+@font-face {
+  font-family: "atu-iconfont";
+  src: url('iconfont/atu-iconfont.eot?t=1545807318834');
+  src: url('iconfont/atu-iconfont.eot?t=1545807318834#iefix') format('embedded-opentype'),
+    url('iconfont/atu-iconfont.woff?t=1545807318834') format('woff'),
+    url('iconfont/atu-iconfont.ttf') format('truetype'),
+    url('iconfont/atu-iconfont.svg?t=1545807318834#iconfont') format('svg');
+}
+* { -webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;}
+html,body,div,p,span,a,b,strong,ol,ul,li,dl,dt,dd,fieldset,h1,h2,h3,h4,h5,h6,hr,form,input,select,button,textarea,iframe,table,th,td,blockquote,img{
+  margin:0; padding:0;
+  text-rendering: optimizeLegibility;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;
+}
+*:focus,a:focus, a:active  {outline: none;}
+::-moz-focus-inner{ border: none;}
+:-moz-placeholder,::-moz-placeholder,:-ms-input-placeholder,::-webkit-input-placeholder{ 
+  color: #999999;font-size: 14px; font-family: '微软雅黑';
+}
+::selection,.selection {background: #166eb7;color: #fff;text-shadow: none;}
+html {
+  font-size: 12px;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+body,div{ -webkit-overflow-scrolling: touch;}
+a{text-decoration: none;}
+a:active,a:hover,a:focus{ outline: 0;}
+article,aside,footer,header,nav,section {  display: block;}
+audio,canvas,video { display: inline-block }
+audio:not([controls]) {display: none; height: 0}
+b,strong,.b {font-weight: bolder; font-size:1em;}
+d,del{ text-decoration: line-through;}
+u{ text-decoration:underline;}
+fieldset {border: 1px solid #c0c0c0;margin: 0 2px;padding: 0.35em 0.625em 0.75em;}
+hr {border:0;border-bottom:1px solid #000;height: 0;overflow:hidden;}
+h1{ font-size: 2em; line-height: 2em;}
+img{ display: block;}
+mark {background-color: #ff0;color: #000;}
+ul,ol{ list-style:none; }
+input,button,select,textarea{ outline:none;}
+input, textarea{ 	-webkit-appearance: textfield; }
+button,input[type="button"],input[type="reset"],input[type="submit"] { cursor: pointer;-webkit-appearance: button;}
+small { font-size: 80%;}
+summary {display: list-item;}
+sub,sup {  font-size: 75%;line-height: 0;position: relative;vertical-align: baseline;}
+sub { bottom: -0.25em}
+sup { top: -0.5em}
+svg:not(:root) { overflow: hidden}
+textarea{ resize:none; overflow: auto;}
+template {display: none;}
+table{ border-collapse:collapse; }
+
+
+.wrap{
+  display: -ms-flexbox !important;
+  display: flex !important;
+  -ms-flex-direction: column !important;
+  flex-direction: column !important;
+  font-size: 1em;
+  overflow-x: hidden
+}
+.animation {
+  -webkit-transition: 0.3s ease all;
+  -moz-transition: 0.3s ease all;
+  -ms-transition: 0.3s ease all;
+  -o-transition: 0.3s ease all;
+  transition: 0.3s ease all
+}
+.no-animation {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -ms-transition: none !important;
+  -o-transition: none !important;
+  transition: none !important
+}
+
+.icon{ font-family:"atu-iconfont";}
+.iconfont {
+  font-family: "atu-iconfont" !important;
+  font-size: 32px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.pr{ position:relative;}
+.clear{ clear: both;}
+.fr{ float: right;}
+.fl{ float: left;}
+.hide{ display: none;}
+[hidden] {
+  display: none
+}
+.tac{ text-align: center;}
+
+.btn{display: inline-block;color: #fff !important;background: #000;padding:5px 20px 5px 20px; border:none;}
+.btn.active{background:#166eb7;}
+.mp32{padding:32px;}
+.p32{ padding:32px;}
+.p30{ padding:30px;}
+.p28{ padding:28px;}
+.p26{ padding:26px;}
+.p24{ padding:24px;}
+.p22{ padding:22px;}
+.p20{ padding:20px;}
+.p18{ padding:18px;}
+.p16{ padding:16px;}
+.p14{ padding:14px;}
+.p12{ padding:12px;}
+.p10{ padding:10px;}
+.p8{ padding:8px;}
+.p6{ padding:6px;}
+.p4{ padding:4px;}
+.p2{ padding:2px;}
+.pt32{ padding-top:32px;}
+.pt30{ padding-top:30px;}
+.pt28{ padding-top:28px;}
+.pt26{ padding-top:26px;}
+.pt24{ padding-top:24px;}
+.pt22{ padding-top:22px;}
+.pt20{ padding-top:20px;}
+.pt18{ padding-top:18px;}
+.pt16{ padding-top:16px;}
+.pt14{ padding-top:14px;}
+.pt12{ padding-top:12px;}
+.pt10{ padding-top:10px;}
+.pt8{ padding-top:8px;}
+.pt6{ padding-top:6px;}
+.pt4{ padding-top:4px;}
+.pt2{ padding-top:2px;}
+.pl32{ padding-left:32px;}
+.pl30{ padding-left:30px;}
+.pl28{ padding-left:28px;}
+.pl26{ padding-left:26px;}
+.pl24{ padding-left:24px;}
+.pl22{ padding-left:22px;}
+.pl20{ padding-left:20px;}
+.pl18{ padding-left:18px;}
+.pl16{ padding-left:16px;}
+.pl14{ padding-left:14px;}
+.pl12{ padding-left:12px;}
+.pl10{ padding-left:10px;}
+.pl8{ padding-left:8px;}
+.pl6{ padding-left:6px;}
+.pl4{ padding-left:4px;}
+.pl2{ padding-left:2px;}
+.fs32{font-size: 32px;}
+.fs30{font-size: 30px;}
+.fs28{font-size: 28px;}
+.fs26{font-size: 26px;}
+.fs24{font-size: 24px;}
+.fs22{font-size: 22px;}
+.fs20{font-size: 20px;}
+.fs18{font-size: 18px;}
+.fs16{font-size: 16px;}
+.fs14{font-size: 14px;}
+.fs12{font-size: 12px;}
+.fs10,.fs8,.fs6{-webkit-transform-origin-x: 0;}
+.fs10{font-size: 12px;-webkit-transform: scale(0.833333333333334);}
+.fs8{font-size: 12px;-webkit-transform: scale(0.666666666666667);}
+.fs6{font-size: 12px;-webkit-transform: scale(0.5);}
+
+
+
+
+.tipBox{ position:absolute; top:0; left:0; z-index:999999999; width:100%; height:100%;}
+.tipBox .tip{ padding:20px 50px 20px 50px; color:#FFF; background:rgba(0,0,0,0.85); position:absolute; top:50%;  left:50%;transform:translate(-50%,-50%); -webkit-transform:translate(-50%,-50%); animation:tip 2s forwards; -webkit-animation:tip 2s forwards; display:block; border-radius:4px; }
+@-webkit-keyframes tip {
+  0%{ margin-top:100px; opacity:0;}
+  20%,66%{ margin-top:0;opacity:1;}
+  100%{  opacity:0;}
+}
+@keyframes tip {
+  0%{ margin-top:100px; opacity:0;}
+  20%,66%{ margin-top:0; opacity:1;}
+  100%{  opacity:0;}
+}
+.alertBox{ position: fixed; top:0;left:0; background: rgba(0,0,0,.3); width: 100%; height: 100%;  z-index: 999;}
+.alertBox .msg{ background:#fff; width: 76%;max-width: 512px; border-radius: 16px; position: absolute; top:50%; left:50%; transform: translate(-50%,-50%); -webkit-transform: translate(-50%,-50%);}
+.msgTitle { line-height: 16px; padding:32px 0 20px 0;  color:#000; text-align: center; width: 100%; ;}
+.msgTitle p{ width: 84%; margin:0 auto;}
+.msgTool{ display: flex;  border-top:1px solid #e5e5e5;}
+.msgTool a{  line-height: 36px;padding-bottom:8px; border-right:1px solid #e5e5e5; color:#2f83e5; text-decoration: none; text-align: center;  } 
+.msgTool a:last-child{ border-right: none;}
+.msgTn2 a{width: 50%;}
+.msgTn1 a{width: 100%;}
+
+@media only screen and (max-width: 375px) {
+  .alertBox {
+    font-size: 0.8em !important;
+  }
+  .mp32{padding:8px;}
+}
+
+@media only screen and (min-width: 375px) and (max-width: 750px){
+ 
+  .alertBox {
+    font-size: 1.1em !important;
+  }
+  .tipBox .tip{font-size: 1.4em !important;}
+  .mp32{padding:12px;}
+}
+
+@media only screen and (min-width: 750px) and (max-width: 960px) {
+
+  .msgTitle {
+    font-size:28px;line-height:48px;
+  }
+  .tipBox .tip{border-radius: 8px;}
+  .alertBox .msg{border-radius: 26px;}
+  .msgTool a{ line-height:72px; font-size:28px;}
+  .tipBox .tip{font-size: 32px !important;}
+  .mp32{padding:16px;}
+}
+@media only screen and (min-width: 960px) {
+  .msgTitle {
+    font-size:28px;line-height:48px;
+  }
+  .tipBox .tip{border-radius: 8px;}
+  .alertBox .msg{border-radius: 26px;}
+  .msgTool a{ line-height:72px; font-size:28px;}
+  .tipBox .tip{font-size: 32px !important;}
+}
+
+@media screen and (min-device-pixel-ratio: 1.0),
+screen and (-webkit-min-device-pixel-ratio: 1.0),
+screen and (-o-min-device-pixel-ratio: 1.0 ),
+screen and (min--moz-device-pixel-ratio: 1.0) {
+ html{ font-size: 12px !important;}
+}
+@media screen and (min-device-pixel-ratio: 1.125),
+screen and (-webkit-min-device-pixel-ratio: 1.125),
+screen and (-o-min-device-pixel-ratio: 1.125 ),
+screen and (min--moz-device-pixel-ratio: 1.125) {
+  html{ font-size: 11px !important;}
+}
+@media screen and (min-device-pixel-ratio: 1.25),
+screen and (-webkit-min-device-pixel-ratio: 1.25),
+screen and (-o-min-device-pixel-ratio: 1.25 ),
+screen and (min--moz-device-pixel-ratio: 1.25) {
+  html{ font-size: 10px !important;}
+}
+@media screen and (min-device-pixel-ratio: 1.375),
+screen and (-webkit-min-device-pixel-ratio: 1.375),
+screen and (-o-min-device-pixel-ratio: 1.375 ),
+screen and (min--moz-device-pixel-ratio: 1.375) {
+  html{ font-size: 9px !important;}
+}
+@media screen and (min-device-pixel-ratio: 1.5625),
+screen and (-webkit-min-device-pixel-ratio: 1.5625),
+screen and (-o-min-device-pixel-ratio: 1.5625 ),
+screen and (min--moz-device-pixel-ratio: 1.5625) {
+  html{ font-size: 8px !important;}
+}
+@media screen and (min-device-pixel-ratio: 1.875),
+screen and (-webkit-min-device-pixel-ratio: 1.875),
+screen and (-o-min-device-pixel-ratio: 1.875 ),
+screen and (min--moz-device-pixel-ratio: 1.875) {
+  html{ font-size: 6px !important;}
+}
+@media screen and (min-device-pixel-ratio: 2.1875),
+screen and (-webkit-min-device-pixel-ratio: 2.1875),
+screen and (-o-min-device-pixel-ratio: 2.1875 ),
+screen and (min--moz-device-pixel-ratio: 2.1875) {
+  html{ font-size: 5px !important;}
+}
+@media screen and (min-device-pixel-ratio: 2.5),
+screen and (-webkit-min-device-pixel-ratio: 2.5),
+screen and (-o-min-device-pixel-ratio: 2.5 ),
+screen and (min--moz-device-pixel-ratio: 2.5) {
+  html{ font-size: 5px !important;}
+}
+@media screen and (min-device-pixel-ratio: 3.125),
+screen and (-webkit-min-device-pixel-ratio:3.125),
+screen and (-o-min-device-pixel-ratio: 3.125 ),
+screen and (min--moz-device-pixel-ratio: 3.125) {
+  html{ font-size: 4px !important;}
+}
+@media screen and (min-device-pixel-ratio: 3.75),
+screen and (-webkit-min-device-pixel-ratio:3.75),
+screen and (-o-min-device-pixel-ratio: 3.75 ),
+screen and (min--moz-device-pixel-ratio: 3.75) {
+  html{ font-size: 3px !important;}
+}
+@media screen and (min-device-pixel-ratio: 5),
+screen and (-webkit-min-device-pixel-ratio:5),
+screen and (-o-min-device-pixel-ratio: 5 ),
+screen and (min--moz-device-pixel-ratio: 5) {
+  html{ font-size: 2px !important;}
+}
+@media screen and (min-device-pixel-ratio: 6.25),
+screen and (-webkit-min-device-pixel-ratio:6.25),
+screen and (-o-min-device-pixel-ratio: 6.25 ),
+screen and (min--moz-device-pixel-ratio: 6.25) {
+  html{ font-size: 2px !important;}
+}

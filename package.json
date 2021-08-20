@@ -4,7 +4,8 @@
   "description": "a fast, small JavaScript library.",
   "main": "atu.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run gulp"
   },
   "repository": {
     "type": "git",
@@ -18,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/alextus/atujs/issues"
   },
-  "homepage": "https://github.com/alextus/atujs#readme"
+  "homepage": "https://github.com/alextus/atujs#readme",
+  "devDependencies": {
+    "gulp": "^4.0.2"
+  }
 }
