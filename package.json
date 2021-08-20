@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/alextus/atujs#readme",
   "devDependencies": {
+    "glob-parent":"^3.1.0",
     "gulp": "^4.0.2"
   }
 }
