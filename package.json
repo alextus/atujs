@@ -5,7 +5,7 @@
   "main": "atu.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm run gulp"
+    "build": "gulp"
   },
   "repository": {
     "type": "git",
@@ -23,5 +23,16 @@
   "devDependencies": {
     "glob-parent": ">=5.1.2",
     "gulp": "^4.0.2"
+  },
+  "dependencies": {
+    "@babel/core": "^7.15.0",
+    "babel-core": "^6.26.3",
+    "browser-sync": "^2.27.5",
+    "del": "^6.0.0",
+    "gulp-babel": "^8.0.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-connect": "^5.7.0",
+    "gulp-uglify": "^3.0.2",
+    "gulp-util": "^3.0.8"
   }
 }
