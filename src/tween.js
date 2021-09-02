@@ -1,225 +1,168 @@
-(function ($, undefined) {
-	var prefix = '', eventPrefix,
-		vendors = { Webkit: 'webkit', Moz: '', O: 'o' },
-		testEl = document.createElement('div'),
-		supportedTransforms = /^((translate|rotate|scale)(X|Y|Z|3d)?|matrix(3d)?|perspective|skew(X|Y)?)$/i,
-		transform,
-		transitionProperty, transitionDuration, transitionTiming, transitionDelay,
-		animationName, animationDuration, animationTiming, animationDelay,
-		cssReset = {}
+// TweenMax精简化
+var Tween = {}
+Tween.to = function (el, duration, properties) {
 
-	function dasherize(str) { return str.replace(/([A-Z])/g, '-$1').toLowerCase() }
-	function normalizeEvent(name) { return eventPrefix ? eventPrefix + name : name.toLowerCase() }
+}
+Tween.fromTo = function (el, duration, properties) {
 
-	if (testEl.style.transform === undefined) $.each(vendors, function (vendor, event) {
-		if (testEl.style[vendor + 'TransitionProperty'] !== undefined) {
-			prefix = '-' + vendor.toLowerCase() + '-'
-			eventPrefix = event
-			return false
-		}
-	})
+}
+/**
+ * 
+ *   TweenMax.to($(".question .questionT .pic"), 0.4, {
+						autoAlpha: 0
+						 autoAlpha: 1,
+								x: 0,
+								delay: 0.1
+				})
+				 TweenMax.fromTo($(".shareEndWu"),1,{scale:0.7},{scale:1,ease:"Elastic.easeInOut"})
+				 TweenMax.fromTo($(".shareEndTag2"),0.6,{x:_gd*320,y:100},{x:0,y:0,delay:0.6})
+					 x: 0,
+				y: 0,
+				autoAlpha: 1,
+				scale: 1 * (isIphoneX ? 1 : 0.86)
+ */
 
-	transform = prefix + 'transform'
-	cssReset[transitionProperty = prefix + 'transition-property'] =
-		cssReset[transitionDuration = prefix + 'transition-duration'] =
-		cssReset[transitionDelay = prefix + 'transition-delay'] =
-		cssReset[transitionTiming = prefix + 'transition-timing-function'] =
-		cssReset[animationName = prefix + 'animation-name'] =
-		cssReset[animationDuration = prefix + 'animation-duration'] =
-		cssReset[animationDelay = prefix + 'animation-delay'] =
-		cssReset[animationTiming = prefix + 'animation-timing-function'] = ''
-
-	$.fx = {
-		off: (eventPrefix === undefined && testEl.style.transitionProperty === undefined),
-		speeds: { _default: 400, fast: 200, slow: 600 },
-		cssPrefix: prefix,
-		transitionEnd: normalizeEvent('TransitionEnd'),
-		animationEnd: normalizeEvent('AnimationEnd')
+function easeFun(ease, s, e, d, t) {
+	//s startVal,e endVal,d step t stepI 0~step
+	let a = t / d, b = s * 1, c = e - s
+	//"Linear","Quad","Cubic","Quart","Quint,Sine,Expo,Circ,Elastic,Bounce,Back"
+	let easeType = ["linear", "Quad", "Cubic", "Quart", "Quint", "Sine", "Expo", "Circ", "Elastic", "Bounce", "Back"]
+	let easeArrs = []
+	for (let i = 1; i < easeType.length; i++) {
+		easeArrs.push('easeIn' + easeType[i])
+		easeArrs.push('easeOut' + easeType[i])
+		easeArrs.push('easeInOut' + easeType[i])
 	}
 
-	$.fn.tween = function (properties, duration, ease, callback, delay) {
-		if ($.isFunction(duration))
-			callback = duration, ease = undefined, duration = undefined
-		if ($.isFunction(ease))
-			callback = ease, ease = undefined
-		if ($.isPlainObject(duration))
-			ease = duration.easing, callback = duration.complete, delay = duration.delay, duration = duration.duration
-		if (duration) duration = (typeof duration == 'number' ? duration :
-			($.fx.speeds[duration] || $.fx.speeds._default)) / 1000
-		if (delay) delay = parseFloat(delay) / 1000
-		return this.anim(properties, duration, ease, callback, delay)
+	if (easeArrs.includes(ease)) {
+		return b + c * eval(ease + '(' + a + ')')
+	} else {
+		return b + c * a;
 	}
+}
+function easeInSine(x) {
+	return 1 - Math.cos((x * Math.PI) / 2);
+}
+function easeOutSine(x) {
+	return Math.sin((x * Math.PI) / 2);
+}
+function easeInOutSine(x) {
+	return -(Math.cos(Math.PI * x) - 1) / 2;
+}
+function easeInQuad(x) {
+	return x * x;
+}
+function easeOutQuad(x) {
+	return 1 - (1 - x) * (1 - x);
+}
+function easeInOutQuad(x) {
+	return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+}
+function easeInQuart(x) {
+	return x * x * x * x;
+}
+function easeOutQuart(x) {
+	return 1 - Math.pow(1 - x, 4);
+}
+function easeInOutQuart(x) {
+	return x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4) / 2;
+}
+function easeInQuint(x) {
+	return x * x * x * x * x;
+}
+function easeOutQuint(x) {
+	return 1 - Math.pow(1 - x, 5);
+}
+function easeInOutQuint(x) {
+	return x < 0.5 ? 16 * x * x * x * x * x : 1 - Math.pow(-2 * x + 2, 5) / 2;
+}
+function easeInExpo(x) {
+	return x === 0 ? 0 : Math.pow(2, 10 * x - 10);
+}
+function easeOutExpo(x) {
+	return x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
+}
+function easeInOutExpo(x) {
+	return x === 0
+		? 0
+		: x === 1
+			? 1
+			: x < 0.5 ? Math.pow(2, 20 * x - 10) / 2
+				: (2 - Math.pow(2, -20 * x + 10)) / 2;
+}
+function easeInCubic(x) {
+	return x * x * x;
+}
+function easeOutCubic(x) {
+	return 1 - Math.pow(1 - x, 3);
+}
+function easeInOutCubic(x) {
+	return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+}
 
-	$.fn.anim = function (properties, duration, ease, callback, delay) {
-		var key, cssValues = {}, cssProperties, transforms = '',
-			that = this, wrappedCallback, endEvent = $.fx.transitionEnd, fired = false
+function easeInCirc(x) {
+	return 1 - Math.sqrt(1 - Math.pow(x, 2));
+}
+function easeOutCirc(x) {
+	return Math.sqrt(1 - Math.pow(x - 1, 2));
 
-		if (duration === undefined) duration = $.fx.speeds._default / 1000
-		if (delay === undefined) delay = 0
-		if ($.fx.off) duration = 0
-		if (typeof properties == 'string') {
-			cssValues[animationName] = properties
-			cssValues[animationDuration] = duration + 's'
-			cssValues[animationDelay] = delay + 's'
-			cssValues[animationTiming] = (ease || 'linear')
-			endEvent = $.fx.animationEnd
-		} else {
-			cssProperties = []
-			for (key in properties)
-				if (supportedTransforms.test(key)) transforms += key + '(' + properties[key] + ') '
-				else cssValues[key] = properties[key], cssProperties.push(dasherize(key))
+}
+function easeInOutCirc(x) {
+	return x < 0.5
+		? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2
+		: (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2;
+}
+function easeInBack(x) {
+	const c1 = 1.70158;
+	const c3 = c1 + 1;
 
-			if (transforms) cssValues[transform] = transforms, cssProperties.push(transform)
-			if (duration > 0 && typeof properties === 'object') {
-				cssValues[transitionProperty] = cssProperties.join(', ')
-				cssValues[transitionDuration] = duration + 's'
-				cssValues[transitionDelay] = delay + 's'
-				cssValues[transitionTiming] = (ease || 'linear')
-			}
-		}
-		wrappedCallback = function (event) {
-			if (typeof event !== 'undefined') {
-				if (event.target !== event.currentTarget) return
-				$(event.target).unbind(endEvent, wrappedCallback)
-			} else
-				$(this).unbind(endEvent, wrappedCallback)
+	return c3 * x * x * x - c1 * x * x;
+}
 
-			fired = true
-			$(this).css(cssReset)
-			callback && callback.call(this)
-		}
-		if (duration > 0) {
-			this.bind(endEvent, wrappedCallback)
-			setTimeout(function () {
-				if (fired) return
-				wrappedCallback.call(that)
-			}, ((duration + delay) * 1000) + 25)
-		}
-		this.size() && this.get(0).clientLeft
-		this.css(cssValues)
-		if (duration <= 0) setTimeout(function () {
-			that.each(function () { wrappedCallback.call(this) })
-		}, 0)
+function easeOutBack(x) {
+	const c1 = 1.70158;
+	const c3 = c1 + 1;
 
-		return this
+	return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+}
+function easeInOutBack(x) {
+	const c1 = 1.70158;
+	const c2 = c1 * 1.525;
+
+	return x < 0.5
+		? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
+		: (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
+}
+let c4 = (2 * Math.PI) / 3;
+function easeInElastic(x) {
+	return x === 0 ? 0 : x === 1 ? 1 : -Math.pow(2, 10 * x - 10) * Math.sin((x * 10 - 10.75) * c4);
+}
+function easeOutElastic(x) {
+	return x === 0 ? 0 : x === 1 ? 1 : Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1;
+}
+function easeInOutElastic(x) {
+	const c5 = (2 * Math.PI) / 4.5;
+	return x === 0 ? 0 : x === 1 ? 1 : x < 0.5 ? -(Math.pow(2, 20 * x - 10) * Math.sin((20 * x - 11.125) * c5)) / 2 : (Math.pow(2, -20 * x + 10) * Math.sin((20 * x - 11.125) * c5)) / 2 + 1;
+}
+function easeInBounce(x) {
+	return 1 - easeOutBounce(1 - x);
+}
+function easeOutBounce(x) {
+	const n1 = 7.5625;
+	const d1 = 2.75;
+
+	if (x < 1 / d1) {
+		return n1 * x * x;
+	} else if (x < 2 / d1) {
+		return n1 * (x -= 1.5 / d1) * x + 0.75;
+	} else if (x < 2.5 / d1) {
+		return n1 * (x -= 2.25 / d1) * x + 0.9375;
+	} else {
+		return n1 * (x -= 2.625 / d1) * x + 0.984375;
 	}
-
-	$.fn.scrollTo = function (options) {
-		var defaults = {
-			top: 0,    //滚动目标位置
-			durTime: 500,  //过渡动画时间
-			delay: 30,     //定时器时间
-			callback: null   //回调函数
-		};
-		var opts = $.extend(defaults, options),
-			timer = null,
-			_this = this,
-			curTop = _this.scrollTop(),//滚动条当前的位置
-			subTop = opts.top - curTop,    //滚动条目标位置和当前位置的差值
-			index = 0,
-			dur = Math.round(opts.durTime / opts.delay),
-			smoothScroll = function (t) {
-				index++;
-				var per = Math.round(subTop / dur);
-				if (index >= dur) {
-					console.log(t)
-					_this.scrollTop(t);
-					window.clearInterval(timer);
-					if (opts.callback && typeof opts.callback == 'function') {
-						opts.callback();
-					}
-					return;
-				} else {
-					console.log(curTop + index * per)
-					_this.scrollTop(curTop + index * per);
-				}
-			};
-		timer = window.setInterval(function () {
-			smoothScroll(opts.top);
-		}, opts.delay);
-		return _this;
-	};
-
-	var origShow = $.fn.show, origHide = $.fn.hide, origToggle = $.fn.toggle
-
-	function anim(el, speed, opacity, scale, callback) {
-		if (typeof speed == 'function' && !callback) callback = speed, speed = undefined
-		var props = { opacity: opacity }
-		if (scale) {
-			props.scale = scale
-			el.css($.fx.cssPrefix + 'transform-origin', '0 0')
-		}
-		return el.tween(props, speed, null, callback)
-	}
-
-	function hide(el, speed, scale, callback) {
-		return anim(el, speed, 0, scale, function () {
-			origHide.call($(this))
-			callback && callback.call(this)
-		})
-	}
-
-	$.fn.show = function (speed, callback) {
-		origShow.call(this)
-		if (speed === undefined) speed = 0
-		else this.css('opacity', 0)
-		return anim(this, speed, 1, '1,1', callback)
-	}
-
-	$.fn.hide = function (speed, callback) {
-		if (speed === undefined) return origHide.call(this)
-		else return hide(this, speed, '0,0', callback)
-	}
-
-	$.fn.toggle = function (speed, callback) {
-		if (speed === undefined || typeof speed == 'boolean')
-			return origToggle.call(this, speed)
-		else return this.each(function () {
-			var el = $(this)
-			el[el.css('display') == 'none' ? 'show' : 'hide'](speed, callback)
-		})
-	}
-
-	$.fn.fadeTo = function (speed, opacity, callback) {
-		return anim(this, speed, opacity, null, callback)
-	}
-
-	$.fn.fadeIn = function (speed, callback) {
-		var target = this.css('opacity')
-		if (target > 0) this.css('opacity', 0)
-		else target = 1
-		return origShow.call(this).fadeTo(speed, target, callback)
-	}
-
-	$.fn.fadeOut = function (speed, callback) {
-		return hide(this, speed, null, callback)
-	}
-
-	$.fn.fadeToggle = function (speed, callback) {
-		return this.each(function () {
-			var el = $(this)
-			el[
-				(el.css('opacity') == 0 || el.css('display') == 'none') ? 'fadeIn' : 'fadeOut'
-			](speed, callback)
-		})
-	}
-
-	$.fn.longPress = function (fn, trsTime) {   //长按监听
-		var $this = this;
-		for (var i = 0; i < $this.length; i++) {
-			(function (target) {
-				var timeout;
-				target.addEventListener('touchstart', function (event) {
-					timeout = setTimeout(function () {
-						fn(event);
-					}, trsTime ? trsTime : 200);
-				}, false);
-				target.addEventListener('touchend', function (event) {
-					clearTimeout(timeout);
-				}, false);
-			})($this[i]);
-		}
-	}
-
-	testEl = null
-})(Atu);
+}
+function easeInOutBounce(x) {
+	return x < 0.5
+		? (1 - easeOutBounce(1 - 2 * x)) / 2
+		: (1 + easeOutBounce(2 * x - 1)) / 2;
+}

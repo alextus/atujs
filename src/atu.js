@@ -6,7 +6,7 @@
 	Atu.js 不兼容IE6、8、9、10 浏览器，移动项目专用
 	version:v1.1.8
 */
-console.log("%c— 艾图互动,2021.09,作品 —%c ", "padding:8px 15px; color:#f2efe8; background-color:#070e1d; line-height:25px;", "padding:8px 5px 5px 0; color:#070e1d; ")
+console.log("%c— 艾特图斯,2021.09,作品 —%c ", "padding:8px 15px; color:#f2efe8; background-color:#070e1d; line-height:25px;", "padding:8px 5px 5px 0; color:#070e1d; ")
 
 var Atu = (function () {
 	var undefined, key, $, classList, emptyArray = [], concat = emptyArray.concat, filter = emptyArray.filter, slice = emptyArray.slice,
@@ -829,8 +829,6 @@ var Atu = (function () {
 
 	return $
 })()
-
-
 
 window.Atu = Atu
 window.$ === undefined && (window.$ = Atu);

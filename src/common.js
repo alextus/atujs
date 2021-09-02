@@ -431,9 +431,9 @@ Atu.addClick = function (str) {
 	}, "jsonp")
 }
 
-window.onerror = function (errorMessage, scriptURI, lineNumber) {
+window.onerror = function (message, url, line, column, error) {
 	//$(".log").html(lineNumber+":"+errorMessage)
-	console.log(lineNumber + ":" + errorMessage)
+	console.log('log---onerror::::',message, url, line, column, error);
 }
 
 
