@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="../src/atu.js?v=1.13"></script>
+</head>
+<body>
+    <div class="test" style="width: 100px;padding:20px;margin:30px;height:80px; border:1px solid #000;box-sizing: border-box;">
+
+    </div>
+    <script>
+        console.log($(".test").width())
+        /*
+        $.each( { Height: "height", Width: "width" }, function( name, type ) {
+            console.log(name,type)
+            $.fn[ "inner" + name ] = function() {
+                var elem = this[0];
+                return elem ?
+                    elem.style ?
+                    parseFloat( Atu.css( elem, type, "padding" ) ) :
+                    this[ type ]() :
+                    null;
+            };
+
+            // outerHeight and outerWidth
+            $.fn[ "outer" + name ] = function( margin ) {
+                var elem = this[0];
+                return elem ?
+                    elem.style ?
+                    parseFloat( Atu.css( elem, type, margin ? "margin" : "border" ) ) :
+                    this[ type ]() :
+                    null;
+            };
+
+        })
+        */
+       console.log($(".test").css("padding-left"))
+       console.log($.camelCase("inner-width"))
+       console.log($(".test").width(),$(".test").height())
+       console.log('innerWidth',$(".test").width()-parseFloat($(".test").css("padding-left"))-parseFloat($(".test").css("padding-right")))
+       console.log('outerWidth',$(".test").width()+parseFloat($(".test").css("margin-left"))+parseFloat($(".test").css("margin-right"))+parseFloat($(".test").css("border-left-width"))+parseFloat($(".test").css("border-right-width")))
+       console.log('innerHeight',$(".test").height()-parseFloat($(".test").css("padding-top"))-parseFloat($(".test").css("padding-bottom")))
+       console.log('outerHeight',$(".test").height()+parseFloat($(".test").css("margin-top"))+parseFloat($(".test").css("margin-bottom"))+parseFloat($(".test").css("border-top-width"))+parseFloat($(".test").css("border-bottom-width")))
+   
+   </script>
+</body>
+</html>

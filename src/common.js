@@ -1,33 +1,103 @@
-
+/**
+ * browser 浏览器类型检测，已通过chrome 93，ie 11
+ */
 var ua = navigator.userAgent.toLowerCase()
-
+var up = navigator.platform.toLowerCase(); 
 var browser = {
-	versions: function () {
-		var u = navigator.userAgent, app = navigator.appVersion;
-		return {         //移动终端浏览器版本信息
-			trident: u.indexOf('Trident') > -1, //IE内核
-			presto: u.indexOf('Presto') > -1, //opera内核
-			webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
-			gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
-			mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
-			ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
-			android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或uc浏览器
-			iPhone: u.indexOf('iPhone') > -1, //是否为iPhone或者QQHD浏览器
-			iPad: u.indexOf('iPad') > -1, //是否iPad
-			webApp: u.indexOf('Safari') == -1 //是否web应该程序，没有头部与底部
-		};
-	}(),
+	ua: ua,
+	ie: ua.indexOf('trident') > -1 ? true : false, //IE内核
+	opera: !!window.opera && window.opera.version,
+	webKit: ua.indexOf('applewebkit') > -1, //苹果、谷歌内核
+	mac: ua.indexOf("macintosh") > -1,
+	presto: ua.indexOf('presto') > -1, //opera内核
+	chrome: ua.indexOf('chrome') > -1,
+	safari: ua.indexOf('safari') > -1,
+	firefox: ua.indexOf('firefox') > -1,
+	edge: ua.indexOf('edg') > -1,
+	gecko: ua.indexOf('gecko') > -1 && ua.indexOf('khtml') == -1, //火狐内核
+	mobile: !!ua.match(/applewebkit.*mobile.*/), //是否为移动终端
+	ios: !!ua.match(/\(i[^;]+;( u;)? cpu.+mac os x/), //ios终端
+	android: ua.indexOf('android') > -1,
+	linux: ua.indexOf('linux') > -1, 
+	iPhone: ua.indexOf('iphone') > -1, 
+	iPad: ua.indexOf('ipad') > -1, 
+	iPod: ua.indexOf('ipod') > -1, 
+	SymbianOS: ua.indexOf('symbian') > -1||ua.indexOf('symbianos') > -1, 
+	WindowsPhone: ua.indexOf('windows phone') > -1, 
+	weixin: ua.indexOf('micromessenger') > -1,
+	weibo: ua.indexOf('weibo') > -1,
+	eleme: ua.indexOf('eleme') > -1,
+	quirks: document.compatMode == "BackCompat",
 	language: (navigator.browserLanguage || navigator.language).toLowerCase()
 }
+browser.type=browser.ie ? "IE" : browser.opera ? "Opear" :  browser.edge ? "Edge" :
+	browser.weixin ? "Weixin" :browser.chrome ? "Chrome" : browser.safari ? "Safari" : "other";
+browser.engine=browser.webKit?"Webkit":browser.gecko?"Gecko":browser.ie?"Trident":"other"
 
 
-var isStorageSupport = localStorageSupported() //全局变量，判断是否支持
-var is_weixin = ua.match(/MicroMessenger/i) == "micromessenger" ? true : false
-var is_weibo = ua.match(/Weibo/i) == "weibo" ? true : false
-var is_eleme = ua.match(/Eleme/i) == "eleme" ? true : false
-var is_iphone = ua.match(/iPhone|mac|iPod|iPad/i)
-var is_mob = !isPc()
-var is_pc = !is_mob
+var isWeixin = is_weixin = browser.weixin
+var isWeibo = is_weibo = browser.weibo
+var isEleme = is_eleme =  browser.eleme
+var isIphone = is_iphone =  browser.iPhone
+var iPad = is_ipad =  browser.iPad
+var isPc=is_pc  =(browser.android||browser.iPhone||browser.iPad||browser.iPod||browser.SymbianOS||browser.WindowsPhone)?false:true;
+var isMob =is_mob = !isPc
+var system = {win: up.indexOf("win") == 0, mac: up.indexOf("mac") == 0, linux: up.indexOf("linux") == 0, xll: false, ipad:iPad }; 
+system.type=system.win?"Win":system.mac?"Mac":system.ipad?"Ipad":browser.android?"Android":system.linux?"linux":"other"
+
+var version = 0;
+if (browser.ie) {
+	var v1 = ua.match(/(?:msie\s([\w.]+))/);
+	var v2 = ua.match(/(?:trident.*rv:([\w.]+))/);
+
+	if (v1 && v2 && v1[1] && v2[1]) {
+		version = Math.max(v1[1] * 1, v2[1] * 1);
+	} else if (v1 && v1[1]) {
+		version = v1[1] * 1;
+	} else if (v2 && v2[1]) {
+		version = v2[1] * 1;
+	} else {
+		version = 0;
+	}
+	browser.ie11Compat = document.documentMode == 11;
+	browser.ie9Compat = document.documentMode == 9;
+	browser.ie8 = !!document.documentMode;
+	browser.ie8Compat = document.documentMode == 8;
+	browser.ie7Compat = (version == 7 && !document.documentMode) || document.documentMode == 7;
+	browser.ie6Compat = version < 7 || browser.quirks;
+	browser.ie9above = version > 8;
+	browser.ie9below = version < 9;
+	browser.ie11above = version > 10;
+	browser.ie11below = version < 11;
+}
+
+if (browser.firefox) {
+	var geckoRelease = ua.match(/rv:([\d\.]+)/);
+	if (geckoRelease) {
+		geckoRelease = geckoRelease[1].split(".");
+		version = geckoRelease[0] * 10000 + (geckoRelease[1] || 0) * 100 + (geckoRelease[2] || 0) * 1;
+	}
+}
+if(browser.edg){
+	if (/edg\/([\d\.]+)/i.test(ua)) {
+		version =  ua.match(/edg\/(\d+\.\d)/i)[1];
+	}
+}else if(browser.chrome){
+	if (/chrome\/([\d\.]+)/i.test(ua)) {
+		version =  ua.match(/chrome\/(\d+\.\d)/i)[1];
+	}
+}
+
+// Opera 9.50+
+if (browser.opera) version = parseFloat(opera.version());
+
+// WebKit 522+ (Safari 3+)
+if (browser.webkit) version = parseFloat(ua.match(/ applewebkit\/(\d+)/)[1]);
+
+browser.version=version
+browser.isCompatible= !browser.mobile && ((browser.ie && version >= 6) || (browser.gecko && version >= 10801) || (browser.opera && version >= 9.5) || (browser.air && version >= 1) || (browser.webkit && version >= 522) || false)
+
+var isStorageSupport =is_storagesupport= localStorageSupported() //全局变量，判断是否支持
 var supportsOrientationChange = "onorientationchange" in window, //是否开启手机横竖屏
 	orientationEvent = supportsOrientationChange ? "orientationchange" : "resize";
 
@@ -42,7 +112,7 @@ var reqAnimationFrame = requestAnimationFrame = window.requestAnimationFrame ||
 	function (callback) {
 		setTimeout(callback, 1000 / 60);
 	};
-
+	
 //创建空console对象，避免JS报错  
 if (!window.console) {
 	window.console = {};
@@ -56,7 +126,7 @@ if (!window.console) {
 	for (var i = 0, l = funcs.length; i < l; i++) {
 		var func = funcs[i];
 		if (!console[func])
-			console[func] = function () { };
+			console[func] = function () {};
 	}
 	if (!console.memory)
 		console.memory = {};
@@ -70,24 +140,8 @@ if (!window.console) {
 function get(sProp) {
 	var re = new RegExp("[&,?]" + sProp + "=([^//&]*)", "i");
 	var a = re.exec(document.location.search);
-	if (a == null) {
-		return "";
-	}
-	return a[1];
+	return a == null?"":a[1];
 };
-
-function isPc() {
-	var userAgentInfo = navigator.userAgent;
-	var Agents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
-	var flag = true;
-	for (var v = 0; v < Agents.length; v++) {
-		if (userAgentInfo.indexOf(Agents[v]) > 0) {
-			flag = false;
-			break;
-		}
-	}
-	return flag;
-}
 
 
 
@@ -111,6 +165,8 @@ function getData(name) {
 			v = "";
 		}
 		return v;
+	}else{
+		console.log('not support getData')
 	}
 	return "";
 
@@ -138,9 +194,7 @@ function getCookie(name) {
 		return unescape(_cookie.substring(firstchar, lastchar));
 	}
 	return "";
-
 }
-
 function setCookie(name, value) {
 	name = cookieBaseName + name
 	var date = new Date();
@@ -210,7 +264,7 @@ function getXY(e) {
 function newImg(src) {
 	var obj = new Image();
 	obj.src = src;
-	obj.onload = function () { }
+	obj.onload = function () {}
 	return obj;
 }
 
@@ -260,7 +314,8 @@ function convertCanvasToImgData(o) {
 	return o.toDataURL("image/jpeg")
 }
 String.prototype.byteLength = function () {
-	var b = 0; l = this.length;
+	var b = 0;
+	l = this.length;
 	if (l) {
 		for (var i = 0; i < l; i++) {
 			if (this.charCodeAt(i) > 255) {
@@ -275,14 +330,15 @@ String.prototype.byteLength = function () {
 	}
 }
 Array.prototype.indexOf = function (o) {
-	for (var t = 0; t < this.length; t++)
-		if (this[t] == o) return t;
-	return -1
-},
+		for (var t = 0; t < this.length; t++)
+			if (this[t] == o) return t;
+		return -1
+	},
 	Array.prototype.remove = function (o) {
 		var t = this.indexOf(o);
 		t > -1 && this.splice(t, 1)
 	};
+
 function e(element) {
 	var elements = new Array();
 	for (var i = 0; i < arguments.length; i++) {
@@ -297,6 +353,7 @@ function e(element) {
 	}
 	return elements;
 }
+
 function at(id) {
 	return e(id);
 }
@@ -305,135 +362,9 @@ function ce(tagName) {
 	return document.createElement(tagName);
 }
 
-Atu.ini = function () {
-	var v = arguments
-	cookieBaseName += v[0];
-	this.evtUrl = v[1] ? v[1] : location.href;
-	this.wxUrl = v[2] ? v[2] : "http://atuad.cn/wx/";
-
-	this.openid = getCookie("openid");
-	this.ua = ""
-	this.site = ""
-	//console.log(typeof wx)
-	if ("undefined" == typeof wx) {
-		$.loadFile("http://res.wx.qq.com/open/js/jweixin-1.4.0.js")
-
-	}
-}
-Atu.iniUser = function (callback, callback2) {
-
-	if (!this.openid) {
-		var wx = get("wx")
-		var d = {}
-		if (wx) {
-
-			d.wx = wx
-			wxArr = wx.split("|")
-			console.log(wxArr)
-		}
-		this.sendDataBack("ini", d, function (p) {
-
-			if (p.openid) {
-				callback && callback(p)
-				Atu.openid = p.openid
-				setCookie("openid", p.openid)
-				//if(wx){ location.replace(Atu.evtUrl);}
-			} else {
-				if (!wx && Atu.tokenUrl) {
-					location.replace(Atu.tokenUrl);
-				}
-			}
-		})
-	} else {
-
-		callback2 && callback2(this.openid)
-	}
-}
-Atu.act = Atu.sendDataBack = Atu.sendMsgBack = function (act, u, callback) {
-	var d = u || {}
-	d.act = typeof (act) == "object" ? act : { "act": act }
-	d.openid = this.openid
-
-	$.get(this.api, d, function (p) {
-		callback && callback(p)
-	}, "jsonp")
-
-}
-Atu.iniWx = function (s) {
-
-	if (!this.wxUrl) {
-		console.log("未设置wxUrl");
-		return;
-	}
-	$.get(this.wxUrl, "", function (d) {
-		wx.config({
-			appId: d.appId,
-			timestamp: d.timestamp,
-			nonceStr: d.nonceStr,
-			signature: d.signature,
-			jsApiList: ['checkJsApi', 'onMenuShareTimeline', 'onMenuShareAppMessage', 'updateAppMessageShareData', 'updateTimelineShareData', 'startRecord', 'stopRecord', 'onVoiceRecordEnd', 'playVoice', 'pauseVoice', 'stopVoice', 'onVoicePlayEnd', 'translateVoice', 'previewImage', 'openLocation'],
-			openTagList: ['wx-open-launch-weapp', 'wx-open-launch-app']
-
-		});
-		wx.ready(function () {
-			Atu.iniShare(s);
-		});
-		wx.error(function (res) {
-			console.log("wxConfig Fail")
-		});
-
-	}, "jsonp")
-}
-Atu.iniShare = function (s) {
-	//alert(s.title+":"+s.title2+":"+s.desc+":"+s.link+":"+s.imgUrl)
-	wx.updateAppMessageShareData({
-		title: s.title,
-		desc: s.desc,
-		link: s.link,
-		imgUrl: s.imgUrl,
-	}, function (res) { });
-	wx.updateTimelineShareData({
-		title: s.title2 || s.title,
-		link: s.link,
-		imgUrl: s.imgUrl,
-	}, function (res) { });
-
-	wx.onMenuShareAppMessage({
-		title: s.title,
-		desc: s.desc,
-		link: s.link,
-		imgUrl: s.imgUrl,
-		success: function (res) { }
-	});
-	wx.onMenuShareTimeline({
-		title: s.title2 || s.title,
-		link: s.link,
-		imgUrl: s.imgUrl,
-		success: function (res) { }
-	});
-
-}
-Atu.iniClick = function (site) {
-	this.site = site
-	this.ua = ua
-	this.addClick()
-}
-Atu.addClick = function (str) {
-	var d = {}
-	d.url = location.href
-	d.type = (!str || str == document.title) ? 0 : 1;
-	d.title = str ? str : document.title
-	d.site = this.site
-	d.ua = this.ua
-
-	$.get("//atuad.cn/tongji", d, function (d) {
-		console.log("atu tongji inied")
-	}, "jsonp")
-}
 
 window.onerror = function (message, url, line, column, error) {
-	//$(".log").html(lineNumber+":"+errorMessage)
-	console.log('log---onerror::::',message, url, line, column, error);
+	console.log('error::', message, url, line, column, error);
 }
 
 
@@ -442,26 +373,32 @@ function newDate(dateStr) {
 	var l = dateArr.length
 	return new Date(dateArr[0], dateArr[1] - 1, dateArr[2], l <= 3 ? 0 : dateArr[3], l <= 3 ? 0 : dateArr[4], l <= 3 ? 0 : dateArr[5]);
 }
+
 function year(t) {
 	var nt = t ? newDate(t) : new Date()
 	return nt.getFullYear();
 }
+
 function month(t) {
 	var nt = t ? newDate(t) : new Date()
 	return nt.getMonth() + 1;
 }
+
 function week(t) {
 	var nt = t ? newDate(t) : new Date()
 	return nt.getDay();
 }
+
 function day(t) {
 	var nt = t ? newDate(t) : new Date()
 	return nt.getDate();
 }
+
 function hour(t) {
 	var nt = t ? newDate(t) : new Date()
 	return nt.getHours();
 }
+
 function now() {
 	var date = new Date();
 	var year = date.getFullYear();
@@ -472,16 +409,19 @@ function now() {
 	var second = FormatNum(date.getSeconds(), 2)
 	return year + "-" + month + "-" + day + " " + hour + ":" + min + ":" + second;
 }
+
 function getTime2Time(t) {
 	time1 = new Date().getTime() / 1000;
 	time2 = new Date(t).getTime() / 1000
 	var time_ = time1 - time2;
 	return time_;
 }
+
 function getLeftTime(endTime) {
-	return - getTime2Time(newDate(endTime))
+	return -getTime2Time(newDate(endTime))
 
 }
+
 function getPassTime(startTime) {
 	return getTime2Time(newDate(startTime))
 }
@@ -496,10 +436,11 @@ function format(time) {
 	s = FormatNum(s, 2);
 
 	var t = m + ":" + s;
-	(h || d || y) ? t = (h + ":" + t) : t
+	(h || d || y) ? t = (h + ":" + t): t
 	d ? t = (d + " " + t) : t
 	return t
 }
+
 function Alexdate() {
 	var sd = new Date()
 	y = FormatNum(sd.getFullYear(), 4);
@@ -514,4 +455,10 @@ function FormatNum(num, weishu) {
 		s = "0" + s;
 	}
 	return s;
+}
+//12秒内提示一次，多次引用只显示一次
+let ct=Math.floor(getData("ct")),nt=new Date().getTime()
+if(nt>ct){
+	console.log("%c— ATTUS™,13717810545 —%c ", "padding:8px 15px; color:#f2efe8; background-color:#070e1d; line-height:25px;", "padding:8px 5px 5px 0; color:#070e1d; ")
+	setData("ct",nt+12000)
 }

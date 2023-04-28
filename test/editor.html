@@ -1,0 +1,2011 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="../src/common.js?v=1.14"></script>
+    <style>
+        .custom-underline {
+            text-decoration: underline;
+        }
+
+        .nite-writer-pen {
+            text-decoration: underline;
+            background: #f3f3f3;
+        }
+    </style>
+</head>
+
+<body>
+<script>
+/* nodeType 
+1	Element	元素名  	null
+2	Attr	属性名称	属性值
+3	Text	#text	节点的内容
+4	CDATASection	#cdata-section	节点的内容
+5	EntityReference	实体引用名称	null
+6	Entity	实体名称	null
+7	ProcessingInstruction	target	节点的内容
+8	Comment	#comment	注释文本
+9	Document	#document	null
+10	DocumentType	文档类型名称	null
+11	DocumentFragment	#document 片段	null
+12	Notation	符号名称	null
+*/
+//过滤已淘汰的h5标签
+/*
+ b 可以用来产生粗体元素。使用strong（意味着强烈强调）代替更有意义，或者用CSS来完成这项工作，增加font-weight: bold的规则，用来表明粗体元素。
+◆ i可以用来产生斜体元素。使用em（表示强调），这也更有意义。或者可以用CSS来表现斜体：font-style: italic
+◆ big可以产生更大字体。使用标题（如h1，h2等，当文本本来就是一个标题时）代替，增加了意义，或简单地在CSS中使用font-size属性，获取更多的控制权。
+◆ small 可以产生小字体。CSS（font-size）再一次取得更多的控制权。
+◆ hr 可用用来展现一条水平线。在CSS中用hr设计很少见，CSS的border-top，border-bottom属性或者朴素的图像做这个效果会更好。
+上述的标签与最新的HTML标准尽管都兼容，但对内容却没有任何好标签应有的意义。They could be more useful but they aren't particularly harmful, and might easily be mistaken for innocent butter-wouldn't-melt-in-their-mouth nuggets of pure goodness when standing next to the following filthy tags.
+
+◆ u可以为元素产生下划线。它提醒着下划线文本还很多连接关联。这就是这个标签死了很久的原因——你不必给非连接文本下划线。
+◆ center可以用来居中在元素内部的元素。CSS属性text-align允许不仅仅是center，还有left、right和justify。
+◆ menu用来创建菜单列表。它并没有ul做的完美，在因为无序列表更通用，ul高高地站在menu的尸体上。
+◆ layer和div元素相似，都由CSS绝顶位置。这仅仅能在老版本的Netscape中工作，所以再也没有什么用。
+◆ blink或者marquee。大声说不！它们应该像本身意义一样被期待，但有着十分有限的支持，和，只会产生非常，非常恶心的笑话。
+◆ font，可以用来定义元素的字体名称，尺寸和颜色，在标签世界中理所当然地获得了臭名昭著标签之王荣誉称号。旧的网站（甚至新的也有）像满世界的瘟疫之蚁一样布满整个页面。大部分的font标签激增是从网页制作软件带来的，把font标签包括颜色和尺寸用在每一个元素。font标签被滥用到出现在当前的每一个重复元素的（如，每次你使用p元素），而CSS，则可以用一条简短的代码来应用重复元素，甚至控制整个网站。使用CSS方法，不仅可以使页面比被大量font标签寄生的更苗条，而且更容易维护因为你所需要做得只是改变CSS文件中的一行，而不是逐一修改每一个font标签。这也增加了维护一个一直保持设计风格一致的网站的可能性。font标签和不恰当的表格使用是两个产生网页不必要臃肿的主要原因。
+*/
+
+        var utils = ({
+            each: function (obj, iterator, context) {
+                if (obj == null) return;
+                if (obj.length === +obj.length) {
+                    for (var i = 0, l = obj.length; i < l; i++) {
+                        if (iterator.call(context, obj[i], i, obj) === false) return false;
+                    }
+                } else {
+                    for (var key in obj) {
+                        if (obj.hasOwnProperty(key)) {
+                            if (iterator.call(context, obj[key], key, obj) === false)
+                                return false;
+                        }
+                    }
+                }
+            },
+            bind: function (fn, context) {
+                return function () {
+                    return fn.apply(context, arguments);
+                };
+            },
+            indexOf: function (array, item, start) {
+                var index = -1;
+                start = this.isNumber(start) ? start : 0;
+                this.each(array, function (v, i) {
+                    if (i >= start && v === item) {
+                        index = i;
+                        return false;
+                    }
+                });
+                return index;
+            },
+            trim: function (str) {
+                return str.replace(/(^[ \t\n\r]+)|([ \t\n\r]+$)/g, "");
+            },
+            listToMap: function (list) {
+                if (!list) return {};
+                list = utils.isArray(list) ? list : list.split(",");
+                for (var i = 0, ci, obj = {};
+                    (ci = list[i++]);) {
+                    obj[ci.toUpperCase()] = obj[ci] = 1;
+                }
+                return obj;
+            },
+            cssStyleToDomStyle: (function () {
+                var test = document.createElement("div").style,
+                    cache = {
+                        float: test.cssFloat != undefined ?
+                            "cssFloat" :
+                            test.styleFloat != undefined ? "styleFloat" : "float"
+                    };
+
+                return function (cssName) {
+                    return (
+                        cache[cssName] ||
+                        (cache[cssName] = cssName.toLowerCase().replace(/-./g, function (
+                        match) {
+                            return match.charAt(1).toUpperCase();
+                        }))
+                    );
+                };
+            })(),
+
+            fixColor: function (name, value) {
+                if (/color/i.test(name) && /rgba?/.test(value)) {
+                    var array = value.split(",");
+                    if (array.length > 3) return "";
+                    value = "#";
+                    for (var i = 0, color;
+                        (color = array[i++]);) {
+                        color = parseInt(color.replace(/[^\d]/gi, ""), 10).toString(16);
+                        value += color.length == 1 ? "0" + color : color;
+                    }
+                    value = value.toUpperCase();
+                }
+                return value;
+            },
+            transUnitToPx: function (val) {
+                if (!/(pt|cm)/.test(val)) {
+                    return val;
+                }
+                var unit;
+                val.replace(/([\d.]+)(\w+)/, function (str, v, u) {
+                    val = v;
+                    unit = u;
+                });
+                switch (unit) {
+                    case "cm":val = parseFloat(val) * 25;break;
+                    case "pt":val = Math.round(parseFloat(val) * 96 / 72);
+                }
+                return val + (val ? "px" : "");
+            },
+        });
+
+
+        utils.each(
+            ["String", "Function", "Array", "Number", "RegExp", "Object", "Date"],
+            function (v) {
+                utils["is" + v] = function (obj) {
+                    return Object.prototype.toString.apply(obj) == "[object " + v + "]";
+                };
+            }
+        );
+
+
+        var dtd = ((function () {
+            function _(s) {
+                for (var k in s) {
+                    s[k.toUpperCase()] = s[k];
+                }
+                return s;
+            }
+            var X = function (t) {
+                var a = arguments;
+                for (var i = 1; i < a.length; i++) {
+                    var x = a[i];
+                    for (var k in x) {
+                        if (!t.hasOwnProperty(k)) {
+                            t[k] = x[k];
+                        }
+                    }
+                }
+                return t;
+            };
+            var A = _({isindex: 1,fieldset: 1}),
+                B = _({input: 1,button: 1,select: 1,textarea: 1,label: 1}),
+                C = X(_({a: 1}), B),
+                D = X({iframe: 1}, C),
+                E = _({hr: 1,ul: 1,menu: 1,div: 1,blockquote: 1,noscript: 1,table: 1,center: 1,address: 1,dir: 1,pre: 1,h5: 1,dl: 1,h4: 1,noframes: 1,h6: 1,ol: 1,h1: 1,h3: 1,h2: 1}),
+                F = _({ins: 1,del: 1,script: 1,style: 1}),
+                G = X(_({mark: 1,b: 1,acronym: 1,bdo: 1,var: 1,"#": 1,abbr: 1,code: 1,br: 1,i: 1,cite: 1,kbd: 1,u: 1,strike: 1,s: 1,tt: 1,strong: 1,q: 1,samp: 1,em: 1,dfn: 1,span: 1}),F),
+                H = X(_({sub: 1,img: 1,embed: 1,object: 1,sup: 1,basefont: 1,map: 1,applet: 1,font: 1,big: 1,small: 1}),G),
+                I = X(_({p: 1}), H),
+                J = X(_({iframe: 1}), H, B),
+                K = _({img: 1,embed: 1,noscript: 1,br: 1,kbd: 1,center: 1,button: 1,
+                    basefont: 1, h6: 1,h5: 1,h4: 1, h3: 1,h2: 1, h1: 1,hr: 1,
+                    samp: 1,
+                    ul: 1, ol: 1,
+                    form: 1,
+                    font: 1,
+                    "#": 1,
+                    select: 1,
+                    menu: 1,
+                    ins: 1,
+                    abbr: 1,
+                    label: 1,
+                    code: 1,
+                    table: 1,
+                    script: 1,
+                    cite: 1,
+                    input: 1,
+                    iframe: 1,
+                    strong: 1,
+                    textarea: 1,
+                    noframes: 1,
+                    big: 1,
+                    small: 1,
+                    span: 1,
+                    sub: 1,
+                    bdo: 1,
+                    var: 1,
+                    div: 1,
+                    object: 1,
+                    sup: 1,
+                    strike: 1,
+                    dir: 1,
+                    map: 1,
+                    dl: 1,
+                    applet: 1,
+                    del: 1,
+                    isindex: 1,
+                    fieldset: 1,
+                    b: 1,
+                    acronym: 1,
+                    a: 1,
+                    blockquote: 1,
+                    i: 1,
+                    u: 1,
+                    s: 1,
+                    tt: 1,
+                    address: 1,
+                    q: 1,
+                    pre: 1,
+                    p: 1,
+                    em: 1,
+                    dfn: 1
+                }),
+                L = X(_({a: 0}), J), //a不能被切开，所以把他
+                M = _({tr: 1}),
+                N = _({"#": 1}),
+                O = X(_({param: 1}), K),
+                P = X(_({form: 1}), A, D, E, I),
+                Q = _({li: 1,ol: 1,ul: 1}),
+                R = _({style: 1,script: 1}),
+                S = _({base: 1,link: 1,meta: 1,title: 1}),
+                T = X(S, R),
+                U = _({head: 1,body: 1}),
+                V = _({html: 1});
+
+            var block = _({
+                    address: 1,
+                    blockquote: 1,
+                    center: 1,
+                    dir: 1,
+                    div: 1,
+                    dl: 1,
+                    fieldset: 1,
+                    form: 1,
+                    h1: 1,
+                    h2: 1,
+                    h3: 1,
+                    h4: 1,
+                    h5: 1,
+                    h6: 1,
+                    hr: 1,
+                    isindex: 1,
+                    menu: 1,
+                    noframes: 1,
+                    ol: 1,
+                    p: 1,
+                    pre: 1,
+                    table: 1,
+                    ul: 1
+                }),
+                empty = _({area: 1,base: 1,basefont: 1,br: 1,col: 1,command: 1,dialog: 1,embed: 1,hr: 1,img: 1,input: 1,isindex: 1,keygen: 1,link: 1,meta: 1,param: 1,source: 1,track: 1,wbr: 1});
+
+            return _({
+                // $ 表示自定的属性
+
+                // body外的元素列表.
+                $nonBodyContent: X(V, U, S),
+
+                //块结构元素列表
+                $block: block,
+
+                //内联元素列表
+                $inline: L,
+                $inlineWithA: X(_({a: 1}), L),
+                $body: X(_({
+                    script: 1,
+                    style: 1
+                }), block),
+
+                $cdata: _({script: 1,style: 1}),
+
+                //自闭和元素
+                $empty: empty,
+
+                //不是自闭合，但不能让range选中里边
+                $nonChild: _({
+                    iframe: 1,
+                    textarea: 1
+                }),
+                //列表元素列表
+                $listItem: _({dd: 1,dt: 1,li: 1}),
+
+                //列表根元素列表
+                $list: _({ul: 1,ol: 1,dl: 1}),
+
+                //不能认为是空的元素
+                $isNotEmpty: _({
+                    table: 1,
+                    ul: 1,
+                    ol: 1,
+                    dl: 1,
+                    iframe: 1,
+                    area: 1,
+                    base: 1,
+                    col: 1,
+                    hr: 1,
+                    img: 1,
+                    embed: 1,
+                    input: 1,
+                    textarea: 1,
+                    link: 1,
+                    meta: 1,
+                    param: 1,
+                    h1: 1,
+                    h2: 1,
+                    h3: 1,
+                    h4: 1,
+                    h5: 1,
+                    h6: 1
+                }),
+
+                //如果没有子节点就可以删除的元素列表，像span,a
+                $removeEmpty: _({
+                    a: 1,
+                    abbr: 1,
+                    acronym: 1,
+                    address: 1,
+                    b: 1,
+                    bdo: 1,
+                    big: 1,
+                    cite: 1,
+                    code: 1,
+                    del: 1,
+                    dfn: 1,
+                    em: 1,
+                    font: 1,
+                    i: 1,
+                    ins: 1,
+                    label: 1,
+                    kbd: 1,
+                    q: 1,
+                    s: 1,
+                    samp: 1,
+                    small: 1,
+                    span: 1,
+                    strike: 1,
+                    strong: 1,
+                    sub: 1,
+                    sup: 1,
+                    tt: 1,
+                    u: 1,
+                    var: 1
+                }),
+
+                $removeEmptyBlock: _({p: 1,div: 1}),
+
+                //在table元素里的元素列表
+                $tableContent: _({caption: 1,col: 1,colgroup: 1,tbody: 1,td: 1,tfoot: 1,th: 1,thead: 1,tr: 1,table: 1}),
+                //不转换的标签
+                $notTransContent: _({pre: 1,script: 1,style: 1,textarea: 1}),
+                html: U,
+                head: T,
+                style: N,
+                script: N,
+                body: P,
+                base: {},
+                link: {},
+                meta: {},
+                title: N,
+                col: {},
+                tr: _({
+                    td: 1,
+                    th: 1
+                }),
+                img: {},
+                embed: {},
+                colgroup: _({thead: 1,col: 1,tbody: 1,tr: 1,tfoot: 1}),
+                noscript: P,
+                td: P,
+                br: {},
+                th: P,
+                center: P,
+                kbd: L,
+                button: X(I, E),
+                basefont: {},
+                h5: L,
+                h4: L,
+                samp: L,
+                h6: L,
+                ol: Q,
+                h1: L,
+                h3: L,
+                option: N,
+                h2: L,
+                form: X(A, D, E, I),
+                select: _({optgroup: 1,option: 1}),
+                font: L,
+                ins: L,
+                menu: Q,
+                abbr: L,
+                label: L,
+                table: _({thead: 1,col: 1,tbody: 1,tr: 1,colgroup: 1,caption: 1,tfoot: 1}),
+                code: L,
+                tfoot: M,
+                cite: L,
+                li: P,
+                input: {},
+                iframe: P,
+                strong: L,
+                textarea: N,
+                noframes: P,
+                big: L,
+                small: L,
+                //trace:
+                span: _({"#": 1,br: 1,b: 1,strong: 1,u: 1,i: 1,em: 1,sub: 1,sup: 1,strike: 1,span: 1}),
+                hr: L,
+                dt: L,
+                sub: L,
+                optgroup: _({option: 1}),
+                param: {},
+                bdo: L,
+                var: L,
+                div: P,
+                object: O,
+                sup: L,
+                dd: P,
+                strike: L,
+                area: {},
+                dir: Q,
+                map: X(_({area: 1,form: 1,p: 1}), A, F, E),
+                applet: O,
+                dl: _({dt: 1,dd: 1}),
+                del: L,
+                isindex: {},
+                fieldset: X(_({legend: 1}), K),
+                thead: M,
+                ul: Q,
+                acronym: L,
+                b: L,
+                a: X(_({a: 1}), J),
+                blockquote: X(_({td: 1,tr: 1,tbody: 1,li: 1}), P),
+                caption: L,
+                i: L,
+                u: L,
+                tbody: M,
+                s: L,
+                address: X(D, I),
+                tt: L,
+                legend: L,
+                q: L,
+                pre: X(G, C),
+                p: X(_({a: 1}), L),
+                em: L,
+                dfn: L,
+                mark: L
+            });
+        })());
+
+
+
+
+        function getDomNode(node, start, ltr, startFromChild, fn, guard) {
+            var tmpNode = startFromChild && node[start],
+                parent;
+            !tmpNode && (tmpNode = node[ltr]);
+            while (!tmpNode && (parent = (parent || node).parentNode)) {
+                if (parent.tagName == "BODY" || (guard && !guard(parent))) {
+                    return null;
+                }
+                tmpNode = parent[ltr];
+            }
+            if (tmpNode && fn && !fn(tmpNode)) {
+                return getDomNode(tmpNode, start, ltr, false, fn);
+            }
+            return tmpNode;
+        }
+        var attrFix = {
+                tabindex: "tabIndex",
+                readonly: "readOnly"
+            },
+            styleBlock = utils.listToMap([
+                "-webkit-box",
+                "-moz-box",
+                "block",
+                "list-item",
+                "table",
+                "table-row-group",
+                "table-header-group",
+                "table-footer-group",
+                "table-row",
+                "table-column-group",
+                "table-column",
+                "table-cell",
+                "table-caption"
+            ]);
+        var domUtils = ({
+            //位置关系
+            POSITION_PRECEDING: 4,
+            //ie6使用其他的会有一段空白出现
+            fillChar: "\u200B",
+            //-------------------------Node部分--------------------------------
+            /**
+             * 获取节点A相对于节点B的位置关系
+             * @method getPosition
+             * @param { Node } nodeA 需要查询位置关系的节点A
+             * @param { Node } nodeB 需要查询位置关系的节点B
+             * @return { Number } 节点A与节点B的关系
+             * @example
+             * ```javascript
+             * //output: 20
+             * var position = domUtils.getPosition( document.documentElement, document.body );
+             *
+             * switch ( position ) {
+             *      case 0:console.log('元素相同'); break;
+             *      case 1:console.log('两个节点在不同的文档中'); break;
+             *      case 2:console.log('节点A在节点B之后');break;
+             *      case 4;console.log('节点A在节点B之前');break;
+             *      case 8:console.log('节点A被节点B包含'); break;
+             *      case 10: console.log('节点A被节点B包含且节点A在节点B之后');break;
+             *      case 16: console.log('节点A包含节点B'); break;
+             *      case 20: console.log('节点A包含节点B且节点A在节点B之前');break;
+             * }
+             * ```
+             */
+            getPosition: function (nodeA, nodeB) {
+                // 如果两个节点是同一个节点
+                if (nodeA === nodeB) {
+                    return 0;
+                }
+                var node,
+                    parentsA = [nodeA],
+                    parentsB = [nodeB];
+                node = nodeA;
+                while ((node = node.parentNode)) {
+                    // 如果nodeB是nodeA的祖先节点
+                    if (node === nodeB) {
+                        return 10;
+                    }
+                    parentsA.push(node);
+                }
+                node = nodeB;
+                while ((node = node.parentNode)) {
+                    // 如果nodeA是nodeB的祖先节点
+                    if (node === nodeA) {
+                        return 20;
+                    }
+                    parentsB.push(node);
+                }
+                parentsA.reverse();
+                parentsB.reverse();
+                if (parentsA[0] !== parentsB[0]) {
+                    return 1;
+                }
+                var i = -1;
+                while ((i++, parentsA[i] === parentsB[i])) {}
+                nodeA = parentsA[i];
+                nodeB = parentsB[i];
+                while ((nodeA = nodeA.nextSibling)) {
+                    if (nodeA === nodeB) {
+                        return 4;
+                    }
+                }
+                return 2;
+            },
+
+            getNodeIndex: function (node, ignoreTextNode) {
+                var preNode = node,
+                    i = 0;
+                while ((preNode = preNode.previousSibling)) {
+                    if (ignoreTextNode && preNode.nodeType == 3) {
+                        if (preNode.nodeType != preNode.nextSibling.nodeType) {
+                            i++;
+                        }
+                        continue;
+                    }
+                    i++;
+                }
+                return i;
+            },
+
+            inDoc: function (node, doc) {
+                return domUtils.getPosition(node, doc) == 10;
+            },
+
+            findParent: function (node, filterFn, includeSelf) {
+                if (node && !domUtils.isBody(node)) {
+                    node = includeSelf ? node : node.parentNode;
+                    while (node) {
+                        if (!filterFn || filterFn(node) || domUtils.isBody(node)) {
+                            return filterFn && !filterFn(node) && domUtils.isBody(node) ?
+                                null :
+                                node;
+                        }
+                        node = node.parentNode;
+                    }
+                }
+                return null;
+            },
+            findParentByTagName: function (node, tagNames, includeSelf, excludeFn) {
+                tagNames = utils.listToMap(utils.isArray(tagNames) ? tagNames : [tagNames]);
+                return domUtils.findParent(
+                    node,
+                    function (node) {
+                        return tagNames[node.tagName] && !(excludeFn && excludeFn(node));
+                    },
+                    includeSelf
+                );
+            },
+
+            findParents: function (node, includeSelf, filterFn, closerFirst) {
+                var parents = includeSelf && ((filterFn && filterFn(node)) || !filterFn) ?
+                    [node] :
+                    [];
+                while ((node = domUtils.findParent(node, filterFn))) {
+                    parents.push(node);
+                }
+                return closerFirst ? parents : parents.reverse();
+            },
+
+
+            insertAfter: function (node, newNode) {
+                return node.nextSibling ?
+                    node.parentNode.insertBefore(newNode, node.nextSibling) :
+                    node.parentNode.appendChild(newNode);
+            },
+
+
+            remove: function (node, keepChildren) {
+                var parent = node.parentNode,
+                    child;
+                if (parent) {
+                    if (keepChildren && node.hasChildNodes()) {
+                        while ((child = node.firstChild)) {
+                            parent.insertBefore(child, node);
+                        }
+                    }
+                    parent.removeChild(node);
+                }
+                return node;
+            },
+
+            getNextDomNode: function (node, startFromChild, filterFn, guard) {
+                return getDomNode(
+                    node,
+                    "firstChild",
+                    "nextSibling",
+                    startFromChild,
+                    filterFn,
+                    guard
+                );
+            },
+
+            isBookmarkNode: function (node) {
+                return node.nodeType == 1 && node.id && /^_baidu_bookmark_/i.test(node.id);
+            },
+
+            clearEmptySibling: function (node, ignoreNext, ignorePre) {
+                function clear(next, dir) {
+                    var tmpNode;
+                    while (
+                        next &&
+                        !domUtils.isBookmarkNode(next) &&
+                        (domUtils.isEmptyInlineElement(next) ||
+                            //这里不能把空格算进来会吧空格干掉，出现文字间的空格丢掉了
+                            !new RegExp("[^\t\n\r" + domUtils.fillChar + "]").test(
+                                next.nodeValue
+                            ))
+                    ) {
+                        tmpNode = next[dir];
+                        domUtils.remove(next);
+                        next = tmpNode;
+                    }
+                }!ignoreNext && clear(node.nextSibling, "nextSibling");
+                !ignorePre && clear(node.previousSibling, "previousSibling");
+            },
+
+            split: function (node, offset) {
+                var doc = node.ownerDocument;
+                if (browser.ie && offset == node.nodeValue.length) {
+                    var next = doc.createTextNode("");
+                    return domUtils.insertAfter(node, next);
+                }
+                var retval = node.splitText(offset);
+                return retval;
+            },
+
+
+            isWhitespace: function (node) {
+                return !new RegExp("[^ \t\n\r" + domUtils.fillChar + "]").test(
+                    node.nodeValue
+                );
+            },
+
+            isSameElement: function (nodeA, nodeB) {
+                if (nodeA.tagName != nodeB.tagName) {
+                    return false;
+                }
+                var thisAttrs = nodeA.attributes,
+                    otherAttrs = nodeB.attributes;
+                if (!browser.ie && thisAttrs.length != otherAttrs.length) {
+                    return false;
+                }
+                var attrA,
+                    attrB,
+                    al = 0,
+                    bl = 0;
+                for (var i = 0;
+                    (attrA = thisAttrs[i++]);) {
+                    if (attrA.nodeName == "style") {
+                        if (attrA.specified) {
+                            al++;
+                        }
+                        if (domUtils.isSameStyle(nodeA, nodeB)) {
+                            continue;
+                        } else {
+                            return false;
+                        }
+                    }
+                    if (browser.ie) {
+                        if (attrA.specified) {
+                            al++;
+                            attrB = otherAttrs.getNamedItem(attrA.nodeName);
+                        } else {
+                            continue;
+                        }
+                    } else {
+                        attrB = nodeB.attributes[attrA.nodeName];
+                    }
+                    if (!attrB.specified || attrA.nodeValue != attrB.nodeValue) {
+                        return false;
+                    }
+                }
+                // 有可能attrB的属性包含了attrA的属性之外还有自己的属性
+                if (browser.ie) {
+                    for (i = 0;
+                        (attrB = otherAttrs[i++]);) {
+                        if (attrB.specified) {
+                            bl++;
+                        }
+                    }
+                    if (al != bl) {
+                        return false;
+                    }
+                }
+                return true;
+            },
+
+
+            isSameStyle: function (nodeA, nodeB) {
+                var styleA = nodeA.style.cssText
+                    .replace(/( ?; ?)/g, ";")
+                    .replace(/( ?: ?)/g, ":"),
+                    styleB = nodeB.style.cssText
+                    .replace(/( ?; ?)/g, ";")
+                    .replace(/( ?: ?)/g, ":");
+                if (browser.opera) {
+                    styleA = nodeA.style;
+                    styleB = nodeB.style;
+                    if (styleA.length != styleB.length) return false;
+                    for (var p in styleA) {
+                        if (/^(\d+|csstext)$/i.test(p)) {
+                            continue;
+                        }
+                        if (styleA[p] != styleB[p]) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                if (!styleA || !styleB) {
+                    return styleA == styleB;
+                }
+                styleA = styleA.split(";");
+                styleB = styleB.split(";");
+                if (styleA.length != styleB.length) {
+                    return false;
+                }
+                for (var i = 0, ci;(ci = styleA[i++]);) {
+                    if (utils.indexOf(styleB, ci) == -1) {
+                        return false;
+                    }
+                }
+                return true;
+            },
+
+            isBlockElm: function (node) {
+                return (
+                    node.nodeType == 1 && (dtd.$block[node.tagName] || styleBlock[domUtils.getComputedStyle(node, "display")]) &&
+                    !dtd.$nonChild[node.tagName]
+                );
+            },
+
+            isBody: function (node) {
+                return node && node.nodeType == 1 && node.tagName.toLowerCase() == "body";
+            },
+
+            isEmptyInlineElement: function (node) {
+                if (node.nodeType != 1 || !dtd.$removeEmpty[node.tagName]) {
+                    return 0;
+                }
+                node = node.firstChild;
+                while (node) {
+                    //如果是创建的bookmark就跳过
+                    if (domUtils.isBookmarkNode(node)) {
+                        return 0;
+                    }
+                    if (
+                        (node.nodeType == 1 && !domUtils.isEmptyInlineElement(node)) ||
+                        (node.nodeType == 3 && !domUtils.isWhitespace(node))
+                    ) {
+                        return 0;
+                    }
+                    node = node.nextSibling;
+                }
+                return 1;
+            },
+
+
+            trimWhiteTextNode: function (node) {
+                function remove(dir) {
+                    var child;
+                    while (
+                        (child = node[dir]) &&
+                        child.nodeType == 3 &&
+                        domUtils.isWhitespace(child)
+                    ) {
+                        node.removeChild(child);
+                    }
+                }
+                remove("firstChild");
+                remove("lastChild");
+            },
+
+
+            mergeChild: function (node, tagName, attrs) {
+                var list = domUtils.getElementsByTagName(node, node.tagName.toLowerCase());
+                for (var i = 0, ci;
+                    (ci = list[i++]);) {
+                    if (!ci.parentNode || domUtils.isBookmarkNode(ci)) {
+                        continue;
+                    }
+                    //span单独处理
+                    if (ci.tagName.toLowerCase() == "span") {
+                        if (node === ci.parentNode) {
+                            domUtils.trimWhiteTextNode(node);
+                            if (node.childNodes.length == 1) {
+                                node.style.cssText = ci.style.cssText + ";" + node.style.cssText;
+                                domUtils.remove(ci, true);
+                                continue;
+                            }
+                        }
+                        ci.style.cssText = node.style.cssText + ";" + ci.style.cssText;
+                        if (attrs) {
+                            var style = attrs.style;
+                            if (style) {
+                                style = style.split(";");
+                                for (var j = 0, s;
+                                    (s = style[j++]);) {
+                                    ci.style[utils.cssStyleToDomStyle(s.split(":")[0])] = s.split(
+                                        ":"
+                                    )[1];
+                                }
+                            }
+                        }
+                        if (domUtils.isSameStyle(ci, node)) {
+                            domUtils.remove(ci, true);
+                        }
+                        continue;
+                    }
+                    if (domUtils.isSameElement(node, ci)) {
+                        domUtils.remove(ci, true);
+                    }
+                }
+            },
+
+            getElementsByTagName: function (node, name, filter) {
+                if (filter && utils.isString(filter)) {
+                    var className = filter;
+                    filter = function (node) {
+                        return domUtils.hasClass(node, className);
+                    };
+                }
+                name = utils.trim(name).replace(/[ ]{2,}/g, " ").split(" ");
+                var arr = [];
+                for (var n = 0, ni;
+                    (ni = name[n++]);) {
+                    var list = node.getElementsByTagName(ni);
+                    for (var i = 0, ci;
+                        (ci = list[i++]);) {
+                        if (!filter || filter(ci)) arr.push(ci);
+                    }
+                }
+
+                return arr;
+            },
+            mergeToParent: function (node) {
+                var parent = node.parentNode;
+                while (parent && dtd.$removeEmpty[parent.tagName]) {
+                    if ((parent.tagName == node.tagName && parent.className == node.className) || parent
+                        .tagName == "A") {
+                        //针对a标签单独处理
+                        domUtils.trimWhiteTextNode(parent);
+                        //span需要特殊处理  不处理这样的情况 <span stlye="color:#fff">xxx<span style="color:#ccc">xxx</span>xxx</span>
+                        if (
+                            (parent.tagName == "SPAN" && !domUtils.isSameStyle(parent, node)) ||
+                            (parent.tagName == "A" && node.tagName == "SPAN")
+                        ) {
+                            if (parent.childNodes.length > 1 || parent !== node.parentNode) {
+                                node.style.cssText =
+                                    parent.style.cssText + ";" + node.style.cssText;
+                                parent = parent.parentNode;
+                                continue;
+                            } else {
+                                parent.style.cssText += ";" + node.style.cssText;
+                                //trace:952 a标签要保持下划线
+                                if (parent.tagName == "A") {
+                                    parent.style.textDecoration = "underline";
+                                }
+                            }
+                        }
+                        if (parent.tagName != "A") {
+                            parent === node.parentNode && domUtils.remove(node, true);
+                            break;
+                        }
+                    }
+                    parent = parent.parentNode;
+                }
+            },
+            mergeSibling: function (node, ignorePre, ignoreNext) {
+                function merge(rtl, start, node) {
+                    var next;
+                    if (
+                        (next = node[rtl]) &&
+                        !domUtils.isBookmarkNode(next) &&
+                        next.nodeType == 1 &&
+                        domUtils.isSameElement(node, next)
+                    ) {
+                        while (next.firstChild) {
+                            if (start == "firstChild") {
+                                node.insertBefore(next.lastChild, node.firstChild);
+                            } else {
+                                node.appendChild(next.firstChild);
+                            }
+                        }
+                        domUtils.remove(next);
+                    }
+                }!ignorePre && merge("previousSibling", "firstChild", node);
+                !ignoreNext && merge("nextSibling", "lastChild", node);
+            },
+
+            createElement: function (doc, tag, attrs) {
+                return domUtils.setAttributes(doc.createElement(tag), attrs);
+            },
+
+            setAttributes: function (node, attrs) {
+                for (var attr in attrs) {
+                    if (attrs.hasOwnProperty(attr)) {
+                        var value = attrs[attr];
+                        switch (attr) {
+                            case "class":
+                                //ie下要这样赋值，setAttribute不起作用
+                                node.className = value;
+                                break;
+                            case "style":
+                                node.style.cssText = node.style.cssText + ";" + value;
+                                break;
+                            case "innerHTML":
+                                node[attr] = value;
+                                break;
+                            case "value":
+                                node.value = value;
+                                break;
+                            default:
+                                node.setAttribute(attrFix[attr] || attr, value);
+                        }
+                    }
+                }
+                return node;
+            },
+
+            getComputedStyle: function (element, styleName) {
+                //一下的属性单独处理
+                var pros = "width height top left";
+
+                if (pros.indexOf(styleName) > -1) {
+                    return (
+                        element[
+                            "offset" +
+                            styleName.replace(/^\w/, function (s) {
+                                return s.toUpperCase();
+                            })
+                        ] + "px"
+                    );
+                }
+                //忽略文本节点
+                if (element.nodeType == 3) {
+                    element = element.parentNode;
+                }
+                try {
+                    var value =
+                        domUtils.getStyle(element, styleName) ||
+                        (window.getComputedStyle ?
+                            window.getComputedStyle(element, "").getPropertyValue(styleName) :
+                            (element.currentStyle || element.style)[utils.cssStyleToDomStyle(styleName)]);
+                } catch (e) {
+                    return "";
+                }
+                return utils.transUnitToPx(utils.fixColor(styleName, value));
+            },
+
+            hasClass: function (element, className) {
+                if (utils.isRegExp(className)) {
+                    return className.test(element.className);
+                }
+                className = utils.trim(className).replace(/[ ]{2,}/g, " ").split(" ");
+                for (var i = 0, ci, cls = element.className;
+                    (ci = className[i++]);) {
+                    if (!new RegExp("\\b" + ci + "\\b", "i").test(cls)) {
+                        return false;
+                    }
+                }
+                return i - 1 == className.length;
+            },
+
+            isBr: function (node) {
+                return node.nodeType == 1 && node.tagName == "BR";
+            },
+
+            isFillChar: function (node, isInStart) {
+                if (node.nodeType != 3) return false;
+                var text = node.nodeValue;
+                if (isInStart) {
+                    return new RegExp("^" + domUtils.fillChar).test(text);
+                }
+                return !text.replace(new RegExp(domUtils.fillChar, "g"), "").length;
+            },
+        });
+
+
+
+        var fillCharReg = new RegExp(domUtils.fillChar, "g");
+
+        var guid = 0,
+            fillChar = domUtils.fillChar,
+            fillData;
+
+        /**
+         * 更新range的collapse状态
+         * @param  {Range}   range    range对象
+         */
+        function updateCollapse(range) {
+            range.collapsed =range.startContainer &&range.endContainer &&range.startContainer === range.endContainer && range.startOffset == range.endOffset;
+        }
+
+        function selectOneNode(rng) {
+            return (
+                !rng.collapsed &&
+                rng.startContainer.nodeType == 1 &&
+                rng.startContainer === rng.endContainer &&
+                rng.endOffset - rng.startOffset == 1
+            );
+        }
+
+        function setEndPoint(toStart, node, offset, range) {
+            //如果node是自闭合标签要处理
+            if (
+                node.nodeType == 1 &&
+                (dtd.$empty[node.tagName] || dtd.$nonChild[node.tagName])
+            ) {
+                offset = domUtils.getNodeIndex(node) + (toStart ? 0 : 1);
+                node = node.parentNode;
+            }
+            if (toStart) {
+                range.startContainer = node;
+                range.startOffset = offset;
+                if (!range.endContainer) {
+                    range.collapse(true);
+                }
+            } else {
+                range.endContainer = node;
+                range.endOffset = offset;
+                if (!range.startContainer) {
+                    range.collapse(false);
+                }
+            }
+            updateCollapse(range);
+            return range;
+        }
+
+        function execContentsAction(range, action) {
+            //调整边界
+            //range.includeBookmark();
+            var start = range.startContainer,
+                end = range.endContainer,
+                startOffset = range.startOffset,
+                endOffset = range.endOffset,
+                doc = document,
+                frag = doc.createDocumentFragment(),
+                tmpStart,
+                tmpEnd;
+            if (start.nodeType == 1) {
+                start =
+                    start.childNodes[startOffset] ||
+                    (tmpStart = start.appendChild(doc.createTextNode("")));
+            }
+            if (end.nodeType == 1) {
+                end =
+                    end.childNodes[endOffset] ||
+                    (tmpEnd = end.appendChild(doc.createTextNode("")));
+            }
+            if (start === end && start.nodeType == 3) {
+                frag.appendChild(
+                    doc.createTextNode(
+                        start.substringData(startOffset, endOffset - startOffset)
+                    )
+                );
+                //is not clone
+                if (action) {
+                    start.deleteData(startOffset, endOffset - startOffset);
+                    range.collapse(true);
+                }
+                return frag;
+            }
+            var current,
+                currentLevel,
+                clone = frag,
+                startParents = domUtils.findParents(start, true),
+                endParents = domUtils.findParents(end, true);
+            for (var i = 0; startParents[i] == endParents[i];) {
+                i++;
+            }
+            for (var j = i, si;
+                (si = startParents[j]); j++) {
+                current = si.nextSibling;
+                if (si == start) {
+                    if (!tmpStart) {
+                        if (range.startContainer.nodeType == 3) {
+                            clone.appendChild(
+                                doc.createTextNode(start.nodeValue.slice(startOffset))
+                            );
+                            //is not clone
+                            if (action) {
+                                start.deleteData(
+                                    startOffset,
+                                    start.nodeValue.length - startOffset
+                                );
+                            }
+                        } else {
+                            clone.appendChild(!action ? start.cloneNode(true) : start);
+                        }
+                    }
+                } else {
+                    currentLevel = si.cloneNode(false);
+                    clone.appendChild(currentLevel);
+                }
+                while (current) {
+                    if (current === end || current === endParents[j]) {
+                        break;
+                    }
+                    si = current.nextSibling;
+                    clone.appendChild(!action ? current.cloneNode(true) : current);
+                    current = si;
+                }
+                clone = currentLevel;
+            }
+            clone = frag;
+            if (!startParents[i]) {
+                clone.appendChild(startParents[i - 1].cloneNode(false));
+                clone = clone.firstChild;
+            }
+            for (var j = i, ei;
+                (ei = endParents[j]); j++) {
+                current = ei.previousSibling;
+                if (ei == end) {
+                    if (!tmpEnd && range.endContainer.nodeType == 3) {
+                        clone.appendChild(
+                            doc.createTextNode(end.substringData(0, endOffset))
+                        );
+                        //is not clone
+                        if (action) {
+                            end.deleteData(0, endOffset);
+                        }
+                    }
+                } else {
+                    currentLevel = ei.cloneNode(false);
+                    clone.appendChild(currentLevel);
+                }
+                //如果两端同级，右边第一次已经被开始做了
+                if (j != i || !startParents[i]) {
+                    while (current) {
+                        if (current === start) {
+                            break;
+                        }
+                        ei = current.previousSibling;
+                        clone.insertBefore(
+                            !action ? current.cloneNode(true) : current,
+                            clone.firstChild
+                        );
+                        current = ei;
+                    }
+                }
+                clone = currentLevel;
+            }
+            if (action) {
+                range
+                    .setStartBefore(
+                        !endParents[i] ?
+                        endParents[i - 1] :
+                        !startParents[i] ? startParents[i - 1] : endParents[i]
+                    )
+                    .collapse(true);
+            }
+            tmpStart && domUtils.remove(tmpStart);
+            tmpEnd && domUtils.remove(tmpEnd);
+            return frag;
+        }
+        var Range = (function (document) {
+            var me = window;
+            me.startContainer = me.startOffset = me.endContainer = me.endOffset = null;
+            me.collapsed = true;
+        });
+
+
+        function removeFillData(doc, excludeNode) {
+            try {
+                if (fillData && domUtils.inDoc(fillData, doc)) {
+                    if (!fillData.nodeValue.replace(fillCharReg, "").length) {
+                        var tmpNode = fillData.parentNode;
+                        domUtils.remove(fillData);
+                        while (
+                            tmpNode &&
+                            domUtils.isEmptyInlineElement(tmpNode) &&
+                            //safari的contains有bug
+                            (!tmpNode.contains(excludeNode))
+                        ) {
+                            fillData = tmpNode.parentNode;
+                            domUtils.remove(tmpNode);
+                            tmpNode = fillData;
+                        }
+                    } else {
+                        fillData.nodeValue = fillData.nodeValue.replace(fillCharReg, "");
+                    }
+                }
+            } catch (e) {}
+        }
+
+        /**
+         * @param node
+         * @param dir
+         */
+        function mergeSibling(node, dir) {
+            var tmpNode;
+            node = node[dir];
+            while (node && domUtils.isFillChar(node)) {
+                tmpNode = node[dir];
+                domUtils.remove(node);
+                node = tmpNode;
+            }
+        }
+
+        Range.prototype = {
+
+            extractContents: function () {
+                return this.collapsed ? null : execContentsAction(this, 2);
+            },
+            setStart: function (node, offset) {
+                return setEndPoint(true, node, offset, this);
+            },
+            setEnd: function (node, offset) {
+                return setEndPoint(false, node, offset, this);
+            },
+            setStartAfter: function (node) {
+                return this.setStart(node.parentNode, domUtils.getNodeIndex(node) + 1);
+            },
+            setStartBefore: function (node) {
+                return this.setStart(node.parentNode, domUtils.getNodeIndex(node));
+            },
+            setEndAfter: function (node) {
+                return this.setEnd(node.parentNode, domUtils.getNodeIndex(node) + 1);
+            },
+            setEndBefore: function (node) {
+                return this.setEnd(node.parentNode, domUtils.getNodeIndex(node));
+            },
+            cloneRange: function () {
+                var me = this;
+                return new Range(me.document)
+                    .setStart(me.startContainer, me.startOffset)
+                    .setEnd(me.endContainer, me.endOffset);
+            },
+            collapse: function (toStart) {
+                var me = this;
+                if (toStart) {
+                    me.endContainer = me.startContainer;
+                    me.endOffset = me.startOffset;
+                } else {
+                    me.startContainer = me.endContainer;
+                    me.startOffset = me.endOffset;
+                }
+                me.collapsed = true;
+                return me;
+            },
+            shrinkBoundary: function (ignoreEnd) {
+                var me = this,
+                    child,
+                    collapsed = me.collapsed;
+
+                function check(node) {
+                    return (
+                        node.nodeType == 1 &&
+                        !domUtils.isBookmarkNode(node) &&
+                        !dtd.$empty[node.tagName] &&
+                        !dtd.$nonChild[node.tagName]
+                    );
+                }
+                while (me.startContainer.nodeType == 1 && (child = me.startContainer.childNodes[me.startOffset]) &&  check(child)) {
+                    me.setStart(child, 0);
+                }
+                if (collapsed) {
+                    return me.collapse(true);
+                }
+                if (!ignoreEnd) {
+                    while (
+                        me.endContainer.nodeType == 1 && //是element
+                        me.endOffset > 0 && //如果是空元素就退出 endOffset=0那么endOffst-1为负值，childNodes[endOffset]报错
+                        (child = me.endContainer.childNodes[me.endOffset - 1]) && //子节点也是element
+                        check(child)
+                    ) {
+                        me.setEnd(child, child.childNodes.length);
+                    }
+                }
+                return me;
+            },
+
+            trimBoundary: function (ignoreEnd) {
+                this.txtToElmBoundary();
+                var start = this.startContainer,
+                    offset = this.startOffset,
+                    collapsed = this.collapsed,
+                    end = this.endContainer;
+                if (start.nodeType == 3) {
+                    if (offset == 0) {
+                        this.setStartBefore(start);
+                    } else {
+                        if (offset >= start.nodeValue.length) {
+                            this.setStartAfter(start);
+                        } else {
+                            var textNode = domUtils.split(start, offset);
+                            //跟新结束边界
+                            if (start === end) {
+                                this.setEnd(textNode, this.endOffset - offset);
+                            } else if (start.parentNode === end) {
+                                this.endOffset += 1;
+                            }
+                            this.setStartBefore(textNode);
+                        }
+                    }
+                    if (collapsed) {
+                        return this.collapse(true);
+                    }
+                }
+                if (!ignoreEnd) {
+                    offset = this.endOffset;
+                    end = this.endContainer;
+                    if (end.nodeType == 3) {
+                        if (offset == 0) {
+                            this.setEndBefore(end);
+                        } else {
+                            offset < end.nodeValue.length && domUtils.split(end, offset);
+                            this.setEndAfter(end);
+                        }
+                    }
+                }
+                return this;
+            },
+
+            txtToElmBoundary: function (ignoreCollapsed) {
+                function adjust(r, c) {
+                    var container = r[c + "Container"],
+                        offset = r[c + "Offset"];
+                    if (container.nodeType == 3) {
+                        if (!offset) {
+                            r[
+                                "set" +
+                                c.replace(/(\w)/, function (a) {
+                                    return a.toUpperCase();
+                                }) +
+                                "Before"
+                            ](container);
+                        } else if (offset >= container.nodeValue.length) {
+                            r[
+                                "set" +
+                                c.replace(/(\w)/, function (a) {
+                                    return a.toUpperCase();
+                                }) +
+                                "After"
+                            ](container);
+                        }
+                    }
+                }
+
+                if (ignoreCollapsed || !this.collapsed) {
+                    adjust(this, "start");
+                    adjust(this, "end");
+                }
+                return this;
+            },
+
+            insertNode: function (node) {
+                var first = node,
+                    length = 1;
+                if (node.nodeType == 11) {
+                    first = node.firstChild;
+                    length = node.childNodes.length;
+                }
+                this.trimBoundary(true);
+                var start = this.startContainer,
+                    offset = this.startOffset;
+                var nextNode = start.childNodes[offset];
+                if (nextNode) {
+                    start.insertBefore(node, nextNode);
+                } else {
+                    start.appendChild(node);
+                }
+                if (first.parentNode === this.endContainer) {
+                    this.endOffset = this.endOffset + length;
+                }
+                return this.setStartBefore(first);
+            },
+
+            createBookmark: function (serialize, same) {
+                var endNode,
+                    startNode = document.createElement("span");
+                startNode.style.cssText = "display:none;line-height:0px;";
+                startNode.appendChild(document.createTextNode("\u200D"));
+                startNode.id = "_baidu_bookmark_start_" + (same ? "" : guid++);
+
+                if (!this.collapsed) {
+                    endNode = startNode.cloneNode(true);
+                    endNode.id = "_baidu_bookmark_end_" + (same ? "" : guid++);
+                }
+                this.insertNode(startNode);
+                if (endNode) {
+                    this.collapse().insertNode(endNode).setEndBefore(endNode);
+                }
+                this.setStartAfter(startNode);
+                return {
+                    start: serialize ? startNode.id : startNode,
+                    end: endNode ? (serialize ? endNode.id : endNode) : null,
+                    id: serialize
+                };
+            },
+
+            moveToBookmark: function (bookmark) {
+                var start = bookmark.id ?
+                    document.getElementById(bookmark.start) :
+                    bookmark.start,
+                    end = bookmark.end && bookmark.id ?
+                    document.getElementById(bookmark.end) :
+                    bookmark.end;
+                this.setStartBefore(start);
+                domUtils.remove(start);
+                if (end) {
+                    this.setEndBefore(end);
+                    domUtils.remove(end);
+                } else {
+                    this.collapse(true);
+                }
+                return this;
+            },
+            enlarge: function (toBlock, stopFn) {
+                var isBody = domUtils.isBody,
+                    pre,
+                    node,
+                    tmp = document.createTextNode("");
+                if (toBlock) {
+                    node = this.startContainer;
+                    if (node.nodeType == 1) {
+                        if (node.childNodes[this.startOffset]) {
+                            pre = node = node.childNodes[this.startOffset];
+                        } else {
+                            node.appendChild(tmp);
+                            pre = node = tmp;
+                        }
+                    } else {
+                        pre = node;
+                    }
+                    while (1) {
+                        if (domUtils.isBlockElm(node)) {
+                            node = pre;
+                            while ((pre = node.previousSibling) && !domUtils.isBlockElm(pre)) {
+                                node = pre;
+                            }
+                            this.setStartBefore(node);
+                            break;
+                        }
+                        pre = node;
+                        node = node.parentNode;
+                    }
+                    node = this.endContainer;
+                    if (node.nodeType == 1) {
+                        if ((pre = node.childNodes[this.endOffset])) {
+                            node.insertBefore(tmp, pre);
+                        } else {
+                            node.appendChild(tmp);
+                        }
+                        pre = node = tmp;
+                    } else {
+                        pre = node;
+                    }
+                    while (1) {
+                        if (domUtils.isBlockElm(node)) {
+                            node = pre;
+                            while ((pre = node.nextSibling) && !domUtils.isBlockElm(pre)) {
+                                node = pre;
+                            }
+                            this.setEndAfter(node);
+                            break;
+                        }
+                        pre = node;
+                        node = node.parentNode;
+                    }
+                    if (tmp.parentNode === this.endContainer) {
+                        this.endOffset--;
+                    }
+                    domUtils.remove(tmp);
+                }
+
+                // 扩展边界到最大
+                if (!this.collapsed) {
+                    while (this.startOffset == 0) {
+                        if (stopFn && stopFn(this.startContainer)) {
+                            break;
+                        }
+                        if (isBody(this.startContainer)) {
+                            break;
+                        }
+                        this.setStartBefore(this.startContainer);
+                    }
+                    while (
+                        this.endOffset ==
+                        (this.endContainer.nodeType == 1 ?
+                            this.endContainer.childNodes.length :
+                            this.endContainer.nodeValue.length)
+                    ) {
+                        if (stopFn && stopFn(this.endContainer)) {
+                            break;
+                        }
+                        if (isBody(this.endContainer)) {
+                            break;
+                        }
+                        this.setEndAfter(this.endContainer);
+                    }
+                }
+                return this;
+            },
+            /**
+             * 调整Range的边界，使其"缩小"到最合适的位置
+             */
+            adjustmentBoundary: function () {
+                if (!this.collapsed) {
+                    while (
+                        !domUtils.isBody(this.startContainer) &&
+                        this.startOffset ==
+                        this.startContainer[
+                            this.startContainer.nodeType == 3 ? "nodeValue" : "childNodes"
+                        ].length &&
+                        this.startContainer[
+                            this.startContainer.nodeType == 3 ? "nodeValue" : "childNodes"
+                        ].length
+                    ) {
+                        this.setStartAfter(this.startContainer);
+                    }
+                    while (
+                        !domUtils.isBody(this.endContainer) &&
+                        !this.endOffset &&
+                        this.endContainer[
+                            this.endContainer.nodeType == 3 ? "nodeValue" : "childNodes"
+                        ].length
+                    ) {
+                        this.setEndBefore(this.endContainer);
+                    }
+                }
+                return this;
+            },
+            applyInlineStyle: function (tagName, attrs, list) {
+                if (this.collapsed) return this;
+                this.trimBoundary()
+                    .enlarge(false, function (node) {
+                        return node.nodeType == 1 && domUtils.isBlockElm(node);
+                    })
+                    .adjustmentBoundary();
+                var bookmark = this.createBookmark(),
+                    end = bookmark.end,
+                    filterFn = function (node) {
+                        return node.nodeType == 1 ?
+                            node.tagName.toLowerCase() != "br" :
+                            !domUtils.isWhitespace(node);
+                    },
+                    current = domUtils.getNextDomNode(bookmark.start, false, filterFn),
+                    node,
+                    pre,
+                    range = this.cloneRange();
+                while (current &&domUtils.getPosition(current, end) & domUtils.POSITION_PRECEDING) {
+                    if (current.nodeType == 3 || dtd[tagName][current.tagName]) {
+                        range.setStartBefore(current);
+                        node = current;
+                        while (
+                            node &&
+                            (node.nodeType == 3 || dtd[tagName][node.tagName]) &&
+                            node !== end
+                        ) {
+                            pre = node;
+                            node = domUtils.getNextDomNode(
+                                node,
+                                node.nodeType == 1,
+                                null,
+                                function (parent) {
+                                    return dtd[tagName][parent.tagName];
+                                }
+                            );
+                        }
+                        var frag = range.setEndAfter(pre).extractContents(),
+                            elm;
+                        if (list && list.length > 0) {
+                            var level, top;
+                            top = level = list[0].cloneNode(false);
+                            for (var i = 1, ci;
+                                (ci = list[i++]);) {
+                                level.appendChild(ci.cloneNode(false));
+                                level = level.firstChild;
+                            }
+                            elm = level;
+                        } else {
+                            elm = document.createElement(tagName);
+                        }
+                        if (attrs) {
+                            domUtils.setAttributes(elm, attrs);
+                        }
+                        elm.appendChild(frag);
+                        //针对嵌套span的全局样式指定，做容错处理
+                        if (elm.tagName == "SPAN" && attrs && attrs.style) {
+                            utils.each(elm.getElementsByTagName("span"), function (s) {
+                                s.style.cssText = s.style.cssText + ";" + attrs.style;
+                            });
+                        }
+                        range.insertNode(list ? top : elm);
+                        //处理下滑线在a上的情况
+                        var aNode;
+                        if (
+                            tagName == "span" &&
+                            attrs.style &&
+                            /text\-decoration/.test(attrs.style) &&
+                            (aNode = domUtils.findParentByTagName(elm, "a", true))
+                        ) {
+                            domUtils.setAttributes(aNode, attrs);
+                            domUtils.remove(elm, true);
+                            elm = aNode;
+                        } else {
+                            domUtils.mergeSibling(elm);
+                            domUtils.clearEmptySibling(elm);
+                        }
+                        //去除子节点相同的
+                        domUtils.mergeChild(elm, attrs);
+                        current = domUtils.getNextDomNode(elm, false, filterFn);
+                        domUtils.mergeToParent(elm);
+                        if (node === end) {
+                            break;
+                        }
+                    } else {
+                        current = domUtils.getNextDomNode(current, true, filterFn);
+                    }
+                }
+                return this.moveToBookmark(bookmark);
+            },
+            removeInlineStyle: function (tagNames, className) {
+                if (this.collapsed) return this;
+                tagNames = utils.isArray(tagNames) ? tagNames : [tagNames];
+                this.shrinkBoundary().adjustmentBoundary();
+                var start = this.startContainer,
+                    end = this.endContainer;
+                while (1) {
+                    if (start.nodeType == 1) {
+                        if (utils.indexOf(tagNames, start.tagName.toLowerCase()) > -1) {
+                            break;
+                        }
+                        if (start.tagName.toLowerCase() == "body") {
+                            start = null;
+                            break;
+                        }
+                    }
+                    start = start.parentNode;
+                }
+                while (1) {
+                    if (end.nodeType == 1) {
+                        if (utils.indexOf(tagNames, end.tagName.toLowerCase()) > -1) {
+                            break;
+                        }
+                        if (end.tagName.toLowerCase() == "body") {
+                            end = null;
+                            break;
+                        }
+                    }
+                    end = end.parentNode;
+                }
+                var bookmark = this.createBookmark(),
+                    frag,
+                    tmpRange;
+                if (start) {
+                    tmpRange = this.cloneRange()
+                        .setEndBefore(bookmark.start)
+                        .setStartBefore(start);
+                    frag = tmpRange.extractContents();
+                    tmpRange.insertNode(frag);
+                    domUtils.clearEmptySibling(start, true);
+                    start.parentNode.insertBefore(bookmark.start, start);
+                }
+                if (end) {
+                    tmpRange = this.cloneRange()
+                        .setStartAfter(bookmark.end)
+                        .setEndAfter(end);
+                    frag = tmpRange.extractContents();
+                    tmpRange.insertNode(frag);
+                    domUtils.clearEmptySibling(end, false, true);
+                    end.parentNode.insertBefore(bookmark.end, end.nextSibling);
+                }
+                var current = domUtils.getNextDomNode(bookmark.start, false, function (
+                        node
+                    ) {
+                        return node.nodeType == 1;
+                    }),
+                    next;
+                while (current && current !== bookmark.end) {
+                    next = domUtils.getNextDomNode(current, true, function (node) {
+                        return node.nodeType == 1;
+                    });
+                    if (utils.indexOf(tagNames, current.tagName.toLowerCase()) > -1 && current.className ===
+                        className) {
+                        domUtils.remove(current, true);
+                    }
+                    current = next;
+                }
+                return this.moveToBookmark(bookmark);
+            },
+            getClosedNode: function () {
+                var node;
+                if (!this.collapsed) {
+                    var range = this.cloneRange().adjustmentBoundary().shrinkBoundary();
+                    if (selectOneNode(range)) {
+                        var child = range.startContainer.childNodes[range.startOffset];
+                        if (
+                            child &&
+                            child.nodeType == 1 &&
+                            (dtd.$empty[child.tagName] || dtd.$nonChild[child.tagName])
+                        ) {
+                            node = child;
+                        }
+                    }
+                }
+                return node;
+            },
+            select: browser.ie ?
+                function (noFillData, textRange) {
+                    var nativeRange;
+                    if (!this.collapsed) this.shrinkBoundary();
+                    var node = this.getClosedNode();
+                    if (node && !textRange) {
+                        try {
+                            nativeRange = document.body.createControlRange();
+                            nativeRange.addElement(node);
+                            nativeRange.select();
+                        } catch (e) {}
+                        return this;
+                    }
+                    var bookmark = this.createBookmark(),
+                        start = bookmark.start,
+                        end;
+                    nativeRange = document.body.createTextRange();
+                    nativeRange.moveToElementText(start);
+                    nativeRange.moveStart("character", 1);
+                    if (!this.collapsed) {
+                        var nativeRangeEnd = document.body.createTextRange();
+                        end = bookmark.end;
+                        nativeRangeEnd.moveToElementText(end);
+                        nativeRange.setEndPoint("EndToEnd", nativeRangeEnd);
+                    } else {
+                        if (!noFillData && this.startContainer.nodeType != 3) {
+                            //使用<span>|x<span>固定住光标
+                            var tmpText = document.createTextNode(fillChar),
+                                tmp = document.createElement("span");
+                            tmp.appendChild(document.createTextNode(fillChar));
+                            start.parentNode.insertBefore(tmp, start);
+                            start.parentNode.insertBefore(tmpText, start);
+                            //当点b,i,u时，不能清除i上边的b
+                            removeFillData(document, tmpText);
+                            fillData = tmpText;
+                            mergeSibling(tmp, "previousSibling");
+                            mergeSibling(start, "nextSibling");
+                            nativeRange.moveStart("character", -1);
+                            nativeRange.collapse(true);
+                        }
+                    }
+                    this.moveToBookmark(bookmark);
+                    tmp && domUtils.remove(tmp);
+                    //IE在隐藏状态下不支持range操作，catch一下
+                    try {
+                        nativeRange.select();
+                    } catch (e) {}
+                    return this;
+                } :
+                function (notInsertFillData) {
+                    function checkOffset(rng) {
+                        function check(node, offset, dir) {
+                            if (node.nodeType == 3 && node.nodeValue.length < offset) {
+                                rng[dir + "Offset"] = node.nodeValue.length;
+                            }
+                        }
+                        check(rng.startContainer, rng.startOffset, "start");
+                        check(rng.endContainer, rng.endOffset, "end");
+                    }
+                    var win = window,
+                        sel = win.getSelection(),
+                        txtNode;
+                    //FF下关闭自动长高时滚动条在关闭dialog时会跳
+                    //ff下如果不body.focus将不能定位闭合光标到编辑器内
+                    browser.gecko ? document.body.focus() : win.focus();
+                    if (sel) {
+                        sel.removeAllRanges();
+                        // trace:870 chrome/safari后边是br对于闭合得range不能定位 所以去掉了判断
+                        // this.startContainer.nodeType != 3 &&! ((child = this.startContainer.childNodes[this.startOffset]) && child.nodeType == 1 && child.tagName == 'BR'
+                        if (this.collapsed && !notInsertFillData) {
+                            var start = this.startContainer,
+                                child = start;
+                            if (start.nodeType == 1) {
+                                child = start.childNodes[this.startOffset];
+                            }
+                            if (
+                                !(start.nodeType == 3 && this.startOffset) &&
+                                (child ?
+                                    !child.previousSibling ||
+                                    child.previousSibling.nodeType != 3 :
+                                    !start.lastChild || start.lastChild.nodeType != 3)
+                            ) {
+                                txtNode = document.createTextNode(fillChar);
+                                //跟着前边走
+                                this.insertNode(txtNode);
+                                removeFillData(document, txtNode);
+                                mergeSibling(txtNode, "previousSibling");
+                                mergeSibling(txtNode, "nextSibling");
+                                fillData = txtNode;
+                                this.setStart(txtNode, browser.webkit ? 1 : 0).collapse(true);
+                            }
+                        }
+                        var nativeRange = document.createRange();
+                        if (
+                            this.collapsed &&
+                            browser.opera &&
+                            this.startContainer.nodeType == 1
+                        ) {
+                            var child = this.startContainer.childNodes[this.startOffset];
+                            if (!child) {
+                                //往前靠拢
+                                child = this.startContainer.lastChild;
+                                if (child && domUtils.isBr(child)) {
+                                    this.setStartBefore(child).collapse(true);
+                                }
+                            } else {
+                                //向后靠拢
+                                while (child && domUtils.isBlockElm(child)) {
+                                    if (child.nodeType == 1 && child.childNodes[0]) {
+                                        child = child.childNodes[0];
+                                    } else {
+                                        break;
+                                    }
+                                }
+                                child && this.setStartBefore(child).collapse(true);
+                            }
+                        }
+                        //是createAddress最后一位算的不准，现在这里进行微调
+                        checkOffset(this);
+                        nativeRange.setStart(this.startContainer, this.startOffset);
+                        nativeRange.setEnd(this.endContainer, this.endOffset);
+                        sel.addRange(nativeRange);
+                    }
+                    return this;
+                }
+        };
+
+
+        /**
+         * 添加下划线
+         */
+        function addUnderline() {
+            replaceSelectedStrByEle('custom-underline')
+        }
+
+        /**
+         * 启用荧光笔
+         */
+        function enableNiteWriterPen() {
+            replaceSelectedStrByEle('nite-writer-pen')
+        }
+        function getRange(){
+            var me = window;
+                var range = new Range(me.document);
+
+                var sel = window.getSelection();
+                if (sel && sel.rangeCount) {
+                    var firstRange = sel.getRangeAt(0);
+                    var lastRange = sel.getRangeAt(sel.rangeCount - 1);
+                    range.setStart(firstRange.startContainer, firstRange.startOffset)
+                        .setEnd(lastRange.endContainer, lastRange.endOffset);
+                }
+                return range
+        }
+
+        /**
+         * 用元素替换被选中的文本
+         */
+        function replaceSelectedStrByEle(className) {
+           
+            var range = getRange();
+            range.applyInlineStyle('i', {
+                class: className
+            });
+            range.select();
+        }
+        function addA(){
+            var range = getRange();
+            range.applyInlineStyle('a', {
+                href: 'http://www.baidu.com'
+            });
+            range.select();
+        }
+    </script>
+    <div>
+        <button onClick='enableNiteWriterPen()'>荧光笔</button>
+        <button onClick="addA()">添加链接</button>
+    </div>
+    <div contenteditable="true" class="content">
+        笔记功能预研
+
+        <p>
+            <h3>《道德经》全文</h3>
+            <p>
+
+                01.道可道，非常道。<i>哈哈哈哈哈</i>名可名，非常名。无名天地之始。有名万物之母。故常无欲以观其妙。常有欲以观
+
+                其徼。此两者同出而异名，同谓之玄。玄之又玄，众妙之门。
+            </p>
+
+            <p>
+                02.天下皆知美之为美，斯恶矣；皆知善之为善，斯不善已。故有无相生，难易相成，长短相形，高下相
+
+                倾，音声相和，前後相随。是以圣人处无为之事，行不言之教。万物作焉而不辞。生而不有，为而不恃，
+
+                功成而弗居。夫唯弗居，是以不去。
+            </p>
+
+            <p>
+                03.不尚贤， 使民不争。不贵难得之货，使民不为盗。不见可欲，使民心不乱。是以圣人之治，虚其心，
+
+                实其腹，弱其志，强其骨；常使民无知、无欲，使夫智者不敢为也。为无为，则无不治。
+            </p>
+
+            <p>
+                04.道冲而用之，或不盈。渊兮似万物之宗。解其纷，和其光，同其尘，湛兮似或存。吾不知谁之子，象
+
+                帝之先。
+            </p>
+            <p>
+                05.天地不仁，以万物为刍狗。圣人不仁，以百姓为刍狗。天地之间，其犹橐迭乎？虚而不屈，动而愈出
+
+                。多言数穷，不如守中。
+            </p>
+            <p>
+                06.谷神不死是谓玄牝。玄牝之门是谓天地根。绵绵若存，用之不勤。
+            </p>
+
+            <p>
+                07.天长地久。天地所以能长且久者，以其不自生，故能长生。是以圣人後其身而身先，外其身而身存。
+
+                非以其无私邪！故能成其私。
+            </p>
+            <p>
+                08.上善若水。水善利万物而不争，处众人之所恶，故几於道。居善地，心善渊，与善仁，言善信，正善
+
+                治，事善能，动善时。夫唯不争，故无尤。
+            </p>
+        </p>
+    </div>
+</body>
+
+</html>

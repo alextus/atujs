@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>浏览器类型版本</title>
+    <script src="//static.alextu.com/js/atu.1.1.9.js"></script>
+</head>
+<body>
+   
+    <script>
+     
+        document.write("ua"+ua)
+        document.write("<br/>")
+        document.write("<br/>")
+        console.log(ua,up)
+        document.write("操作系统类型："+system.type)
+        document.write("<br/>")
+        document.write("浏览器类型："+browser.type)
+        document.write("<br/>")
+        document.write("浏览器版本："+browser.version)
+        document.write("<br/>")
+        document.write("浏览器引擎："+browser.engine)
+        document.write("<br/>")
+        console.log(browser.type,browser.engine,browser.version,system.type)
+        //micromessenger
+         version=ua.match(/chrome\/(\d(.(\d)){4})/i);
+        console.log(version)
+       
+    </script>
+</body>
+</html>

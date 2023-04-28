@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="../src/atu.js?v=1.13"></script>
+  <script src="../src/event.js?v=1.13"></script>
+  <script src="../src/common.js?v=1.13"></script>
+  <script src="../src/tween.js?v=1.14"></script>
+  <script src="../src/animate.js?v=1.13"></script>
+</head>
+<body>
+  <div class="anim" style="position: relative;">
+    <div id="kuai" class="absolute top left" style="background:#000;color:#fff; width: 20px;height:20px; opacity: 1; ">11</div>
+    <div id="kuai2" class="absolute top left" style="background:#000;color:#fff; width: 20px;height:20px; top:20px; ">22</div>
+    <div id="kuai3" class="absolute top left" style="background:#000;color:#fff; width: 20px;height:20px; top:40px; ">33</div>
+    <div id="kuai4" class="absolute top left" style="background:#000;color:#fff; width: 20px;height:20px; top:60px; ">44</div>
+    <br/><br/>   <br/><br/>
+    <a href="javascript:toRight();">toRight</a> 
+    <a href="javascript:rotation();">rotation</a> 
+    
+    <script>
+        function toRight(){
+            /*
+            linear　　平均速度
+ease　　快启动，慢停止，物理原则
+ease-in　　先慢，后快
+ease-out　　先快，后慢
+ease-in-out　　先慢，再快，再慢停止
+
+            1.ease   对应自定义cubic-bezier(.25,.01,.25,1),效果为先慢后快再慢；
+2.linear   对应自定义cubic-bezier(0,0,1,1)，效果为匀速直线； 
+3.ease-in  对应自定义cubic-bezier(.42,0,1,1),效果为先慢后快； 
+4.ease-out  对应自定义cubic-bezier(0,0,.58,1),效果为先快后慢； 
+5.ease-in-out   对应自定义cubic-bezier(.42,0,.58,1),效果为先慢后快再慢。 
+来回缓冲效果 cubic-bezier(0.68, -0.55, 0.27, 1.55) 如下图  
+cubic-bezier(.21,1.93,.53,.64)
+cubic-bezier(0, .27, .32, 1)
+cubic-bezier(1, 0, 0.96, 0.91)
+            */
+            console.log("toRight")
+            //$("#kuai").fadeIn()
+            $("#kuai").animate({width: 200}, 1200,"easeInOutCirc");
+            $("#kuai2").animate({width: 200}, 1200,"cubic-bezier(.21,1.93,.53,.64)");
+            $("#kuai3").animate({width: 200}, 1200,"cubic-bezier(0, .27, .32, 1)");
+            $("#kuai4").animate({width: 200}, 1200,"cubic-bezier(1, 0, 0.96, 0.91)");
+         
+           
+        }
+       
+        function rotation(){
+            $("#kuai2").animate({rotate: '45deg', translate3d: '10px,10px,10px'},1200)
+        }
+     
+        function scrollTop(){
+            console.log("scrollTo")
+           //   $(window).scrollTop(0)
+           $("body,html").tween({scrollTop: 0},400,'easeInOutQuad')
+          //$(window).scrollTo(0)
+        }
+    </script>
+  <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+  <a href="javascript:scrollTop();">scrollTop</a>
+</body>
+</html>

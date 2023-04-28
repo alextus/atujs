@@ -262,4 +262,10 @@
 		return compatible(event)
 	}
 
+	$.fn.change = function () {
+		var e = new Event('change');
+		$(this)[0].dispatchEvent(e)
+	};
+
+
 })(Atu);

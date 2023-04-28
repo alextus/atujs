@@ -1,13 +1,22 @@
-/* 
-	ATTUS https://www.attus.cn
-	2021.09.01 Beijing.Shanghai.China
-	Wechat:alextus
-	Mobile:13717810545
-	Atu.js 不兼容IE6、8、9、10 浏览器，移动项目专用
-	version:v1.1.8
+/*   ___          ___          ___           ___            ___  
+    /\  \        /\  \        /\  \         /\__\          /\  \  
+   /::\  \       \:\  \       \:\  \       /:/  /         /::\  \     
+  /:/\:\  \       \:\  \       \:\  \     /:/  /         /:/\:\  \   
+ /::\~\:\  \      /::\  \      /::\  \   /:/  /  ___     \:\~\:\  \
+/:/\:\ \:\__\    /:/\:\__\    /:/\:\__\ /:/__/  /\__\  /\ \:\ \:\__\ 
+\/__\:\/:/  /   /:/  \/__/   /:/  \/__/ \:\  \ /:/  /  \:\ \:\ \/__/  
+     \::/  /   /:/  /       /:/  /       \:\  /:/  /    \:\ \:\__\  
+     /:/  /   /:/  /       /:/  /         \:\/:/  /      \:\/:/  /
+    /:/  /    \/__/        \/__/           \::/  /        \::/  /
+    \/__/                                   \/__/          \/__/ 
+                                      
+ * ATTUS https://www.attus.cn
+ * 2022.12.01 Beijing.Shanghai.Ningbo.China
+ * Wechat:alextus
+ * Mobile:13717810545
+ * Atu.js 不兼容IE浏览器，移动项目专用
+ * version:v1.1.9
 */
-console.log("%c— 艾特图斯,2021.09,作品 —%c ", "padding:8px 15px; color:#f2efe8; background-color:#070e1d; line-height:25px;", "padding:8px 5px 5px 0; color:#070e1d; ")
-
 var Atu = (function () {
 	var undefined, key, $, classList, emptyArray = [], concat = emptyArray.concat, filter = emptyArray.filter, slice = emptyArray.slice,
 		document = window.document,
@@ -543,6 +552,9 @@ var Atu = (function () {
 				}) :
 				(0 in this ? this[0].innerHTML : null)
 		},
+		outHtml:function(){
+			return this[0].outHTML
+		},
 		text: function (text) {
 			return 0 in arguments ?
 				this.each(function (idx) {
@@ -763,6 +775,28 @@ var Atu = (function () {
 				el.css(dimension, funcArg(this, value, idx, el[dimension]()))
 			})
 		}
+		$.fn["inner"+dimensionProperty]=function(){
+			var el = $(this),v1,v2
+			if(dimension=='width'){
+				v1='left'
+				v2="right"
+			}else{
+				v1='top'
+				v2="bottom"
+			}
+			return el[dimension]()-parseFloat(el.css('padding-'+v1))-parseFloat(el.css('padding-'+v2))
+		}
+		$.fn["outer"+dimensionProperty]=function(){
+			var el = $(this),v1,v2
+			if(dimension=='width'){
+				v1='left'
+				v2="right"
+			}else{
+				v1='top'
+				v2="bottom"
+			}
+			return el[dimension]()+parseFloat(el.css('margin-'+v1))+parseFloat($(this).css('margin-'+v2))+parseFloat(el.css('border-'+v1+"-"+dimension))+parseFloat($(this).css('border-'+v2+"-"+dimension))
+		}
 	})
 
 	function traverseNode(node, fun) {
@@ -832,3 +866,130 @@ var Atu = (function () {
 
 window.Atu = Atu
 window.$ === undefined && (window.$ = Atu);
+
+
+Atu.ini = function () {
+	var v = arguments
+	cookieBaseName += v[0];
+	this.evtUrl = v[1] ? v[1] : location.href;
+	this.wxUrl = v[2] ? v[2] : "//atuad.cn/wx/";
+
+	this.openid = getCookie("openid");
+	this.ua = ""
+	this.site = ""
+	//console.log(typeof wx)
+	if ("undefined" == typeof wx) {
+		$.loadFile("http://res.wx.qq.com/open/js/jweixin-1.4.0.js")
+
+	}
+}
+Atu.iniUser = function (callback, callback2) {
+
+	if (!this.openid) {
+		var wx = get("wx")
+		var d = {}
+		if (wx) {
+
+			d.wx = wx
+			wxArr = wx.split("|")
+			console.log(wxArr)
+		}
+		this.sendDataBack("ini", d, function (p) {
+
+			if (p.openid) {
+				callback && callback(p)
+				Atu.openid = p.openid
+				setCookie("openid", p.openid)
+				//if(wx){ location.replace(Atu.evtUrl);}
+			} else {
+				if (!wx && Atu.tokenUrl) {
+					location.replace(Atu.tokenUrl);
+				}
+			}
+		})
+	} else {
+
+		callback2 && callback2(this.openid)
+	}
+}
+Atu.act = Atu.sendDataBack = Atu.sendMsgBack = function (act, u, callback) {
+	var d = u || {}
+	d.act = typeof (act) == "object" ? act : { "act": act }
+	d.openid = this.openid
+
+	$.get(this.api, d, function (p) {
+		callback && callback(p)
+	}, "jsonp")
+
+}
+Atu.iniWx = function (s) {
+
+	if (!this.wxUrl) {
+		console.log("未设置wxUrl");
+		return;
+	}
+	$.get(this.wxUrl, {curl:location.href}, function (d) {
+		wx.config({
+			appId: d.appId,
+			timestamp: d.timestamp,
+			nonceStr: d.nonceStr,
+			signature: d.signature,
+			jsApiList: ['checkJsApi', 'onMenuShareTimeline', 'onMenuShareAppMessage', 'updateAppMessageShareData', 'updateTimelineShareData', 'startRecord', 'stopRecord', 'onVoiceRecordEnd', 'playVoice', 'pauseVoice', 'stopVoice', 'onVoicePlayEnd', 'translateVoice', 'previewImage', 'openLocation', 'getLocation'],
+			openTagList: ['wx-open-launch-weapp', 'wx-open-launch-app']
+
+		});
+		wx.ready(function () {
+			Atu.iniShare(s);
+		});
+		wx.error(function (res) {
+			console.log("wxConfig Fail")
+		});
+
+	}, "jsonp")
+}
+Atu.iniShare = function (s) {
+	//alert(s.title+":"+s.title2+":"+s.desc+":"+s.link+":"+s.imgUrl)
+	wx.updateAppMessageShareData({
+		title: s.title,
+		desc: s.desc,
+		link: s.link,
+		imgUrl: s.imgUrl,
+	}, function (res) { });
+	wx.updateTimelineShareData({
+		title: s.title2 || s.title,
+		link: s.link,
+		imgUrl: s.imgUrl,
+	}, function (res) { });
+
+	wx.onMenuShareAppMessage({
+		title: s.title,
+		desc: s.desc,
+		link: s.link,
+		imgUrl: s.imgUrl,
+		success: function (res) { }
+	});
+	wx.onMenuShareTimeline({
+		title: s.title2 || s.title,
+		link: s.link,
+		imgUrl: s.imgUrl,
+		success: function (res) { }
+	});
+
+}
+Atu.iniClick = function (site) {
+	this.site = site
+	this.ua = ua
+	this.addClick()
+}
+Atu.addClick = function (str) {
+	var d = {}
+	d.url = location.href
+	d.type = (!str || str == document.title) ? 0 : 1;
+	d.title = str ? str : document.title
+	d.site = this.site
+	d.ua = this.ua
+
+	$.get("//atuad.cn/tongji", d, function (d) {
+		console.log("atu tongji inied")
+	}, "jsonp")
+}

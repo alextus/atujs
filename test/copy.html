@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input id="weixinhao" value="Alextus">
+    <a href="javascript:copyTxt();">点击复制</a>
+    <a href="javascript:goWeixin();">打开微信</a>
+    <script>
+
+	function copyTxt() {
+		var wx = document.getElementById("weixinhao");
+		wx.select(); // 选择对象
+		document.execCommand("Copy"); // 执行浏览器复制命令
+	}
+
+	
+	function goWeixin() {
+		location.href = 'weixin://';
+	}
+
+    </script>
+<iframe height="300" style="width: 100%;" scrolling="no" title="deformable particles" src="https://codepen.io/attus/embed/MWXPrJW?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+    See the Pen <a href="https://codepen.io/attus/pen/MWXPrJW">
+    deformable particles</a> by Alex TU (<a href="https://codepen.io/attus">@attus</a>)
+    on <a href="https://codepen.io">CodePen</a>.
+  </iframe>
+
+</body>
+</html>

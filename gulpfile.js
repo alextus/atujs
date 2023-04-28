@@ -12,8 +12,8 @@ const fs = require('fs');
 const path = require('path');
 
 
-var version = "1.1.8"
-var time = "2021.09.01"
+var version = "1.2.0"
+var time = "2023.04.28"
 var redeme = "/*\r\n	ATTUS https://www.attus.cn\r\n	" + time + " Beijing.Shanghai.China\r\n	Wechat:alextus\r\n	Mobile:13717810545\r\n	Atu.js不兼容IE6、8、9、10 浏览器，移动项目专用\r\n	version:v" + version + "\r\n*/"
 
 var paths = {
@@ -83,9 +83,9 @@ gulp.task('default', async () => {
     });
 
   //  复制文件到这里
-  var needCoppyFiles = ['atu.1.1.8.js', 'atu.1.1.8.min.js', 'atu.markdown.0.1.0.js']
+  var needCoppyFiles = ['atu.'+version+'.js', 'atu.'+version+'.min.js', 'atu.markdown.0.1.0.js']
   for (let i = 0; i < needCoppyFiles.length; i++) {
-    copyFile('./build/' + needCoppyFiles[i], '../../alextu.com/static/js/', needCoppyFiles[i]);
+    copyFile('./build/' + needCoppyFiles[i], '../js/', needCoppyFiles[i]);
   }
 });
 

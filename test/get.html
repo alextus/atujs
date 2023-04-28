@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="../src/common.js?v=1.14"></script>
+</head>
+<body>
+    测试：<a href="?v=adb">变量v</a>
+    <a href="?v=%D2%B9%E8%C9">变量v gb2312</a>
+    <a href="?v=%E5%A4%9C%E6%9E%AD">变量v utf8</a>
+    <a href="?v=夜枭">变量夜枭</a>
+    <script>
+        console.log(encodeURIComponent("夜枭"))
+        console.log("网址",location.href,location.href)
+        let v=get("v")
+        console.log(v)
+        console.log(unescape(v))
+        console.log(decodeURI(v))
+
+        //当前是移动还是pc,是什么浏览器
+      
+       
+    </script>
+</body>
+</html>

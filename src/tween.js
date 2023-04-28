@@ -1,9 +1,11 @@
 // TweenMax精简化
 var Tween = {}
 Tween.to = function (el, duration, properties) {
-
+	let delay=properties.delay?properties.delay:0
+	let ease=properties.ease?properties.ease:0
+	$.tween($(el),)
 }
-Tween.fromTo = function (el, duration, properties) {
+Tween.fromTo = function (el, duration, properties, properties2) {
 
 }
 /**

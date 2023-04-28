@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <script src="../build/atu.1.1.8.min.js?v=1.13"></script>
+    <link rel="stylesheet" type="text/css" href="http://static.alextu.com/atui/atu.0.1.2.css">
+    <style>
+        .nav .active{ background:#000;color:#fff;}
+        .a{font-size: 14px; color:#ff33dd;}
+    </style>
+</head>
+<body class="p24">
+    <a href="browser.html">浏览器系统</a>
+    <h2>样式相关</h2>
+    <a class="a" href="javascript:;" data-id="1" >a样式</a>
+    <script>
+        var attrStart=127,attrEnd=0,stepNum=72,a=1
+        console.log("attrStart",attrStart,attrEnd,stepNum,attrEnd - attrStart,Math.sqrt(2 * (attrEnd - attrStart) / a))
+
+
+        console.log($(".a").data("id"))
+        console.log($(".a").css("font-size"))
+        console.log($(".a").css("color"))
+    </script>
+    <h2>弹窗相关</h2>
+    <a href="javascript:showTip();">showTip</a>
+    <a href="javascript:showAlert();">showAlert</a>
+    <script>
+        function showTip(){
+            $.tip("showTip")
+        }
+        function showAlert(){
+            $.alert("一键开启消息提醒，活动福利抢先掌握",'一键开启',function(){
+                alert("1")
+            },'暂不开启')
+            //
+        }
+    </script>
+    <h2>时间相关</h2>
+    <div class="time"></div>
+    <script>
+        let time="year:"+year()+"<br/>month:"+month()+"<br/>week:"+week()+"<br/>day:"+day()+"<br/>hour:"+hour()+"<br/>now:"+now()+"<br/>"
+        time+="Alexdate:"+Alexdate()+":"+year('1982-12-19')+"-"+month('1982-12-19')+"-"+day('1982-12-19')+"<br/>"
+        time+="newData:"+newDate('1982-12-19 00:00:00')+"<br/>"
+        time+="距离1982-12-19，passtime:"+getPassTime('1982-12-19')+":"+format(getPassTime('1982-12-19'))+"<br/>距离2032-12-19，leftTime:"+getLeftTime('2032-12-19')+":"+format(getLeftTime('2032-12-19'))
+        $(".time").html(time)
+    </script>
+    <h2>tabSwitch</h2>
+    <div class="tabBox">
+        <div class="nav"><a href="javascript:;">tab1</a><a href="javascript:;">tab2</a><a href="javascript:;">tab3</a></div>
+        <div class="content">
+            <div class="c ">111</div>
+            <div class="c hide">222</div>
+            <div class="c hide">333</div>
+        </div>
+    </div>
+    <script>
+        $(".tabBox").tabSwitch(".nav a",".content .c")
+    </script>
+
+    <h2>动画相关</h2>
+    <div class="anim" style="position: relative;">
+        <div id="kuai" class="absolute top left" style="background:#000;color:#fff; width: 20px;height:20px; opacity: 1; ">11</div>
+        <br/><br/>
+        <div id="kuai2" class="absolute top left" style="background:#000;color:#fff; width: 20px;height:20px; top:20px; ">22</div>
+        <div id="kuai3" class="absolute top left" style="background:#000;color:#fff; width: 20px;height:20px; top:40px; ">33</div>
+        <div id="kuai4" class="absolute top left" style="background:#000;color:#fff; width: 20px;height:20px; top:60px; ">44</div>
+        <br/><br/><br/><br/>
+        <a href="javascript:toRight();">animate</a> 
+        <a href="javascript:toRight1();">tween</a> 
+        <a href="javascript:rotation();">rotation</a> 
+        <a href="javascript:scrollTo1();">scrollTo</a>
+        <script>
+            function toRight(){
+                /*
+                linear　　平均速度
+ease　　快启动，慢停止，物理原则
+ease-in　　先慢，后快
+ease-out　　先快，后慢
+ease-in-out　　先慢，再快，再慢停止
+
+                1.ease   对应自定义cubic-bezier(.25,.01,.25,1),效果为先慢后快再慢；
+2.linear   对应自定义cubic-bezier(0,0,1,1)，效果为匀速直线； 
+3.ease-in  对应自定义cubic-bezier(.42,0,1,1),效果为先慢后快； 
+ 4.ease-out  对应自定义cubic-bezier(0,0,.58,1),效果为先快后慢； 
+5.ease-in-out   对应自定义cubic-bezier(.42,0,.58,1),效果为先慢后快再慢。 
+来回缓冲效果 cubic-bezier(0.68, -0.55, 0.27, 1.55) 如下图  
+cubic-bezier(.21,1.93,.53,.64)
+cubic-bezier(0, .27, .32, 1)
+cubic-bezier(1, 0, 0.96, 0.91)
+                */
+                console.log("toRight")
+                //$("#kuai").fadeIn()
+                $("#kuai").animate({width: 200,opacity:0.5,background:"#ff33dd",color:"#000"}, 1200);
+
+                 $("#kuai2").animate({width: 200,opacity:0.5,background:"#ff33dd",color:"#000"}, 1200,"cubic-bezier(0.68, -0.55, 0.27, 1.55)");
+
+                 $("#kuai3").animate({width: 200,opacity:0.5,background:"#ff33dd",color:"#000"}, 1200,"cubic-bezier(.66,.1,1,.41)");
+                 $("#kuai4").animate({width: 200,opacity:0.5,background:"#ff33dd",color:"#000"}, 1200,"cubic-bezier(.17, .86, .73, .14)");
+                 //cubic-bezier(0.02, 0.01, 0.21, 1
+               // $("#kuai").fadeOut()
+               
+            }
+            function toRight1(){
+                $("#kuai").tween({width: 200,opacity:0.5}, 1200);
+            }
+            function rotation(){
+                $("#kuai2").animate({rotate: '45deg', translate3d: '10px,10px,10px'},1200)
+            }
+         
+            function scrollTo1(){
+                console.log("scrollTo")
+               //   $(window).scrollTop(0)
+               $("body,html").anim2({scrollTop: 0},1200)
+              //$(window).scrollTo(0)
+            }
+        </script>
+        
+        
+    </div>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+</body>
+</html>
