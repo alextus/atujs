@@ -30,19 +30,19 @@ var browser = {
 	quirks: document.compatMode == "BackCompat",
 	language: (navigator.browserLanguage || navigator.language).toLowerCase()
 }
-browser.type=browser.ie ? "IE" : browser.opera ? "Opear" :  browser.edge ? "Edge" :
+	browser.type=browser.ie ? "IE" : browser.opera ? "Opear" :  browser.edge ? "Edge" :
 	browser.weixin ? "Weixin" :browser.chrome ? "Chrome" : browser.safari ? "Safari" : "other";
-browser.engine=browser.webKit?"Webkit":browser.gecko?"Gecko":browser.ie?"Trident":"other"
+	browser.engine=browser.webKit?"Webkit":browser.gecko?"Gecko":browser.ie?"Trident":"other"
 
 
 var isWeixin = is_weixin = browser.weixin
 var isWeibo = is_weibo = browser.weibo
 var isEleme = is_eleme =  browser.eleme
 var isIphone = is_iphone =  browser.iPhone
-var iPad = is_ipad =  browser.iPad
+var isIPad = is_ipad =  browser.iPad
 var isPc=is_pc  =(browser.android||browser.iPhone||browser.iPad||browser.iPod||browser.SymbianOS||browser.WindowsPhone)?false:true;
 var isMob =is_mob = !isPc
-var system = {win: up.indexOf("win") == 0, mac: up.indexOf("mac") == 0, linux: up.indexOf("linux") == 0, xll: false, ipad:iPad }; 
+var system = {win: up.indexOf("win") == 0, mac: up.indexOf("mac") == 0, linux: up.indexOf("linux") == 0, xll: false, ipad:isIPad }; 
 system.type=system.win?"Win":system.mac?"Mac":system.ipad?"Ipad":browser.android?"Android":system.linux?"linux":"other"
 
 var version = 0;
@@ -135,7 +135,9 @@ if (!window.console) {
 
 
 
-
+function trim(str){
+	return str.replace(/(^\s*)|(\s*$)/g, ""); 
+}
 //获取Request
 function get(sProp) {
 	var re = new RegExp("[&,?]" + sProp + "=([^//&]*)", "i");
@@ -330,14 +332,14 @@ String.prototype.byteLength = function () {
 	}
 }
 Array.prototype.indexOf = function (o) {
-		for (var t = 0; t < this.length; t++)
-			if (this[t] == o) return t;
-		return -1
-	},
-	Array.prototype.remove = function (o) {
-		var t = this.indexOf(o);
-		t > -1 && this.splice(t, 1)
-	};
+	for (var t = 0; t < this.length; t++)
+		if (this[t] == o) return t;
+	return -1
+},
+Array.prototype.remove = function (o) {
+	var t = this.indexOf(o);
+	t > -1 && this.splice(t, 1)
+};
 
 function e(element) {
 	var elements = new Array();
@@ -456,6 +458,136 @@ function FormatNum(num, weishu) {
 	}
 	return s;
 }
+
+function copty(txt){
+	let
+}
+
+Atu.ini = function () {
+	var v = arguments
+	cookieBaseName += v[0];
+	this.evtUrl = v[1] ? v[1] : location.href;
+	this.wxUrl = v[2] ? v[2] : "//atuad.cn/wx/";
+
+	this.openid = getCookie("openid");
+	this.ua = ""
+	this.site = ""
+	//console.log(typeof wx)
+	if ("undefined" == typeof wx) {
+		$.loadFile("http://res.wx.qq.com/open/js/jweixin-1.4.0.js")
+
+	}
+}
+Atu.iniUser = function (callback, callback2) {
+
+	if (!this.openid) {
+		var wx = get("wx")
+		var d = {}
+		if (wx) {
+
+			d.wx = wx
+			wxArr = wx.split("|")
+			console.log(wxArr)
+		}
+		this.sendDataBack("ini", d, function (p) {
+
+			if (p.openid) {
+				callback && callback(p)
+				Atu.openid = p.openid
+				setCookie("openid", p.openid)
+				//if(wx){ location.replace(Atu.evtUrl);}
+			} else {
+				if (!wx && Atu.tokenUrl) {
+					location.replace(Atu.tokenUrl);
+				}
+			}
+		})
+	} else {
+
+		callback2 && callback2(this.openid)
+	}
+}
+Atu.act = Atu.sendDataBack = Atu.sendMsgBack = function (act, u, callback) {
+	var d = u || {}
+	d.act = typeof (act) == "object" ? act : { "act": act }
+	d.openid = this.openid
+
+	$.get(this.api, d, function (p) {
+		callback && callback(p)
+	}, "jsonp")
+
+}
+Atu.iniWx = function (s) {
+
+	if (!this.wxUrl) {
+		console.log("未设置wxUrl");
+		return;
+	}
+	$.get(this.wxUrl, {curl:location.href}, function (d) {
+		wx.config({
+			appId: d.appId,
+			timestamp: d.timestamp,
+			nonceStr: d.nonceStr,
+			signature: d.signature,
+			jsApiList: ['checkJsApi', 'onMenuShareTimeline', 'onMenuShareAppMessage', 'updateAppMessageShareData', 'updateTimelineShareData', 'startRecord', 'stopRecord', 'onVoiceRecordEnd', 'playVoice', 'pauseVoice', 'stopVoice', 'onVoicePlayEnd', 'translateVoice', 'previewImage', 'openLocation', 'getLocation'],
+			openTagList: ['wx-open-launch-weapp', 'wx-open-launch-app']
+
+		});
+		wx.ready(function () {
+			Atu.iniShare(s);
+		});
+		wx.error(function (res) {
+			console.log("wxConfig Fail")
+		});
+
+	}, "jsonp")
+}
+Atu.iniShare = function (s) {
+	wx.updateAppMessageShareData({
+		title: s.title,
+		desc: s.desc,
+		link: s.link,
+		imgUrl: s.imgUrl,
+	}, function (res) { });
+	wx.updateTimelineShareData({
+		title: s.title2 || s.title,
+		link: s.link,
+		imgUrl: s.imgUrl,
+	}, function (res) { });
+
+	wx.onMenuShareAppMessage({
+		title: s.title,
+		desc: s.desc,
+		link: s.link,
+		imgUrl: s.imgUrl,
+		success: function (res) { }
+	});
+	wx.onMenuShareTimeline({
+		title: s.title2 || s.title,
+		link: s.link,
+		imgUrl: s.imgUrl,
+		success: function (res) { }
+	});
+
+}
+Atu.iniClick = function (site) {
+	this.site = site
+	this.ua = ua
+	this.addClick()
+}
+Atu.addClick = function (str) {
+	var d = {}
+	d.url = location.href
+	d.type = (!str || str == document.title) ? 0 : 1;
+	d.title = str ? str : document.title
+	d.site = this.site
+	d.ua = this.ua
+
+	$.get("//atuad.cn/tongji", d, function (d) {
+		console.log("atu tongji inied")
+	}, "jsonp")
+}
+
 //12秒内提示一次，多次引用只显示一次
 let ct=Math.floor(getData("ct")),nt=new Date().getTime()
 if(nt>ct){

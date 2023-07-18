@@ -243,3 +243,23 @@
 
 	testEl = null
 })(Atu);
+
+function easeFun(ease, s, e, d, t) {
+	//s startVal,e endVal,d step t stepI 0~step
+	let a = t / d, b = s * 1, c = e - s
+	//"Linear","Quad","Cubic","Quart","Quint,Sine,Expo,Circ,Elastic,Bounce,Back"
+	let easeType = ["linear", "Quad", "Cubic", "Quart", "Quint", "Sine", "Expo", "Circ", "Elastic", "Bounce", "Back"]
+
+	let easeArrs = []
+	for (let i = 1; i < easeType.length; i++) {
+		easeArrs.push('easeIn' + easeType[i])
+		easeArrs.push('easeOut' + easeType[i])
+		easeArrs.push('easeInOut' + easeType[i])
+	}
+
+	if (anime.penner.includes(ease)) {
+		return b + c * eval(anime.penner[ease]() + '(' + a + ')')
+	} else {
+		return b + c * a;
+	}
+};

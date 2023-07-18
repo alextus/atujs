@@ -58,8 +58,7 @@ var Atu = (function () {
 			'frameborder': 'frameBorder',
 			'contenteditable': 'contentEditable'
 		},
-		isArray = Array.isArray ||
-			function (object) { return object instanceof Array }
+		isArray = Array.isArray ||function (object) { return object instanceof Array }
 
 	atu.matches = function (element, selector) {
 		if (!selector || !element || element.nodeType !== 1) return false
@@ -305,8 +304,16 @@ var Atu = (function () {
 		var patrn = /^0{0,1}(13[0-9]|14(0|1|[4-9])|15([0-3]|[5-9])|16(2|5|6|7)|17[0-8]|18[0-9]|19([0-3]|[5-9]))+\d{8}$/
 		return patrn.test(s)
 	}
+	$.isUrl = function (s) {
+		patrn = /(^[0-9]{3,4}\-[0-9]{7,8}$)|(^\([0-9]{3,4}\)[0-9]{3,8}$)|(^0{0,1}1[3-9]\d{9}$)|(1[3-9]\d{9}$)/;
+		return patrn.exec(s) ? true : false;
+	}
 	$.isEmail = function (s) {
 		var patrn = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+		return patrn.exec(s) ? true : false;
+	}
+	$.isIdcard = function (s) {
+		patrn = /(^[0-9]{3,4}\-[0-9]{7,8}$)|(^\([0-9]{3,4}\)[0-9]{3,8}$)|(^0{0,1}1[3-9]\d{9}$)|(1[3-9]\d{9}$)/;
 		return patrn.exec(s) ? true : false;
 	}
 	$.isQQ = function (s) {
@@ -639,9 +646,7 @@ var Atu = (function () {
 				height: Math.round(obj.height)
 			}
 		},
-		replaceWith: function (t) {
-			return this.before(t).remove()
-		},
+
 
 		css: function (property, value) {
 			if (arguments.length < 2) {
@@ -762,8 +767,7 @@ var Atu = (function () {
 		}
 	};
 	['width', 'height'].forEach(function (dimension) {
-		var dimensionProperty =
-			dimension.replace(/./, function (m) { return m[0].toUpperCase() })
+		var dimensionProperty = dimension.replace(/./, function (m) { return m[0].toUpperCase() })
 
 		$.fn[dimension] = function (value) {
 			var offset, el = this[0]
@@ -866,130 +870,3 @@ var Atu = (function () {
 
 window.Atu = Atu
 window.$ === undefined && (window.$ = Atu);
-
-
-Atu.ini = function () {
-	var v = arguments
-	cookieBaseName += v[0];
-	this.evtUrl = v[1] ? v[1] : location.href;
-	this.wxUrl = v[2] ? v[2] : "//atuad.cn/wx/";
-
-	this.openid = getCookie("openid");
-	this.ua = ""
-	this.site = ""
-	//console.log(typeof wx)
-	if ("undefined" == typeof wx) {
-		$.loadFile("http://res.wx.qq.com/open/js/jweixin-1.4.0.js")
-
-	}
-}
-Atu.iniUser = function (callback, callback2) {
-
-	if (!this.openid) {
-		var wx = get("wx")
-		var d = {}
-		if (wx) {
-
-			d.wx = wx
-			wxArr = wx.split("|")
-			console.log(wxArr)
-		}
-		this.sendDataBack("ini", d, function (p) {
-
-			if (p.openid) {
-				callback && callback(p)
-				Atu.openid = p.openid
-				setCookie("openid", p.openid)
-				//if(wx){ location.replace(Atu.evtUrl);}
-			} else {
-				if (!wx && Atu.tokenUrl) {
-					location.replace(Atu.tokenUrl);
-				}
-			}
-		})
-	} else {
-
-		callback2 && callback2(this.openid)
-	}
-}
-Atu.act = Atu.sendDataBack = Atu.sendMsgBack = function (act, u, callback) {
-	var d = u || {}
-	d.act = typeof (act) == "object" ? act : { "act": act }
-	d.openid = this.openid
-
-	$.get(this.api, d, function (p) {
-		callback && callback(p)
-	}, "jsonp")
-
-}
-Atu.iniWx = function (s) {
-
-	if (!this.wxUrl) {
-		console.log("未设置wxUrl");
-		return;
-	}
-	$.get(this.wxUrl, {curl:location.href}, function (d) {
-		wx.config({
-			appId: d.appId,
-			timestamp: d.timestamp,
-			nonceStr: d.nonceStr,
-			signature: d.signature,
-			jsApiList: ['checkJsApi', 'onMenuShareTimeline', 'onMenuShareAppMessage', 'updateAppMessageShareData', 'updateTimelineShareData', 'startRecord', 'stopRecord', 'onVoiceRecordEnd', 'playVoice', 'pauseVoice', 'stopVoice', 'onVoicePlayEnd', 'translateVoice', 'previewImage', 'openLocation', 'getLocation'],
-			openTagList: ['wx-open-launch-weapp', 'wx-open-launch-app']
-
-		});
-		wx.ready(function () {
-			Atu.iniShare(s);
-		});
-		wx.error(function (res) {
-			console.log("wxConfig Fail")
-		});
-
-	}, "jsonp")
-}
-Atu.iniShare = function (s) {
-	//alert(s.title+":"+s.title2+":"+s.desc+":"+s.link+":"+s.imgUrl)
-	wx.updateAppMessageShareData({
-		title: s.title,
-		desc: s.desc,
-		link: s.link,
-		imgUrl: s.imgUrl,
-	}, function (res) { });
-	wx.updateTimelineShareData({
-		title: s.title2 || s.title,
-		link: s.link,
-		imgUrl: s.imgUrl,
-	}, function (res) { });
-
-	wx.onMenuShareAppMessage({
-		title: s.title,
-		desc: s.desc,
-		link: s.link,
-		imgUrl: s.imgUrl,
-		success: function (res) { }
-	});
-	wx.onMenuShareTimeline({
-		title: s.title2 || s.title,
-		link: s.link,
-		imgUrl: s.imgUrl,
-		success: function (res) { }
-	});
-
-}
-Atu.iniClick = function (site) {
-	this.site = site
-	this.ua = ua
-	this.addClick()
-}
-Atu.addClick = function (str) {
-	var d = {}
-	d.url = location.href
-	d.type = (!str || str == document.title) ? 0 : 1;
-	d.title = str ? str : document.title
-	d.site = this.site
-	d.ua = this.ua
-
-	$.get("//atuad.cn/tongji", d, function (d) {
-		console.log("atu tongji inied")
-	}, "jsonp")
-}

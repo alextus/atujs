@@ -17,7 +17,7 @@ var time = "2023.04.28"
 var redeme = "/*\r\n	ATTUS https://www.attus.cn\r\n	" + time + " Beijing.Shanghai.China\r\n	Wechat:alextus\r\n	Mobile:13717810545\r\n	Atu.js不兼容IE6、8、9、10 浏览器，移动项目专用\r\n	version:v" + version + "\r\n*/"
 
 var paths = {
-  scripts: ['src/atu.js', 'src/event.js', 'src/ajax.js', 'src/tween.js','src/animate.js', 'src/loadFile.js', 'src/message.js', 'src/tabSwitch.js', 'src/common.js']
+  scripts: ['src/atu.js', 'src/event.js', 'src/ajax.js', 'src/tween.js','src/animate.js','src/anime.js', 'src/loadFile.js', 'src/message.js', 'src/tabSwitch.js', 'src/common.js']
 }
 gulp.task('build:atu', async () => {
   gulp.src(['src/atu.js', 'src/event.js', 'src/ajax.js', 'src/common.js'])
@@ -49,15 +49,6 @@ gulp.task('build:atu', async () => {
 })
 gulp.task('default', async () => {
 
-
-  gulp.src('src/markdown.js')//{sourcemaps:true}   src/*.js
-    .pipe(babel())
-    .pipe(concat('atu.markdown.0.1.0.js'))
-    .pipe(gulp.dest('build'))
-    .on('error', function (err) {
-      gutil.log(gutil.colors.red('[Error]'), err.toString());
-    });
-
   gulp.src(paths.scripts)//{sourcemaps:true}   src/*.js
     .pipe(babel())
     //.pipe(uncommentIt())
@@ -82,11 +73,7 @@ gulp.task('default', async () => {
       gutil.log(gutil.colors.red('[Error]'), err.toString());
     });
 
-  //  复制文件到这里
-  var needCoppyFiles = ['atu.'+version+'.js', 'atu.'+version+'.min.js', 'atu.markdown.0.1.0.js']
-  for (let i = 0; i < needCoppyFiles.length; i++) {
-    copyFile('./build/' + needCoppyFiles[i], '../js/', needCoppyFiles[i]);
-  }
+
 });
 
 function copyFile(orgfilepath, desdirpath, desfilename) {
@@ -102,10 +89,25 @@ function copyFile(orgfilepath, desdirpath, desfilename) {
     console.error(Date().toString() + "复制文件" + orgfilepath.toString() + "不存在");
   }
 }
-
+gulp.task('copy', async () => {
+    //  复制文件到这里
+    var needCoppyFiles = ['atu.'+version+'.js', 'atu.'+version+'.min.js', 'atu.markdown.0.1.0.js']
+    for (let i = 0; i < needCoppyFiles.length; i++) {
+      copyFile('./build/' + needCoppyFiles[i], '../js/', needCoppyFiles[i]);
+    }
+})
 gulp.task('clean', async () => {
   del(['./build/'], () => {
     console.log("clean")
   })
 
+})
+gulp.task('markdown', async () => {
+  gulp.src('src/markdown.js')//{sourcemaps:true}   src/*.js
+  .pipe(babel())
+  .pipe(concat('atu.markdown.0.1.0.js'))
+  .pipe(gulp.dest('build'))
+  .on('error', function (err) {
+    gutil.log(gutil.colors.red('[Error]'), err.toString());
+  });
 })
