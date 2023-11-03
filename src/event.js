@@ -50,6 +50,12 @@
 		var id = zid(element), set = (handlers[id] || (handlers[id] = []))
 		events.split(/\s/).forEach(function (event) {
 			if (event == 'ready') return $(document).ready(fn)
+      if (event == 'touchleft') return $(element).touchLeft(fn);
+      if (event == 'touchright') return $(element).touchRight(fn);
+      if (event == 'touchup') return $(element).touchUp(fn);
+      if (event == 'touchdown') return $(element).touchDown(fn);
+      if (event == 'longpress') return $(element).longPress(fn);
+      
 			var handler = parse(event)
 			handler.fn = fn
 			handler.sel = selector
