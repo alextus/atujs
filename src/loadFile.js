@@ -12,8 +12,9 @@
 		var d = new Array;
 		a.each(b, function (index, file) {
 
-			var att = file.split('.');
-			var ext = att[att.length - 1].toLowerCase();
+      var att = file.split('.'),att2 = att[att.length - 1].split('?');
+
+			var ext = att2[0].toLowerCase();
 			var isCSS = ext == "css";
 			var isJS = ext == "js";
 			var isIMG = ext == "jpg" || ext == "jpeg" || ext == "png" || ext == "gif";

@@ -529,10 +529,20 @@ Atu.iniWx = function (s) {
 			timestamp: d.timestamp,
 			nonceStr: d.nonceStr,
 			signature: d.signature,
-			jsApiList: ['checkJsApi', 'onMenuShareTimeline', 'onMenuShareAppMessage', 'updateAppMessageShareData', 'updateTimelineShareData', 'startRecord', 'stopRecord', 'onVoiceRecordEnd', 'playVoice', 'pauseVoice', 'stopVoice', 'onVoicePlayEnd', 'translateVoice', 'previewImage', 'openLocation', 'getLocation'],
+			jsApiList: ['checkJsApi', 'onMenuShareTimeline', 'onMenuShareAppMessage','onMenuShareWeibo', 'updateAppMessageShareData', 'updateTimelineShareData', 
+      'startRecord', 'stopRecord', 'onVoiceRecordEnd', 'playVoice', 'pauseVoice', 'stopVoice', 'onVoicePlayEnd','uploadVoice','downloadVoice','translateVoice', 
+      'chooseImage', 'previewImage','uploadImage','downloadImage', 'getNetworkType','getLocation','openLocation','closeWindow','scanQRCode',
+      'hideOptionMenu','showOptionMenu','hideMenuItems','showMenuItems','hideAllNonBaseMenuItem','showAllNonBaseMenuItem',
+      'openEnterpriseChat','openEnterpriseContact'],
 			openTagList: ['wx-open-launch-weapp', 'wx-open-launch-app']
-
 		});
+    /**
+  '', '分享菜单->时间线', '分享菜单->app信息', '分享菜单->微博',' ', ' ', '开始记录', 
+'停止记录', '当声音记录停止', '播放声音', '暂停声音', '当声音播放结束','上传声音','下载声音','翻译声音',
+'选择图片','预览图片','上传图片','下载图片','获得网络类型','打开位置','获得位置','关闭窗口','扫描二维码'
+'隐藏选项菜单','显示选项菜单','隐藏菜单项','显示菜单项','隐藏所有子菜单项','显示所有子菜单项',
+'企业号 聊天','企业号 联系人'
+     */
 		wx.ready(function () {
 			Atu.iniShare(s);
 		});
