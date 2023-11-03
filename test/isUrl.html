@@ -4,9 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>isUrl</title>
+    <script src="http://oss.alextu.cn/js/atu.1.1.7.js"></script>
 </head>
 <body>
     网址判定
-    身份证号判定
+    <input type="text" value="" name="url"/>
+    <a href="javascript:isUrl();">判定</a>
+    <br/>
+  
+
+    <script>
+        function parse_url(url){
+            let arrUrl = url.split("/");
+            let scheme=arrUrl[0].replace(":",""),host=arrUrl[2],query='',path=url.replace(scheme+"://"+host,'')
+            if(url.indexOf("?")>0){
+                arrUrl=url.split("?");
+                query=arrUrl[1]
+                path=path.replace("?"+query,'')
+            }
+            return {scheme,host,path,query}
+        }
+        function isUrl(){
+            let url=$("[name=url]").val(),urld=parse_url(url)
+
+            console.log(urld)
+            patrn = /^(http|ftp|https):\/\/(([-a-zA-Z0-9].)+[A-Za-z0-9])(\/[A-Za-z0-9\.\/\?%&=])*/g;
+            patrn2 = new RegExp("[`\"~:/!+@#$^&*()|{}';,\\[\\]<>《》~！@#￥……&*（）——|{}【】‘；：”“。，、？ ]")
+       
+         
+            r= patrn.test(url) ? (patrn2.test(urld.host)?false:true) : false;
+            console.log(patrn.exec(url))
+            alert(r,patrn.test(url))
+        }
+
+    </script>
 </body>
 </html>

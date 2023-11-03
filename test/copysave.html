@@ -11,8 +11,8 @@
 <body>
     <p>一段文字</p>
     <a href="javascript:;">选中</a>
-    <a href="javascript:;">另存为txt</a>
-    <a href="javascript:copy('www.attu1s.cn')">复制</a>
+    <a href="javascript:saveFile('www.attus.cn');">另存为txt</a>
+    <a href="javascript:copy('www.attus.cn')">复制</a>
     <a href="javascript:save('http://www.alextu.com/stable-diffusion++.pdf')">下载</a>
     <script>
         function copy(txt){
@@ -111,6 +111,22 @@
                 setTimeout(function () { URL.revokeObjectURL(url) }, 4E4) // 40s
             }
         }
+
+        function saveFile(txt){
+            var blob=new Blob([txt],{type:"text/plain;charset=utf-8"})
+            const fileName='test.txt';
+            if("msSaveOorOpenBlob" in navigator){
+                //ie浏览器
+                window.navigator.msSaveOorOpenBlob(blob,fileName);
+            }else{
+                var url=window.URL.createObjectURL(blob);
+                var link=document.createElement('a');
+                link.href=url
+                link.setAttribute('download',fileName);
+                link.click();
+            }
+        }
+        
     </script>
 </body>
 </html>

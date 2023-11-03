@@ -267,5 +267,89 @@
 		$(this)[0].dispatchEvent(e)
 	};
 
+  
+  var touchObject=[],touchObjectXy=[],touchLeftId=-1,touchIds=[-1,-1,-1,-1]
+  function iniTouchXY(obj,type,fn){
+      //type 0 ,1,2,3：left,right,top,down
+      if(touchObject.indexOf(obj)<0){
+          touchObject.push(obj)
+          //console.log("第一次添加",touchObject.indexOf(obj))
+          touchObjectXy[touchObject.indexOf(obj)]={sxy:{x:0,y:0},exy:{x:0,y:0}}
+      }
+      let touchId=-1
+      obj.addEventListener(touch, function (e) {
+          touchId=touchIds[type]=touchObject.indexOf(obj)
+          touchObjectXy[touchId].sxy=getXY(e);
+      }, false);
+      obj.addEventListener(touchend, function (e) {
+          touchObjectXy[touchId]={sxy:{x:0,y:0},exy:{x:0,y:0}}
+          touchId=touchIds[type]=-1
+      }, false);
+      
+      $(document).on(touchmove,function(e){
+          
+          if(touchId>-1){
+              touchObjectXy[touchId].exy=getXY(e);
+  
+              let sx=touchObjectXy[touchId].sxy.x,ex=touchObjectXy[touchId].exy.x
+              let sy=touchObjectXy[touchId].sxy.y,ey=touchObjectXy[touchId].exy.y
+              let dpx=$(window).width()*30/750
+             // console.log(type,sx,ex,sy,ey)
+              if((type==0 && ex<sx && Math.abs(ex-sx)>dpx)||(type==1 && ex>sx && Math.abs(ex-sx)>dpx)
+                  ||(type==2 && ey<sy && Math.abs(ey-sy)>dpx)||(type==3 && ey>sy && Math.abs(ey-sy)>dpx)){
+                  fn()
+                  touchId=-1
+              }
+          }
+  
+      })
+  }
+  $.fn.touchLeft = function (fn) {
+      //左滑
+      var $this = this;
+     // console.log($this)
+      for (var i = 0; i < $this.length; i++) {
+          (function (target) {
+              iniTouchXY(target,0,fn)
+          })($this[i]);
+          
+      }
+  };
+  $.fn.touchRight = function (fn) {
+      //右滑
+      var $this = this;
+     // console.log($this)
+      for (var i = 0; i < $this.length; i++) {
+          (function (target) {
+              iniTouchXY(target,1,fn)
+          })($this[i]);
+          
+      }
+      
+  };
+  $.fn.touchUp = function (fn) {
+      //右滑
+      var $this = this;
+      //console.log($this)
+      for (var i = 0; i < $this.length; i++) {
+          (function (target) {
+              iniTouchXY(target,2,fn)
+          })($this[i]);
+          
+      }
+      
+  };
+  $.fn.touchDown = function (fn) {
+      //右滑
+      var $this = this;
+     // console.log($this)
+      for (var i = 0; i < $this.length; i++) {
+          (function (target) {
+              iniTouchXY(target,3,fn)
+          })($this[i]);
+          
+      }
+      
+  };
 
 })(Atu);
