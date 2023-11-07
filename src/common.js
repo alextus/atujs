@@ -99,11 +99,13 @@ browser.isCompatible= !browser.mobile && ((browser.ie && version >= 6) || (brows
 
 var isStorageSupport =is_storagesupport= localStorageSupported() //全局变量，判断是否支持
 var supportsOrientationChange = "onorientationchange" in window, //是否开启手机横竖屏
-	orientationEvent = supportsOrientationChange ? "orientationchange" : "resize";
+	orientationEvent = supportsOrientationChange ? "orientationchange" : "resize",
+  isTouchDevice=('ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0);
 
-var touch = is_mob ? "touchstart" : "mousedown"
-var touchmove = is_mob ? "touchmove" : "mousemove"
-var touchend = is_mob ? "touchend" : "mouseup"
+var touch = isTouchDevice ? "touchstart" : "mousedown";
+var touchmove = isTouchDevice ? "touchmove" : "mousemove";
+var touchend = isTouchDevice ? "touchend" : "mouseup";
+
 var reqAnimationFrame = requestAnimationFrame = window.requestAnimationFrame ||
 	window.mozRequestAnimationFrame ||
 	window.webkitRequestAnimationFrame ||
@@ -241,7 +243,7 @@ function getXY(e) {
 		_cx = 0,
 		_cy = 0,
 		_e = false
-	if (/(iPhone|iPad|iPod|iOS|Android)/i.test(navigator.userAgent)) {
+	if (/(iPhone|iPad|iPod|iOS|Android)/i.test(navigator.userAgent) || isTouchDevice) {
 		if (e.targetTouches || e.changedTouches || e.touches) {
 			if (e.targetTouches[0] != undefined) {
 				_e = e.targetTouches[0]

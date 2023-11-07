@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>touch-test</title>
+  <script src="js/atu.1.2.0.min.js"></script>
+</head>
+<body>
+  
+  <script>
+    console.log('ontouchstart' in window,navigator.maxTouchPoints )
+
+function isTouchDevice() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+}
+if (isTouchDevice()) {
+  document.write("这是一个触屏设备,"+navigator.maxTouchPoints+","+window.DocumentTouch);
+  document.title=document instanceof DocumentTouch
+} else {
+  document.write("这不是一个触屏设备");
+}
+var ua=navigator.userAgent
+$(document).on("touchstart",function(e){
+  let d=getXY(e)
+  document.write(ua+"<br/>11:"+d.x)
+})
+$(document).on(touch,function(e){
+  let d=getXY(e)
+  document.write(ua+"<br/>22:"+d.x)
+})
+  </script>
+</body>
+</html>

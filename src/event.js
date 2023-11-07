@@ -310,6 +310,18 @@
   
       })
   }
+  $.fn.touch=function(fun){
+    $(this).on(touch, function (e) {   fun()})
+  }
+  $.fn.touchmove=function(fun){
+      $(this)[0].addEventListener(touchmove, function (e) {
+          e.preventDefault();
+          fun()
+      }, { passive: false }); 
+  }
+  $.fn.touchend=function(fun){
+      $(this).on(touchend, function (e) {  fun()})
+  }
   $.fn.touchLeft = function (fn) {
       //左滑
       var $this = this;
