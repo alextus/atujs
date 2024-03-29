@@ -215,10 +215,7 @@ function delCookie(name) {
 
 function RandArr(arr) {
 	num = arr.length
-	var temp_array = new Array();
-	for (var index in arr) {
-		temp_array.push(arr[index]);
-	}
+	var temp_array = arr;
 	var return_array = new Array();
 	for (var i = 0; i < num; i++) {
 
@@ -332,6 +329,9 @@ String.prototype.byteLength = function () {
 	} else {
 		return 0;
 	}
+}
+String.prototype.replaceAll = function (find, replace) {
+  return this.replace(new RegExp(find, 'g'), replace);
 }
 Array.prototype.indexOf = function (o) {
 	for (var t = 0; t < this.length; t++)

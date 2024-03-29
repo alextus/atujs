@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>字符串原生扩展</title>
+</head>
+<body>
+  <script>
+String.prototype.replaceAll = function (find, replace) {
+  return this.replace(new RegExp(find, 'g'), replace);
+}
+
+let a="as12as34as56as78"
+console.log(a.replaceAll('as',''))
+  </script>
+</body>
+</html>
