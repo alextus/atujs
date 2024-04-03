@@ -42,6 +42,7 @@ var isIphone = is_iphone =  browser.iPhone
 var isIPad = is_ipad =  browser.iPad
 var isPc=is_pc  =(browser.android||browser.iPhone||browser.iPad||browser.iPod||browser.SymbianOS||browser.WindowsPhone)?false:true;
 var isMob =is_mob = !isPc
+var isLocal=is_local=location.href.indexOf("localhosts")>0
 var system = {win: up.indexOf("win") == 0, mac: up.indexOf("mac") == 0, linux: up.indexOf("linux") == 0, xll: false, ipad:isIPad }; 
 system.type=system.win?"Win":system.mac?"Mac":system.ipad?"Ipad":browser.android?"Android":system.linux?"linux":"other"
 
@@ -590,6 +591,6 @@ Atu.addClick = function (str) {
 //12秒内提示一次，多次引用只显示一次
 let ct=Math.floor(getData("ct")),nt=new Date().getTime()
 if(nt>ct){
-	console.log("%c— ATTUS™,13717810545 —%c ", "padding:8px 15px; color:#f2efe8; background-color:#070e1d; line-height:25px;", "padding:8px 5px 5px 0; color:#070e1d; ")
+	console.log("%c— ATTUS™,13717810545,作品 —%c ", "padding:8px 15px; color:#f2efe8; background-color:#070e1d; line-height:25px;", "padding:8px 5px 5px 0; color:#070e1d; ")
 	setData("ct",nt+12000)
 }

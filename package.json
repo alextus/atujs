@@ -1,6 +1,6 @@
 {
   "name": "atujs",
-  "version": "1.5.0",
+  "version": "1.2.1",
   "description": "a fast, small JavaScript library.",
   "main": "atu.js",
   "scripts": {
@@ -29,10 +29,12 @@
     "@babel/core": "^7.15.0",
     "babel-core": "^6.26.3",
     "browser-sync": "^2.27.5",
+    "caniuse-lite": "^1.0.30001600",
     "del": "^6.0.0",
     "gulp-babel": "^8.0.0",
     "gulp-concat": "^2.6.1",
     "gulp-connect": "^5.7.0",
+    "gulp-replace": "^1.1.4",
     "gulp-uglify": "^3.0.2",
     "gulp-uncomment-it": "^1.0.0",
     "gulp-util": "^3.0.8"

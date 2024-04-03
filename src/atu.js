@@ -1,22 +1,4 @@
-/*   ___          ___          ___           ___            ___  
-    /\  \        /\  \        /\  \         /\__\          /\  \  
-   /::\  \       \:\  \       \:\  \       /:/  /         /::\  \     
-  /:/\:\  \       \:\  \       \:\  \     /:/  /         /:/\:\  \   
- /::\~\:\  \      /::\  \      /::\  \   /:/  /  ___     \:\~\:\  \
-/:/\:\ \:\__\    /:/\:\__\    /:/\:\__\ /:/__/  /\__\  /\ \:\ \:\__\ 
-\/__\:\/:/  /   /:/  \/__/   /:/  \/__/ \:\  \ /:/  /  \:\ \:\ \/__/  
-     \::/  /   /:/  /       /:/  /       \:\  /:/  /    \:\ \:\__\  
-     /:/  /   /:/  /       /:/  /         \:\/:/  /      \:\/:/  /
-    /:/  /    \/__/        \/__/           \::/  /        \::/  /
-    \/__/                                   \/__/          \/__/ 
-                                      
- * ATTUS https://www.attus.cn
- * 2022.12.01 Beijing.Shanghai.Ningbo.China
- * Wechat:alextus
- * Mobile:13717810545
- * Atu.js 不兼容IE浏览器，移动项目专用
- * version:v1.1.9
-*/
+/* readme */
 var Atu = (function () {
 	var undefined, key, $, classList, emptyArray = [], concat = emptyArray.concat, filter = emptyArray.filter, slice = emptyArray.slice,
 		document = window.document,

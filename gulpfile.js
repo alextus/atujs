@@ -4,7 +4,7 @@ const gutil = require('gulp-util');
 const uglify = require('gulp-uglify');  //压缩
 const concat = require('gulp-concat'); //合并
 const babel = require('gulp-babel')
-
+const replace = require('gulp-replace');
 const del = require("del");
 const connet = require("gulp-connect");
 const browserSync = require("browser-sync");
@@ -12,12 +12,12 @@ const fs = require('fs');
 const path = require('path');
 
 
-var version = "1.2.0"
-var time = "2023.10.28"
+var version = "1.2.1"
+var time = "2024.03.29"
 
                                       
 
-var redeme = "/*   ___          ___          ___           ___            ___        \r\n    /\\  \\        /\\  \\        /\\  \\         /\\__\\          /\\  \\       \r\n   /::\\  \\       \\:\\  \\       \\:\\  \\       /:/  /         /::\\  \\      \r\n  /:/\\:\\  \\       \\:\\  \\       \\:\\  \\     /:/  /         /:/\\:\\  \\     \r\n /::\\~\\:\\  \\      /::\\  \\      /::\\  \\   /:/  /  ___     \\:\\~\\:\\  \\    \r\n/:/\\:\\ \\:\\__\\    /:/\\:\\__\\    /:/\\:\\__\\ /:/__/  /\\__\\  /\\ \\:\\ \\:\\__\\   \r\n\\/__\\:\\/:/  /   /:/  \\/__/   /:/  \\/__/ \\:\\  \\ /:/  /  \\:\\ \\:\\ \\/__/   \r\n     \\::/  /   /:/  /       /:/  /       \\:\\  /:/  /    \\:\\ \\:\\__\\     \r\n     /:/  /   /:/  /       /:/  /         \\:\\/:/  /      \\:\\/:/  /     \r\n    /:/  /    \\/__/        \\/__/           \\::/  /        \\::/  /      \r\n    \\/__/                                   \\/__/          \\/__/       \r\n\r\n	ATTUS https://www.attus.cn\r\n	" + time + " Beijing.Shanghai.China\r\n	Wechat:alextus\r\n	Mobile:13717810545\r\n	Atu.js不兼容IE6、8、9、10 浏览器，移动项目专用\r\n	version:v" + version + "\r\n*/"
+var redeme = "/*   ___          ___          ___           ___            ___        \r\n    /\\  \\        /\\  \\        /\\  \\         /\\__\\          /\\  \\       \r\n   /::\\  \\       \\:\\  \\       \\:\\  \\       /:/  /         /::\\  \\      \r\n  /:/\\:\\  \\       \\:\\  \\       \\:\\  \\     /:/  /         /:/\\:\\  \\     \r\n /::\\~\\:\\  \\      /::\\  \\      /::\\  \\   /:/  /  ___     \\:\\~\\:\\  \\    \r\n/:/\\:\\ \\:\\__\\    /:/\\:\\__\\    /:/\\:\\__\\ /:/__/  /\\__\\  /\\ \\:\\ \\:\\__\\   \r\n\\/__\\:\\/:/  /   /:/  \\/__/   /:/  \\/__/ \\:\\  \\ /:/  /  \\:\\ \\:\\ \\/__/   \r\n     \\::/  /   /:/  /       /:/  /       \\:\\  /:/  /    \\:\\ \\:\\__\\     \r\n     /:/  /   /:/  /       /:/  /         \\:\\/:/  /      \\:\\/:/  /     \r\n    /:/  /    \\/__/        \\/__/           \\::/  /        \\::/  /      \r\n    \\/__/                                   \\/__/          \\/__/       \r\n\r\n	艾特图斯 https://www.attus.cn\r\n	" + time + " Beijing.Shanghai.China\r\n	Wechat:alextus\r\n	Mobile:13717810545\r\n	Atu.js不兼容IE6、8、9、10 浏览器，移动项目专用\r\n	version:v" + version + "\r\n*/"
 
 var paths = {
   scripts: ['src/atu.js', 'src/event.js', 'src/ajax.js', 'src/tween.js','src/animate.js', 'src/loadFile.js', 'src/message.js',  'src/common.js']
@@ -55,7 +55,19 @@ gulp.task('default', async () => {
 
   gulp.src(paths.scripts)
     .pipe(babel())
+    .pipe(replace('13717810545', time.substring(0,7)))
+    .pipe(replace('/* readme */',redeme))
     .pipe(concat('atu.' + version + '.js'))
+    .pipe(uglify({
+      mangle: false,        //类型：Boolean 默认：true， 是否修改变量名
+      compress: false,      //类型：Boolean 默认：true， 是否完全压缩
+      output: {
+        preamble: redeme,
+        comments: function (node, comment) {
+          return comment.value.indexOf("@date") >= 0;  //含有@date字符 部分的注释进行保留
+        },
+      }
+    }))
     .pipe(gulp.dest('build'))
     .on('error', function (err) {
       gutil.log(gutil.colors.red('[Error]'), err.toString());
@@ -63,6 +75,8 @@ gulp.task('default', async () => {
 
   gulp.src(paths.scripts)
     .pipe(babel())
+    .pipe(replace('13717810545', time.substring(0,7)))
+    .pipe(replace('/* readme */',redeme))
     .pipe(concat('atu.' + version + '.min.js'))
     .pipe(uglify({
       mangle: true,        //类型：Boolean 默认：true， 是否修改变量名
