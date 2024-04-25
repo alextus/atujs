@@ -57,7 +57,15 @@ var Atu = (function () {
 		return obj == null ? String(obj) :
 			class2type[toString.call(obj)] || "object"
 	}
-
+  function isNumber(val){
+    var num = Number(val), type = typeof val
+    return val != null && type != 'boolean' &&
+      (type != 'string' || val.length) &&
+      !isNaN(num) && isFinite(num) || false
+  }
+  function isString(val){
+    return typeof val === "string";
+  }
 	function isFunction(value) { return type(value) == "function" }
 	function isWindow(obj) { return obj != null && obj == obj.window }
 	function isDocument(obj) { return obj != null && obj.nodeType == obj.DOCUMENT_NODE }
@@ -264,13 +272,8 @@ var Atu = (function () {
 		for (name in obj) return false
 		return true
 	}
-
-	$.isNumber = function (val) {
-		var num = Number(val), type = typeof val
-		return val != null && type != 'boolean' &&
-			(type != 'string' || val.length) &&
-			!isNaN(num) && isFinite(num) || false
-	}
+	$.isNumber =isNumber
+  $.isString =isString
 	$.inArray = function (elem, array, i) {
 		return emptyArray.indexOf.call(array, elem, i)
 	}
@@ -704,6 +707,20 @@ var Atu = (function () {
 				})
 			})
 		},
+    scale:function(){
+      let sx=sy=1,pxy='center center',i1=i2=0
+      if (arguments.length ==2) {
+        isString(arguments[1])?pxy=arguments[1]: i2=1;
+      }
+      if (arguments.length ==3) {i2=2; pxy=arguments[2];      }
+      sx=arguments[i1];
+      sy=arguments[i2];
+      let s="scale("+sx+","+sy+")"
+      return this.each(function (idx) {
+        $(this).css({"transform":s,"-webkit-transform":s,"-moz-transform":s,"-ms-transform":s,
+                     "transform-origin":pxy,"-webkit-transform-origin":pxy,"-moz-transform-origin":pxy,"-ms-transform-origin":pxy})
+      })
+    },
 		scrollTop: function (value) {
 			if (!this.length) return
 			var hasScrollTop = 'scrollTop' in this[0]

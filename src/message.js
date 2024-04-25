@@ -3,6 +3,7 @@
 	a.tip = function (msg) {
 		if ($(".tipBox").length == 0) {
 			$("body").append('<div class="tipBox"></div>')
+      if(isPc){$("body").addClass("isPc");}
 		}
 		$(".tipBox").append('<div class="tip">' + msg + '</div>').show()
 		setTimeout(function () {
@@ -12,7 +13,9 @@
 	a.alert = function (msg, tag1, fun1, tag2, fun2) {
 		if ($(".alertBox").length == 0) {
 			$("body").append('<div class="alertBox hide"><div class="msg"><div class="msgTitle"><p>msg</p></div><div class="msgTool"></div></div></div>')
-		}
+      if(isPc){$("body").addClass("isPc");}
+    }
+    
 		hideAlertBox = function () { $(".alertBox").hide(); }
 		if (fun1 == undefined) { fun1 = hideAlertBox; }
 		if (fun2 == undefined) { fun2 = hideAlertBox; }

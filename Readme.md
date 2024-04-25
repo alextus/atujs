@@ -4,7 +4,9 @@
   两个发布版本都过滤注释，只是min会压缩变量
   新增string.replaceAll
       isTouchDevice
-       $.touch, $.touchmove, $.touchend
+      $.touch, $.touchmove, $.touchend
+
+  新增 $.isString $(id).scale()
 # 1.2.0
   新增isUrl,isIdcard
   $.touchLeft,$.touchRight,$.touchUp,$.touchDown
@@ -19,8 +21,7 @@
 ## 1.1.8.1 3秒内仅console.log(版本信息)一次
 # 1.1.7
   $.isMobile更新，添加14，15，17，18，19段
-  新增 $.replaceWith
-  新增 tabSwitch及longPress
+  新增 $.replaceWith $.tabSwitch 及 $.longPress
   更新 a.alert,Atu.act,format()
   新增 console(),e(),at(id),ce(tagName),year(),month(),week(),day(),hour(),now(),getLeftTime(),getPassTime()
 # 1.1.6
