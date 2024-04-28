@@ -545,7 +545,8 @@ var Atu = (function () {
 				(0 in this ? this[0].innerHTML : null)
 		},
 		outHtml:function(){
-			return this[0].outHTML
+      //console.log(this[0].outHtml)
+      return $('<div></div>').append(this.clone()).html()
 		},
 		text: function (text) {
 			return 0 in arguments ?
