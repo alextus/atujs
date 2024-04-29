@@ -12,6 +12,35 @@
   <script src="../src/animate.js?v=1.13"></script>
 </head>
 <body>
+  <div>
+    <h2>transform</h2>
+    <div class="a1" style="background:#000;width: 20px;height:20px; transform: translateX(10px) rotate(120deg);"></div>
+    <div class="a2" style="background:#000;width: 20px;height:20px; transform: translate(40px,40px) rotate(120deg);"></div>
+    <a href="javascript:get();">get</a> 
+    <script>
+       function get(){
+           console.log($(".a1").css("transform"))
+           console.log($(".a2").css("transform"))
+           console.log( getElementTransforms($(".a1")[0]).get("translateX")||0)
+           console.log( getElementTransforms($(".a2")[0]).get("translateX")||0)
+        }
+
+ function getElementTransforms(el) {
+  
+  var str = el.style.transform || '';
+  var reg  = /(\w+)\(([^)]*)\)/g;
+  var transforms = new Map();
+  var m; while (m = reg.exec(str)) { transforms.set(m[1], m[2]); }
+  return transforms;
+}
+    </script>
+  </div>
+
+
+
+
+
+
   <div class="anim" style="position: relative;">
     <div id="kuai" class="absolute top left" style="background:#000;color:#fff; width: 20px;height:20px; opacity: 1; ">11</div>
     <div id="kuai2" class="absolute top left" style="background:#000;color:#fff; width: 20px;height:20px; top:20px; ">22</div>
@@ -20,25 +49,27 @@
     <br/><br/>   <br/><br/>
     <a href="javascript:toRight();">toRight</a> 
     <a href="javascript:rotation();">rotation</a> 
-    
+    <h2>Tween</h2>
+    <a href="javascript:toRight2();">toRight2</a> 
+    <a href="javascript:rotation2();">rotation2</a> 
     <script>
         function toRight(){
             /*
             linear　　平均速度
-ease　　快启动，慢停止，物理原则
-ease-in　　先慢，后快
-ease-out　　先快，后慢
-ease-in-out　　先慢，再快，再慢停止
+            ease　　快启动，慢停止，物理原则
+            ease-in　　先慢，后快
+            ease-out　　先快，后慢
+            ease-in-out　　先慢，再快，再慢停止
 
-            1.ease   对应自定义cubic-bezier(.25,.01,.25,1),效果为先慢后快再慢；
-2.linear   对应自定义cubic-bezier(0,0,1,1)，效果为匀速直线； 
-3.ease-in  对应自定义cubic-bezier(.42,0,1,1),效果为先慢后快； 
-4.ease-out  对应自定义cubic-bezier(0,0,.58,1),效果为先快后慢； 
-5.ease-in-out   对应自定义cubic-bezier(.42,0,.58,1),效果为先慢后快再慢。 
-来回缓冲效果 cubic-bezier(0.68, -0.55, 0.27, 1.55) 如下图  
-cubic-bezier(.21,1.93,.53,.64)
-cubic-bezier(0, .27, .32, 1)
-cubic-bezier(1, 0, 0.96, 0.91)
+                        1.ease   对应自定义cubic-bezier(.25,.01,.25,1),效果为先慢后快再慢；
+            2.linear   对应自定义cubic-bezier(0,0,1,1)，效果为匀速直线； 
+            3.ease-in  对应自定义cubic-bezier(.42,0,1,1),效果为先慢后快； 
+            4.ease-out  对应自定义cubic-bezier(0,0,.58,1),效果为先快后慢； 
+            5.ease-in-out   对应自定义cubic-bezier(.42,0,.58,1),效果为先慢后快再慢。 
+            来回缓冲效果 cubic-bezier(0.68, -0.55, 0.27, 1.55) 如下图  
+            cubic-bezier(.21,1.93,.53,.64)
+            cubic-bezier(0, .27, .32, 1)
+            cubic-bezier(1, 0, 0.96, 0.91)
             */
             console.log("toRight")
             //$("#kuai").fadeIn()
@@ -53,7 +84,19 @@ cubic-bezier(1, 0, 0.96, 0.91)
         function rotation(){
             $("#kuai2").animate({rotate: '45deg', translate3d: '10px,10px,10px'},1200)
         }
-     
+        function toRight2(){
+        
+            $("#kuai").tween({width: 200}, 1.2,{ease:"Sine.easeIn"});
+            $("#kuai2").tween({width: 200}, 1.2,{ease:"Sine.easeOut"});
+            $("#kuai3").tween({width: 200}, 1.2,{ease:"Sine.easeInOut"});
+            $("#kuai4").tween({width: 200}, 1.2,{easne:"Bounce.easeIn"});
+         
+           
+        }
+       
+        function rotation2(){
+            $("#kuai2").tween({rotate: '45deg'},1.2)
+        }
         function scrollTop(){
             console.log("scrollTo")
            //   $(window).scrollTop(0)

@@ -764,7 +764,24 @@ var Atu = (function () {
 					parent = parent.offsetParent
 				return parent
 			})
-		}
+		},
+    autoHeight: function (){
+
+      let minHeight=this.attr("minHeight"),obj=this[0]
+      console.log(this.css("height").replace("px",''),minHeight,this.css("height").replace("px",'')<minHeight)
+      if(minHeight && this.css("height").replace("px",'')<minHeight){
+        obj.style.height =minHeight+ 'px'
+      }
+      obj.addEventListener('input', ()=>{
+        const currentScrollTop = obj.scrollTop;
+        obj.style.height ='auto'
+        obj.style.height = (obj.scrollHeight) + 'px'; 
+        if(minHeight && obj.scrollHeight<minHeight){
+          obj.style.height =minHeight+ 'px'
+        }
+        obj.scrollTop = currentScrollTop; 
+      });
+    }
 	};
 	['width', 'height'].forEach(function (dimension) {
 		var dimensionProperty = dimension.replace(/./, function (m) { return m[0].toUpperCase() })

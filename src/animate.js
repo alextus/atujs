@@ -50,6 +50,7 @@
 		return this.anim(properties, duration, ease, callback, delay)
 	}
 	$.fn.anim = function (properties, duration, ease, callback, delay) {
+
 		var key, cssValues = {}, cssProperties, transforms = '',
 			that = this, wrappedCallback, endEvent = $.fx.transitionEnd, fired = false
 
@@ -108,45 +109,88 @@
 		return this
 	}
 
-	$.fn.tween = function (properties, duration, ease, callback, delay) {
-		if (!ease) { ease = "linear" }
+	$.fn.tween = function (properties, duration,properties2) {
+		let ease = properties2 && properties2?.ease?properties2.ease:"linear" 
+    let delay = properties2 && properties2?.delay?properties2.delay:0
+    let callback = properties2 && properties2?.callback?properties2.callback:()=>{}
+
 		console.log("tween", properties, duration, ease, callback, delay)
 
-		var stepNum = Math.floor(duration * 60 / 1000), stepI = 0
-		var _this = this
+		let stepNum = Math.floor(duration * 60), stepI = 0
+		let _this = this
 		if (stepNum < 1) { stepNum = 1 }
 		let attrs = [], attrType = "0", attrItem = [], attrStart = 0, attrEnd = 0
 		let a = 1, unit = ""
-
+    console.log(this)
 		for (key in properties) {
+      key=key.toLowerCase()
 			attrs[key] = [];
 			if (key == "scrollTop") {
 				attrType = 1
 				attrStart = this.scrollTop()
-
-			} else {
+      } else {
 				//css属性
 				attrType = 0
-				attrStart = this.css(key).replace("px", "")
+       
+      
+        if(['','x','y','scale','scalex','scaley','rotate'].indexOf(key)>0){
+          attrStart =( getElementTransforms($(_this)[0]).get(getTransformKey(key))||"0").replace(getTransformUnit(key), "")
+        }else{
+          attrStart = this.css(key).replace("px", "")
+        }
+       
 			}
-			attrEnd = properties[key]
+      if(['','x','y','scale','scalex','scaley','rotate'].indexOf(key)>0){
+			  attrEnd = properties[key].replace(getTransformUnit(key), "")
+      }else{
+        console.log("key",properties[key])
+        attrEnd = $.isNumber(properties[key])?properties[key]:properties[key].replace("px", "")
+      }
+      console.log("attrStart:",attrStart,"attrEnd:",attrEnd)
 			console.log(key, attrStart)
 			//attrItem.push(attrType)
-			for (let i = 0; i < stepNum; i++) {
+			for (let i = 0; i < stepNum-1; i++) {
 
 				attrs[key].push(easeFun(ease, attrStart, attrEnd, stepNum, i))
 			}
+      attrs[key].push(attrEnd)
 			console.log(attrs[key])
 
 		}
-
+    function getTransformKey(key){
+      let nkey=key
+      if(nkey=='x'){nkey='translateX'}
+      if(nkey=='y'){nkey='translateY'}
+      if(nkey=='scalex'){nkey='scaleX'}
+      if(nkey=='scaley'){nkey='scaleY'}
+      return nkey
+    }
+    function getTransformUnit(key){
+      return key=='rotate'?'deg':'px'
+    }
+    function getElementTransforms(el) {
+  
+      var str = el.style.transform || '';
+      var reg  = /(\w+)\(([^)]*)\)/g;
+      var transforms = new Map();
+      var m; while (m = reg.exec(str)) { transforms.set(m[1], m[2]); }
+      return transforms;
+    }
 		function update(stepI) {
 			reqAnimationFrame(function () {
 				for (key in properties) {
+          key=key.toLowerCase()
 					if (key == "scrollTop") {
 						_this.scrollTop(attrs[key][stepI])
 					} else {
-						_this.css(key, attrs[key][stepI])
+            if(['','x','y','scale','scalex','scaley','rotate'].indexOf(key)>0){
+              
+              _this.css("transform",getTransformKey(key)+"("+attrs[key][stepI]+getTransformUnit(key)+")")
+            }else{
+              _this.css(key, attrs[key][stepI])
+            }
+            
+					
 					}
 				}
 				console.log("update", key, attrs[key][stepI])
@@ -244,22 +288,67 @@
 	testEl = null
 })(Atu);
 
+var penner = (function () {
+
+  // Based on jQuery UI's implemenation of easing equations from Robert Penner (http://www.robertpenner.com/easing)
+
+  var eases = {};
+  var functionEasings = {
+    linear: function () { return function (t) { return t; }; },
+    Sine: function () { return function (t) { return 1 - Math.cos(t * Math.PI / 2); }; },
+    Circ: function () { return function (t) { return 1 - Math.sqrt(1 - t * t); }; },
+    Back: function () { return function (t) { return t * t * (3 * t - 2); }; },
+    Bounce: function () { return function (t) {
+      var pow2, b = 4;
+      while (t < (( pow2 = Math.pow(2, --b)) - 1) / 11) {}
+      return 1 / Math.pow(4, 3 - b) - 7.5625 * Math.pow(( pow2 * 3 - 2 ) / 22 - t, 2)
+    }; },
+    Elastic: function (amplitude, period) {
+      if ( amplitude === void 0 ) amplitude = 1;
+      if ( period === void 0 ) period = .5;
+
+      var a = minMax(amplitude, 1, 10);
+      var p = minMax(period, .1, 2);
+      return function (t) {
+        return (t === 0 || t === 1) ? t : 
+          -a * Math.pow(2, 10 * (t - 1)) * Math.sin((((t - 1) - (p / (Math.PI * 2) * Math.asin(1 / a))) * (Math.PI * 2)) / p);
+      }
+    }
+  };
+
+  var baseEasings = ['Quad', 'Cubic', 'Quart', 'Quint', 'Expo'];
+
+  baseEasings.forEach(function (name, i) {
+    functionEasings[name] = function () { return function (t) { return Math.pow(t, i + 2); }; };
+  });
+
+  Object.keys(functionEasings).forEach(function (name) {
+    console.log(name)
+    var easeIn = functionEasings[name];
+    eases[name] = easeIn;
+    eases[name+'easeIn'] = easeIn;
+    eases[name+'easeOut'] = function (a, b) { return function (t) { return 1 - easeIn(a, b)(1 - t); }; };
+    eases[name+'easeInOut'] = function (a, b) { return function (t) { return t < 0.5 ? easeIn(a, b)(t * 2) / 2 : 
+      1 - easeIn(a, b)(t * -2 + 2) / 2; }; };
+    eases[name+'easeOutIn'] = function (a, b) { return function (t) { return t < 0.5 ? (1 - easeIn(a, b)(1 - t * 2)) / 2 : 
+      (easeIn(a, b)(t * 2 - 1) + 1) / 2; }; };
+  });
+  //console.log(eases)
+  return eases;
+
+})();
 function easeFun(ease, s, e, d, t) {
 	//s startVal,e endVal,d step t stepI 0~step
+  ease=ease.replace(".ease","ease")
+
 	let a = t / d, b = s * 1, c = e - s
-	//"Linear","Quad","Cubic","Quart","Quint,Sine,Expo,Circ,Elastic,Bounce,Back"
-	let easeType = ["linear", "Quad", "Cubic", "Quart", "Quint", "Sine", "Expo", "Circ", "Elastic", "Bounce", "Back"]
 
-	let easeArrs = []
-	for (let i = 1; i < easeType.length; i++) {
-		easeArrs.push('easeIn' + easeType[i])
-		easeArrs.push('easeOut' + easeType[i])
-		easeArrs.push('easeInOut' + easeType[i])
-	}
-
-	if (anime.penner.includes(ease)) {
-		return b + c * eval(anime.penner[ease]() + '(' + a + ')')
+	if (ease in penner) {
+		return b + c * penner[ease]()( a )
 	} else {
 		return b + c * a;
 	}
 };
+function minMax(val, min, max) {
+  return Math.min(Math.max(val, min), max);
+}

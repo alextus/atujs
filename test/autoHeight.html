@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>autoHeight</title>
+  <script src="../src/atu.js?v=1.16"></script>
+  <style>
+     textarea{ resize: none;}
+     .edit{ width: 200px; height: 100px; border:1px solid #333;}
+  </style>
+</head>
+<body>
+  <textarea name="readme" cols="90" rows="4" autoHeight="true" ></textarea>
+  <div class="edit" contenteditable="true" minHeight="200"></div>
+  <script>
+  
+      $("textarea").autoHeight()
+      $(".edit").autoHeight()
+      /*
+      $("textarea").each(function(){
+          if($(this).attr("autoHeight")){
+            autoHeight($(this)[0])
+          
+          }
+      })
+      autoHeight($('.edit')[0])
+      function autoHeight(obj){
+        let minHeight=$(obj).attr("minHeight")
+        if($(obj).css("height")<minHeight){$(obj).css("height",minHeight)}
+        obj.addEventListener('input', ()=>{
+          const currentScrollTop = obj.scrollTop;
+          obj.style.height = (obj.scrollHeight) + 'px'; 
+          if(minHeight && obj.scrollHeight<minHeight){
+            obj.style.height =minHeight+ 'px'
+          }
+          obj.scrollTop = currentScrollTop; 
+        });
+      }
+      */
+  </script>
+</body>
+</html>
