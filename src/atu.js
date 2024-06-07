@@ -544,6 +544,13 @@ var Atu = (function () {
 				}) :
 				(0 in this ? this[0].innerHTML : null)
 		},
+    htmls:function(html){
+      return 0 in arguments ?
+      this.each(function (idx) {
+        $(this).replaceWith(html)
+      }) :
+      (0 in this ? this[0].outerHTML : null)
+    },
 		outHtml:function(){
       //console.log(this[0].outHtml)
       return $('<div></div>').append(this.clone()).html()
