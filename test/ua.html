@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ua</title>
+  <style>
+    p{padding:0 0 0 20px;margin: 0;}
+  </style>
+</head>
+<body>
+ 
+  <script>
+    var ua = navigator.userAgent.toLowerCase()
+    var up = navigator.platform.toLowerCase(); 
+    var browser = {
+      ua: ua,
+      ie: ua.indexOf('trident') > -1 ? true : false, //IE内核
+      opera: !!window.opera && window.opera.version,
+      webKit: ua.indexOf('applewebkit') > -1, //苹果、谷歌内核
+      mac: ua.indexOf("macintosh") > -1,
+      gecko: ua.indexOf('gecko') > -1 && ua.indexOf('khtml') == -1, //火狐内核
+      mobile: !!ua.match(/applewebkit.*mobile.*/), //是否为移动终端
+      ios: !!ua.match(/\(i[^;]+;( u;)? cpu.+mac os x/), //ios终端
+      WindowsPhone: ua.indexOf('windows phone') > -1, 
+      weixin: ua.indexOf('micromessenger') > -1,
+      SymbianOS: ua.indexOf('symbian') > -1||ua.indexOf('symbianos') > -1, 
+      quirks: document.compatMode == "BackCompat",
+      language: (navigator.browserLanguage || navigator.language).toLowerCase()
+    }
+    let bs=['presto','chrome','safari','edg','android','linux','iPhone','iPad','iPod','alipay','firefox','xiaomi','redmi','vivo','oppo','honor','huawei','weibo','eleme','qq']
+    bs.forEach(item => {
+      window["is"+capitalizeFirstLetter(item)]=window["is_"+item.toLowerCase()]=browser[item]= browser[item.toLowerCase()]= ua.indexOf(item.toLowerCase()) > -1
+    });
+    console.log(ua)
+    console.log(isEleme,is_eleme)
+    
+      browser.type=browser.ie ? "IE" : browser.opera ? "Opear" :  browser.edge ? "Edge" :
+      browser.weixin ? "Weixin" :browser.chrome ? "Chrome" : browser.safari ? "Safari" : "other";
+      browser.engine=browser.webKit?"Webkit":browser.gecko?"Gecko":browser.ie?"Trident":"other"
+      var isWeixin = is_weixin = browser.weixin
+    /*
+    
+    var isWeibo = is_weibo = browser.weibo
+    var isEleme = is_eleme =  browser.eleme
+    var isIphone = is_iphone =  browser.iPhone
+    var isIPad = is_ipad =  browser.iPad
+    */
+    var isPc=is_pc  =(browser.android||browser.iPhone||browser.iPad||browser.iPod||browser.SymbianOS||browser.WindowsPhone)?false:true;
+    var isMob =is_mob = !isPc
+    var isLocal=is_local=location.href.indexOf("localhosts")>0
+    var system = {win: up.indexOf("win") == 0, mac: up.indexOf("mac") == 0, linux: up.indexOf("linux") == 0, xll: false, ipad:isIpad }; 
+    system.type=system.win?"Win":system.mac?"Mac":system.ipad?"Ipad":browser.android?"Android":system.linux?"linux":"other"
+    
+    
+    
+    
+    function camelize(str) { return str.replace(/-+(.)?/g, function (match, chr) { return chr ? chr.toUpperCase() : '' }) }
+    function capitalizeFirstLetter(str) {
+      return str.toLowerCase().replace(/\b[a-z]/g, function(match) { return match.toUpperCase();});
+    }
+    console.log("isWeixin",isWeixin)
+    console.log(camelize('weixin'))
+    console.log(camelize('isWeixin'))
+    console.log(camelize('is-weixin'))
+      </script>
+  
+</body>
+</html>

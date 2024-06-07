@@ -1,6 +1,7 @@
 /**
  * browser 浏览器类型检测，已通过chrome 93，ie 11
  */
+
 var ua = navigator.userAgent.toLowerCase()
 var up = navigator.platform.toLowerCase(); 
 var browser = {
@@ -9,41 +10,30 @@ var browser = {
 	opera: !!window.opera && window.opera.version,
 	webKit: ua.indexOf('applewebkit') > -1, //苹果、谷歌内核
 	mac: ua.indexOf("macintosh") > -1,
-	presto: ua.indexOf('presto') > -1, //opera内核
-	chrome: ua.indexOf('chrome') > -1,
-	safari: ua.indexOf('safari') > -1,
-	firefox: ua.indexOf('firefox') > -1,
 	edge: ua.indexOf('edg') > -1,
 	gecko: ua.indexOf('gecko') > -1 && ua.indexOf('khtml') == -1, //火狐内核
 	mobile: !!ua.match(/applewebkit.*mobile.*/), //是否为移动终端
 	ios: !!ua.match(/\(i[^;]+;( u;)? cpu.+mac os x/), //ios终端
-	android: ua.indexOf('android') > -1,
-	linux: ua.indexOf('linux') > -1, 
-	iPhone: ua.indexOf('iphone') > -1, 
-	iPad: ua.indexOf('ipad') > -1, 
-	iPod: ua.indexOf('ipod') > -1, 
 	SymbianOS: ua.indexOf('symbian') > -1||ua.indexOf('symbianos') > -1, 
 	WindowsPhone: ua.indexOf('windows phone') > -1, 
 	weixin: ua.indexOf('micromessenger') > -1,
-	weibo: ua.indexOf('weibo') > -1,
-	eleme: ua.indexOf('eleme') > -1,
 	quirks: document.compatMode == "BackCompat",
 	language: (navigator.browserLanguage || navigator.language).toLowerCase()
 }
-	browser.type=browser.ie ? "IE" : browser.opera ? "Opear" :  browser.edge ? "Edge" :
-	browser.weixin ? "Weixin" :browser.chrome ? "Chrome" : browser.safari ? "Safari" : "other";
-	browser.engine=browser.webKit?"Webkit":browser.gecko?"Gecko":browser.ie?"Trident":"other"
 
+let bs=['presto','chrome','safari','firefox','android','linux','iPhone','iPad','iPod','alipay','xiaomi','redmi','vivo','oppo','honor','huawei','weibo','eleme','qq']
+bs.forEach(item => {
+  window["is"+capitalizeFirstLetter(item)]=window["is_"+item.toLowerCase()]=browser[item]= browser[item.toLowerCase()]= ua.indexOf(item.toLowerCase()) > -1
+});
+browser.type=browser.ie ? "IE" : browser.opera ? "Opear" :  browser.edge ? "Edge" :
+browser.weixin ? "Weixin" :browser.chrome ? "Chrome" : browser.safari ? "Safari" : "other";
+browser.engine=browser.webKit?"Webkit":browser.gecko?"Gecko":browser.ie?"Trident":"other"
 
 var isWeixin = is_weixin = browser.weixin
-var isWeibo = is_weibo = browser.weibo
-var isEleme = is_eleme =  browser.eleme
-var isIphone = is_iphone =  browser.iPhone
-var isIPad = is_ipad =  browser.iPad
 var isPc=is_pc  =(browser.android||browser.iPhone||browser.iPad||browser.iPod||browser.SymbianOS||browser.WindowsPhone)?false:true;
 var isMob =is_mob = !isPc
 var isLocal=is_local=location.href.indexOf("localhosts")>0
-var system = {win: up.indexOf("win") == 0, mac: up.indexOf("mac") == 0, linux: up.indexOf("linux") == 0, xll: false, ipad:isIPad }; 
+var system = {win: up.indexOf("win") == 0, mac: up.indexOf("mac") == 0, linux: up.indexOf("linux") == 0, xll: false, ipad:isIpad }; 
 system.type=system.win?"Win":system.mac?"Mac":system.ipad?"Ipad":browser.android?"Android":system.linux?"linux":"other"
 
 var version = 0;
@@ -136,8 +126,9 @@ if (!window.console) {
 
 }
 
-
-
+function capitalizeFirstLetter(str) {
+  return str.toLowerCase().replace(/\b[a-z]/g, function(match) { return match.toUpperCase();});
+}
 function trim(str){
 	return str.replace(/(^\s*)|(\s*$)/g, ""); 
 }
@@ -372,40 +363,59 @@ window.onerror = function (message, url, line, column, error) {
 	console.log('error::', message, url, line, column, error);
 }
 
-
-function newDate(dateStr) {
-	var dateArr = dateStr.split(/[- : \/]/);
-	var l = dateArr.length
-	return new Date(dateArr[0], dateArr[1] - 1, dateArr[2], l <= 3 ? 0 : dateArr[3], l <= 3 ? 0 : dateArr[4], l <= 3 ? 0 : dateArr[5]);
+function timestamp(t=0){
+  let t2=t.toString()
+  if(t2.length==10){
+    return Number(t2)*1000
+  }else if(t2.length==13){
+    return Number(t2)
+  }else if(t2=="0"){
+    return new Date().getTime()
+  }else{
+    return '';
+  }
+}
+function newDate(dateStr='') {
+  if(!dateStr){return new Date();}
+  if(!isNaN(dateStr) ){
+    let t=timestamp(dateStr)
+    if(!t){  return ''}
+    dateStr= now(t);
+  }
+  var dateArr = dateStr.split(/[- : \/]/);
+  var l = dateArr.length
+  return new Date(dateArr[0], dateArr[1] - 1, dateArr[2], l <= 3 ? 0 : dateArr[3], l <= 3 ? 0 : dateArr[4], l <= 3 ? 0 : dateArr[5]);
+  
 }
 
-function year(t) {
-	var nt = t ? newDate(t) : new Date()
+function year(t='') {
+	var nt = newDate(t) 
 	return nt.getFullYear();
 }
 
-function month(t) {
-	var nt = t ? newDate(t) : new Date()
+function month(t='') {
+	var nt = newDate(t) 
 	return nt.getMonth() + 1;
 }
 
-function week(t) {
-	var nt = t ? newDate(t) : new Date()
+function week(t='') {
+	var nt = newDate(t) 
 	return nt.getDay();
 }
 
-function day(t) {
-	var nt = t ? newDate(t) : new Date()
+function day(t='') {
+	var nt = newDate(t) 
 	return nt.getDate();
 }
 
-function hour(t) {
-	var nt = t ? newDate(t) : new Date()
+function hour(t='') {
+	var nt = newDate(t) 
 	return nt.getHours();
 }
 
-function now() {
-	var date = new Date();
+function now(t='') {
+ 
+	var date = t?new Date(t):new Date()
 	var year = date.getFullYear();
 	var month = FormatNum(date.getMonth() + 1);
 	var day = FormatNum(date.getDate());
@@ -446,16 +456,23 @@ function format(time) {
 	return t
 }
 
-function Alexdate() {
-	var sd = new Date()
+function Alexdate(t=0,split='') {
+
+  if(t===''||t=='-'){
+    split=t,t=0;
+  }
+
+	var sd = t=newDate(t);
 	y = FormatNum(sd.getFullYear(), 4);
 	m = FormatNum(sd.getMonth() + 1, 2);
 	d = FormatNum(sd.getDate(), 2);
-	return y + "" + m + "" + d;
+
+	return y + split + m + split + d;
 }
 
 function FormatNum(num, weishu) {
 	s = num.toString()
+  console.log(s,s.length,weishu)
 	for (i = s.length; i < weishu; i++) {
 		s = "0" + s;
 	}
@@ -463,7 +480,7 @@ function FormatNum(num, weishu) {
 }
 
 
-
+if(!window.Atu){window.Atu={}}
 Atu.ini = function () {
 	var v = arguments
 	cookieBaseName += v[0];
