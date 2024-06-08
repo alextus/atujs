@@ -594,12 +594,18 @@ var Atu = (function () {
 			return this.each(function () { delete this[name] })
 		},
 		data: function (name, value) {
-			var attrName = 'data-' + name.replace(capitalRE, '-$1').toLowerCase()
-
-			var data = (1 in arguments) ?
-				this.attr(attrName, value) :
-				this.attr(attrName)
-
+      let attrName,data
+      if (1 in arguments){
+         attrName = 'data-' + name.replace(capitalRE, '-$1').toLowerCase()
+         data =this.attr(attrName, value)
+      }else{
+        if (isObject(name)) {
+          for (key in name){
+            attrName = 'data-' + key.replace(capitalRE, '-$1').toLowerCase()
+            data =this.attr(attrName, name[key])
+          }
+        }
+      }
 			return data !== null ? deserializeValue(data) : undefined
 		},
 		val: function (value) {
