@@ -594,9 +594,8 @@ var Atu = (function () {
 			return this.each(function () { delete this[name] })
 		},
 		data: function (name, value) {
-      let attrName,data
+      let attrName=isObject(name)?'':('data-' + name.replace(capitalRE, '-$1').toLowerCase()),data
       if (1 in arguments){
-         attrName = 'data-' + name.replace(capitalRE, '-$1').toLowerCase()
          data =this.attr(attrName, value)
       }else{
         if (isObject(name)) {
@@ -604,6 +603,8 @@ var Atu = (function () {
             attrName = 'data-' + key.replace(capitalRE, '-$1').toLowerCase()
             data =this.attr(attrName, name[key])
           }
+        }else{
+          data = this.attr(attrName)
         }
       }
 			return data !== null ? deserializeValue(data) : undefined

@@ -478,7 +478,45 @@ function FormatNum(num, weishu) {
 	}
 	return s;
 }
-
+function copy(txt){
+  if($("#atuCopyInput").length==0){
+      $("body").append('<input id="atuCopyInput" style="opacity: 0;position: absolute;"/>')
+  }
+  $("#atuCopyInput").val(txt)
+  $("#atuCopyInput")[0].select()
+  console.log(document.execCommand('copy')?'复制成功':'复制失败')
+}
+function download(url,name){
+  console.log("save",url)
+  const xhr=new window.XMLHttpRequest()
+  xhr.open('GET',url,true)
+  xhr.responseType='blob'
+  xhr.onload= function () {
+      console.log(11111)
+      const blob=window.URL.createObjectURL(x.response)
+      var a = document.createElement('a')
+      name = name || url.name || 'download'
+      a.download = name
+      a.rel = 'noopener' 
+      console.log("blob:",blob)
+      a.href = blob
+      click(a, a.target = '_blank')
+  }
+  xhr.onerror = function () {
+      console.error('could not download file')
+  }
+  xhr.send()
+}
+function click (node) {
+  try {
+      node.dispatchEvent(new MouseEvent('click'))
+  } catch (e) {
+      var evt = document.createEvent('MouseEvents')
+      evt.initMouseEvent('click', true, true, window, 0, 0, 0, 80,
+          20, false, false, false, false, 0, null)
+      node.dispatchEvent(evt)
+  }
+}
 
 if(!window.Atu){window.Atu={}}
 Atu.ini = function () {
