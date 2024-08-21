@@ -36,8 +36,11 @@
 		transitionEnd: normalizeEvent('TransitionEnd'),
 		animationEnd: normalizeEvent('AnimationEnd')
 	}
-
+  $.fn.pause = function () {
+    this.css({"transition-play-state": "paused"})
+  }
 	$.fn.animate = function (properties, duration, ease, callback, delay) {
+
 		if ($.isFunction(duration))
 			callback = duration, ease = undefined, duration = undefined
 		if ($.isFunction(ease))
@@ -49,37 +52,62 @@
 		if (delay) delay = parseFloat(delay) / 1000
 		return this.anim(properties, duration, ease, callback, delay)
 	}
+  $.fn.animateFrom = function (properties0, properties, duration, ease, callback, delay) {
+    if (typeof properties0 == 'string') {
+      properties0=cssString2Object(properties0)
+    }
+    this.css(properties0)
+    return this.animate(properties, duration, ease, callback, delay)
+	}
 	$.fn.anim = function (properties, duration, ease, callback, delay) {
-
+    this.autoCss(properties)
+    console.log("getElementTransforms",getElementTransforms($(this)[0]))
+    
+    console.log("anim",properties, duration, ease, callback, delay)
 		var key, cssValues = {}, cssProperties, transforms = '',
 			that = this, wrappedCallback, endEvent = $.fx.transitionEnd, fired = false
 
 		if (duration === undefined) duration = $.fx.speeds._default / 1000
 		if (delay === undefined) delay = 0
 		if ($.fx.off) duration = 0
-		if (typeof properties == 'string') {
+		if (typeof properties == 'string' && properties.indexOf(":")==-1) {
 			cssValues[animationName] = properties
 			cssValues[animationDuration] = duration + 's'
 			cssValues[animationDelay] = delay + 's'
-			cssValues[animationTiming] = (ease || 'linear')
+			cssValues[animationTiming] = (cssEase(ease) || 'linear')
 			endEvent = $.fx.animationEnd
 		} else {
-			cssProperties = []
+      if(properties == 'string'){
+        properties=cssString2Object(properties)
+      }
+			cssProperties =this.data('properties')?this.data('properties').split(","):[]
 			for (key in properties)
-				if (supportedTransforms.test(key)) {
-					transforms += key + '(' + properties[key] + ') '
-				} else if (key == 'scrollTop') {
+        nkey=key
+        if(key=="x" || key=="y" || key=="z"||supportedTransforms.test(key)){
+          nkey="transform"
+          let unit=getTransformUnit(key)
+          let transforms=getElementTransforms($(this)[0])
+          transforms.set(getTransformKey(key),properties[key].toString().replace(unit,'')+unit)
+          nval=cssTransformObject2String(transforms)
+  
+        }else{
+          nkey=dasherize(key)
+          nval=properties[key]
+        }
+				if (key == 'scrollTop') {
 					return $.fn.tween(properties, duration, ease, callback, delay)
 				} else {
-					cssValues[key] = properties[key], cssProperties.push(dasherize(key))
+					cssValues[nkey] = nval
+          if(cssProperties.indexOf(nkey)==-1){cssProperties.push(nkey)}
 				}
 
 			if (transforms) cssValues[transform] = transforms, cssProperties.push(transform)
 			if (duration > 0 && typeof properties === 'object') {
 				cssValues[transitionProperty] = cssProperties.join(', ')
+        this.data('properties', cssProperties.join(','))
 				cssValues[transitionDuration] = duration + 's'
 				cssValues[transitionDelay] = delay + 's'
-				cssValues[transitionTiming] = (ease || 'linear')
+				cssValues[transitionTiming] = (cssEase(ease) || 'linear')
 			}
 		}
 		wrappedCallback = function (event) {
@@ -93,37 +121,38 @@
 			$(this).css(cssReset)
 			callback && callback.call(this)
 		}
-		if (duration > 0) {
+		if (duration >= 0) {
 			this.bind(endEvent, wrappedCallback)
 			setTimeout(function () {
 				if (fired) return
-				wrappedCallback.call(that)
+				that.each(function () { wrappedCallback.call(that) })
 			}, ((duration + delay) * 1000) + 25)
 		}
 		this.size() && this.get(0).clientLeft
+    //console.log(this.size(), this.get(0).clientLeft)
+    console.log("cssValues",cssValues)
 		this.css(cssValues)
-		if (duration <= 0) setTimeout(function () {
-			that.each(function () { wrappedCallback.call(this) })
-		}, 0)
-
+	
 		return this
 	}
 
 	$.fn.tween = function (properties, duration,properties2) {
+    let _this=this
 		let ease = properties2 && properties2?.ease?properties2.ease:"linear" 
     let delay = properties2 && properties2?.delay?properties2.delay:0
     let callback = properties2 && properties2?.callback?properties2.callback:()=>{}
 
 		console.log("tween", properties, duration, ease, callback, delay)
-
+    if (duration >100) duration = duration / 1000
 		let stepNum = Math.floor(duration * 60), stepI = 0
-		let _this = this
+
 		if (stepNum < 1) { stepNum = 1 }
 		let attrs = [], attrType = "0", attrItem = [], attrStart = 0, attrEnd = 0
 		let a = 1, unit = ""
     console.log(this)
+    //this.autoCss(properties)
 		for (key in properties) {
-      key=key.toLowerCase()
+      //key=key.toLowerCase()
 			attrs[key] = [];
 			if (key == "scrollTop") {
 				attrType = 1
@@ -136,15 +165,16 @@
         if(['','x','y','scale','scalex','scaley','rotate'].indexOf(key)>0){
           attrStart =( getElementTransforms($(_this)[0]).get(getTransformKey(key))||"0").replace(getTransformUnit(key), "")
         }else{
-          attrStart = this.css(key).replace("px", "")
+          console.log(key,dasherize(key),_this.css(key),this,_this) 
+          attrStart = _this.css(key).toString().replace("px", "")
         }
        
 			}
       if(['','x','y','scale','scalex','scaley','rotate'].indexOf(key)>0){
 			  attrEnd = properties[key].replace(getTransformUnit(key), "")
       }else{
-        console.log("key",properties[key])
-        attrEnd = $.isNumber(properties[key])?properties[key]:properties[key].replace("px", "")
+        console.log("key",key,dasherize(key),properties[key])
+        attrEnd = $.isNumber(properties[key])?properties[key]:properties[key].toString().replace("px", "")
       }
       console.log("attrStart:",attrStart,"attrEnd:",attrEnd)
 			console.log(key, attrStart)
@@ -155,31 +185,13 @@
 			}
       attrs[key].push(attrEnd)
 			console.log(attrs[key])
-
+     
 		}
-    function getTransformKey(key){
-      let nkey=key
-      if(nkey=='x'){nkey='translateX'}
-      if(nkey=='y'){nkey='translateY'}
-      if(nkey=='scalex'){nkey='scaleX'}
-      if(nkey=='scaley'){nkey='scaleY'}
-      return nkey
-    }
-    function getTransformUnit(key){
-      return key=='rotate'?'deg':'px'
-    }
-    function getElementTransforms(el) {
-  
-      var str = el.style.transform || '';
-      var reg  = /(\w+)\(([^)]*)\)/g;
-      var transforms = new Map();
-      var m; while (m = reg.exec(str)) { transforms.set(m[1], m[2]); }
-      return transforms;
-    }
+    
 		function update(stepI) {
 			reqAnimationFrame(function () {
 				for (key in properties) {
-          key=key.toLowerCase()
+          //key=key.toLowerCase()
 					if (key == "scrollTop") {
 						_this.scrollTop(attrs[key][stepI])
 					} else {
@@ -193,7 +205,7 @@
 					
 					}
 				}
-				console.log("update", key, attrs[key][stepI])
+				//console.log("update", key, attrs[key][stepI])
 				if (stepI < stepNum - 1) {
 					stepI++;
 					update(stepI)
@@ -267,23 +279,19 @@
 			](speed, callback)
 		})
 	}
-
-	$.fn.longPress = function (fn, trsTime) {   //长按监听
-		var $this = this;
-		for (var i = 0; i < $this.length; i++) {
-			(function (target) {
-				var timeout;
-				target.addEventListener('touchstart', function (event) {
-					timeout = setTimeout(function () {
-						fn(event);
-					}, trsTime ? trsTime : 200);
-				}, false);
-				target.addEventListener('touchend', function (event) {
-					clearTimeout(timeout);
-				}, false);
-			})($this[i]);
-		}
-	}
+  $.fn.autoCss=function(props){
+    const obj=["width","height","top","left","background-color","font-size","line-height"]
+    console.log("autoCss")
+    const el = $(this)
+   
+    obj.forEach(properties => {
+       let auto=props && !(properties in props)?0:1
+        //console.log(properties,auto,props,properties in props)
+        auto && el.css({[properties]:el.css(properties)})
+    });
+     
+   
+  }
 
 	testEl = null
 })(Atu);
@@ -323,22 +331,61 @@ var penner = (function () {
   });
 
   Object.keys(functionEasings).forEach(function (name) {
-    console.log(name)
-    var easeIn = functionEasings[name];
+   // console.log(name)
+    var easeIn = functionEasings[name];  
     eases[name] = easeIn;
-    eases[name+'easeIn'] = easeIn;
-    eases[name+'easeOut'] = function (a, b) { return function (t) { return 1 - easeIn(a, b)(1 - t); }; };
-    eases[name+'easeInOut'] = function (a, b) { return function (t) { return t < 0.5 ? easeIn(a, b)(t * 2) / 2 : 
+    eases[name+'In'] =eases[name+'easeIn'] = easeIn;
+    eases[name+'Out'] =eases[name+'easeOut'] = function (a, b) { return function (t) { return 1 - easeIn(a, b)(1 - t); }; };
+    eases[name+'InOut'] = eases[name+'easeInOut'] = function (a, b) { return function (t) { return t < 0.5 ? easeIn(a, b)(t * 2) / 2 : 
       1 - easeIn(a, b)(t * -2 + 2) / 2; }; };
-    eases[name+'easeOutIn'] = function (a, b) { return function (t) { return t < 0.5 ? (1 - easeIn(a, b)(1 - t * 2)) / 2 : 
+    eases[name+'OutIn'] = function (a, b) { return function (t) { return t < 0.5 ? (1 - easeIn(a, b)(1 - t * 2)) / 2 : 
       (easeIn(a, b)(t * 2 - 1) + 1) / 2; }; };
   });
   //console.log(eases)
   return eases;
 
 })();
+function cssEase(ease) {
+  switch (ease) {
+    case "linear":return "cubic-bezier(.5,0,.5,1)";
+    case "QuadIn":return "cubic-bezier(0.55, 0.085, 0.68, 0.53)";
+    case "QuadOut":return "cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+    case "QuadInOut":return "cubic-bezier(0.455, 0.03, 0.515, 0.955)";
+    case "CubicIn":return "cubic-bezier(0.55, 0.055, 0.675, 0.19)";
+    case "CubicOut":return "cubic-bezier(0.215, 0.61, 0.355, 1)";
+    case "CubicInOut":return "cubic-bezier(0.645, 0.045, 0.355, 1)";
+    case "QuartIn":return "cubic-bezier(0.895, 0.03, 0.685, 0.22)";
+    case "QuartOut":return "cubic-bezier(0.165, 0.84, 0.44, 1)";
+    case "QuartInOut":return "cubic-bezier(0.77, 0, 0.175, 1)";
+    case "QuintIn":return "cubic-bezier(0.755, 0.05, 0.855, 0.06)";
+    case "QuintOut":return "cubic-bezier(0.23, 1, 0.32, 1)";
+    case "QuintInOut":return "cubic-bezier(0.86, 0, 0.07, 1)";
+    case "ExpoIn":return "cubic-bezier(0.95, 0.05, 0.795, 0.035)";
+    case "ExpoOut":return "cubic-bezier(0.19, 1, 0.22, 1)";
+    case "ExpoInOut":return "cubic-bezier(1, 0, 0, 1)";
+    case "SineIn":return "cubic-bezier(0.47, 0, 0.745, 0.715)";
+    case "SineOut":return "cubic-bezier(0.39, 0.575, 0.565, 1)";
+    case "SineInOut":return "cubic-bezier(0.445, 0.05, 0.55, 0.95)";
+    case "CircIn":return "cubic-bezier(0.6, 0.04, 0.98, 0.335)";
+    case "CircOut":return "cubic-bezier(0.075, 0.82, 0.165, 1)";
+    case "CircInOut":return "cubic-bezier(0.785, 0.135, 0.15, 0.86)";
+    case "BackIn":return "cubic-bezier(0.6, -0.28, 0.735, 0.045)";
+    case "BackOut":return "cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+    case "BackInOut":return "cubic-bezier(0.68, -0.55, 0.265, 1.55)";
+    case "ElasticIn":return "cubic-bezier(0.752, 0.085, 0.364, 1)";
+    case "ElasticOut":return "cubic-bezier(0.22, 1, 0.365, 1)";
+    case "ElasticInOut":return "cubic-bezier(1, -0.52, 0, 1.49)";
+    case "BounceIn":return "cubic-bezier(0.2, 0.75, 0.45, 1)";
+    case "BounceOut":return "cubic-bezier(0.34, 1.56, 0.64, 1)";
+    case "BounceInOut":return "cubic-bezier(0.895, 0.03, 0.685, 0.22)";
+    default:
+      return ease;
+  }
+}
+
 function easeFun(ease, s, e, d, t) {
 	//s startVal,e endVal,d step t stepI 0~step
+  
   ease=ease.replace(".ease","ease")
 
 	let a = t / d, b = s * 1, c = e - s
@@ -351,4 +398,48 @@ function easeFun(ease, s, e, d, t) {
 };
 function minMax(val, min, max) {
   return Math.min(Math.max(val, min), max);
+}
+function cssString2Object(cssString){
+  const cssObject = {};
+  const cssProperties = cssString.split(';');
+  cssProperties.forEach((property) => {
+    if (property.trim()!== '') {
+      const [key, value] = property.split(':');
+      cssObject[key.trim()] = value.trim();
+    }
+  });
+  return cssObject
+}
+function cssObject2String(obj){
+  let cssString = ''
+  for(let key in obj){
+    cssString+=key+':'+obj[key]+';'
+  }
+  return cssString
+}
+function cssTransformObject2String(myMap){
+  let cssString = ''
+  for (const [key, value] of myMap) {
+    cssString += `${key}(${value}) `;
+  }
+  return cssString
+}
+function getTransformKey(key){
+  let nkey=key
+  if(nkey=='x'){nkey='translateX'}
+  if(nkey=='y'){nkey='translateY'}
+  if(nkey=='z'){nkey='translateZ'}
+  return nkey
+}
+function getTransformUnit(key){
+  console.log("getTransformUnit",key)
+  return (key=='rotate'||key=='rotateX'||key=='rotateY')?'deg':'px'
+}
+function getElementTransforms(el) {
+
+  var str = el.style.transform || '';
+  var reg  = /(\w+)\(([^)]*)\)/g;
+  var transforms = new Map();
+  var m; while (m = reg.exec(str)) { transforms.set(m[1], m[2]); }
+  return transforms;
 }

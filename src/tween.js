@@ -7,7 +7,8 @@ Tween.to = function (el, duration, properties) {
 	$(el).tween(properties,duration,properties)
 }
 Tween.fromTo = function (el, duration, properties, properties2) {
-
+  $(el).css(properties)
+  Tween.to(el,duration,properties2)
 }
 /**
  * 

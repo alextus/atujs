@@ -6,9 +6,125 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="../src/atu.js"></script>
+    <script src="../src/event.js"></script>
     <script src="../src/animate.js"></script>
+    <script src="../src/common.js"></script>
+    <style>
+      .demo{ background: #000; color: #fff; display: inline-block;}
+      .demo2,.demo3,.demo4{ position:absolute;}
+    </style>
 </head>
 <body>
-    
+    <div class="demo demo1">显示与隐藏<br/>淡入与淡出</div><br/>
+    <a href="javascript:show();" class="btn">显示</a>
+    <a href="javascript:hide();" class="btn">隐藏</a>
+    <a href="javascript:showhide();" class="btn">显示隐藏</a>
+    <a href="javascript:fadeIn();" class="btn">FadeIn</a>
+    <a href="javascript:fadeOut();" class="btn">FadeOut</a>
+    <a href="javascript:fadeInOut();" class="btn">FadeInOut</a>
+    <script>
+      function show(){
+        $(".demo1").show()
+      }
+      function hide(){
+        $(".demo1").hide()
+      }
+      function showhide(){
+        $(".demo1").toggle()
+      }
+      function fadeIn(){
+        $(".demo1").fadeIn()
+      }
+      function fadeOut(){
+        $(".demo1").fadeOut()
+      }
+      function fadeInOut(){
+        $(".demo1").fadeToggle()
+      }
+      
+    </script>
+    <br/><br/>
+    animate(properties, duration, ease, callback, delay)<br/>
+    css 方式实现,缺点是无法中间暂停<br/>
+    <div style="position: relative;height: 32px;">
+      <div class="demo demo2" >obj</div>
+    </div><br/>
+    各类属性<br/>
+    <a href="javascript:goAnim({top:300});">top+300</a> <br/>
+    <a href="javascript:goAnim({left:300});">left+300</a> <br/>
+    <a href="javascript:goAnim({width:100});">width+100</a> <br/>
+    <a href="javascript:goAnim({'background-color':'red'});">background-color+100</a> <br/>
+    <a href="javascript:goAnim({color:'green'});">color+100</a> <br/>
+    <a href="javascript:goAnim({'font-size':42});">font-size+42</a> <br/>
+    <a href="javascript:goAnim({'x':'200px'});">x+200</a> <br/>
+    <a href="javascript:goAnim({'y':200});">y+200</a> <br/>
+    <a href="javascript:goAnim({'rotate':'180deg'});">rotate+180</a> <br/>
+    <a href="javascript:pause();">暂停</a> <br/>
+    <script>
+      function goAnim(properties){
+      
+   
+       // console.log(getComputedStyle($(".demo2")[0]).getPropertyValue('width')) 这个会自动赋值
+       // 
+      //  $(".demo2").css({width:$(".demo2").width(),height:$(".demo2").height()})
+        $(".demo2").animate(properties, 1000,"ease", function(){})
+        setTimeout(function(){
+          $(".demo2").pause()
+        },500)
+      }
+      function pause(){
+        $(".demo2").pause()
+      }
+
+    </script>
+    <br/><br/>各类缓动<br/>
+    <div class="goXList">
+      
+    </div> 
+
+
+
+    left+300 :<a href="javascript:goX('In');" class="btn">easeIn</a>
+    <a href="javascript:goX('Out');" class="btn"> easeOut</a>
+    <a href="javascript:goX('InOut');" class="btn"> easeInOut</a><br/>
+
+
+    <script>
+      easeList=['linear', 'Sine', 'Circ', 'Back', 'Bounce', 'Elastic', 'Quad', 'Cubic', 'Quart', 'Quint','Expo']
+      for(var i=0;i<easeList.length;i++){
+        $(".goXList").append('<div class="goX" data-ease="'+easeList[i]+'" style="position: relative; height: 32px;">\
+          <div class="demo demo3">滑动'+easeList[i]+' </div>\
+        </div>')
+      }
+
+      function goX(ease){
+        $(".goX").each(function(){
+          let eased=$(this).data("ease")+ease
+          console.log(eased)
+            $( $(this).find(".demo3")).animateFrom({left:0},{left:300}, 1000,eased, function(){})
+        })
+       
+      }
+    </script><br/><br/>
+tween(properties, duration, ease, callback, delay)<br/>
+分节奏 setTimeout 方式实现
+<div style="position: relative; height: 32px;">
+  <div class="demo demo4">自定义动画</div> 
+</div>
+<div class="demo4List" >
+  <a href="javascript:goTween();" >goTween</a><br/>
+</div>
+
+  <br/> <br/> <br/> <br/> <br/> <br/> <br/>
+    <script>
+      for(var i=0;i<easeList.length;i++){
+        $(".demo4List").append("<a href=\"javascript:goTween('"+easeList[i]+"In');\" class='btn'>"+easeList[i]+"In</a>&nbsp;&nbsp;")
+        $(".demo4List").append("<a href=\"javascript:goTween('"+easeList[i]+"Out');\" class='btn'>"+easeList[i]+"Out</a>&nbsp;&nbsp;")
+        $(".demo4List").append("<a href=\"javascript:goTween('"+easeList[i]+"InOut');\" class='btn'>"+easeList[i]+"InOut</a><br/>")
+      }
+      function goTween(ease){
+ $(".demo4").tween({left:300},1000,{ease:ease?ease:"easeInOut"})
+      }
+    </script>
 </body>
 </html>

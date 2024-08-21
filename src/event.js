@@ -369,6 +369,22 @@
       }
       
   };
+  $.fn.longPress = function (fn, trsTime) {   //长按监听
+		var $this = this;
+		for (var i = 0; i < $this.length; i++) {
+			(function (target) {
+				var timeout;
+				target.addEventListener('touchstart', function (event) {
+					timeout = setTimeout(function () {
+						fn(event);
+					}, trsTime ? trsTime : 200);
+				}, false);
+				target.addEventListener('touchend', function (event) {
+					clearTimeout(timeout);
+				}, false);
+			})($this[i]);
+		}
+	};
   $.fn.scrollEnd = function (fn) {
     //右滑
     var $this = this;
