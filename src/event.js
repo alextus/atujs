@@ -55,7 +55,7 @@
       if (event == 'touchup') return $(element).touchUp(fn);
       if (event == 'touchdown') return $(element).touchDown(fn);
       if (event == 'longpress') return $(element).longPress(fn);
-      
+      if (event == 'scrollend') return $(element).scrollEnd(fn);
 			var handler = parse(event)
 			handler.fn = fn
 			handler.sel = selector
@@ -369,5 +369,26 @@
       }
       
   };
+  $.fn.scrollEnd = function (fn) {
+    //右滑
+    var $this = this;
+    let isCheck=0,isDocument=$this[0] instanceof Document
+    $this.on("scroll", function () {
+      
+      const scrollHeight = isDocument?$this[0].documentElement.scrollHeight:$this.prop('scrollHeight');
+      const scrollTop = isDocument? $this[0].documentElement.scrollTop:$this.scrollTop();
+      const clientHeight =isDocument?$this[0].documentElement.clientHeight:$this.height();
+ 
+      console.log("scroll",isDocument,scrollHeight,scrollTop,clientHeight)
+      if (scrollTop + clientHeight >= scrollHeight && !isCheck) {
+        console.log('已滚动到底部');
+        fn()
+        isCheck=1
+        setTimeout(()=>{isCheck=0},150)
+      }
+    })
+    
+};
+
 
 })(Atu);
