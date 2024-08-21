@@ -282,8 +282,8 @@ var Atu = (function () {
 		return str == null ? "" : String.prototype.trim.call(str)
 	}
 	$.isTel = function (s) {
-		patrn = /(^[0-9]{3,4}\-[0-9]{7,8}$)|(^\([0-9]{3,4}\)[0-9]{3,8}$)|(^0{0,1}1[3-9]\d{9}$)|(1[3-9]\d{9}$)/;
-		return patrn.exec(s) ? true : false;
+		var patrn = /(^[0-9]{3,4}\-[0-9]{7,8}$)|(^\([0-9]{3,4}\)[0-9]{7,8}$)|([0-9]{7,8}$)/;
+		return patrn.exec(s) || $.isMobile(s)? true : false;
 	}
 	$.isMobile = function (s) {
 		var patrn = /^0{0,1}(13[0-9]|14(0|1|[4-9])|15([0-3]|[5-9])|16(2|5|6|7)|17[0-8]|18[0-9]|19([0-3]|[5-9]))+\d{8}$/
