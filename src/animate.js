@@ -52,6 +52,10 @@
 		if (delay) delay = parseFloat(delay) / 1000
 		return this.anim(properties, duration, ease, callback, delay)
 	}
+  $.fn.animateTo = function ( properties, duration, ease, callback, delay) {
+    this.autoCss(properties)
+    return this.animate(properties, duration, ease, callback, delay)
+	}
   $.fn.animateFrom = function (properties0, properties, duration, ease, callback, delay) {
     if (typeof properties0 == 'string') {
       properties0=cssString2Object(properties0)
@@ -60,10 +64,10 @@
     return this.animate(properties, duration, ease, callback, delay)
 	}
 	$.fn.anim = function (properties, duration, ease, callback, delay) {
-    this.autoCss(properties)
-    console.log("getElementTransforms",getElementTransforms($(this)[0]))
+    //this.autoCss(properties)
+    $.log("getElementTransforms",getElementTransforms($(this)[0]))
     
-    console.log("anim",properties, duration, ease, callback, delay)
+    $.log("anim",properties, duration, ease, callback, delay)
 		var key, cssValues = {}, cssProperties, transforms = '',
 			that = this, wrappedCallback, endEvent = $.fx.transitionEnd, fired = false
 
@@ -129,8 +133,8 @@
 			}, ((duration + delay) * 1000) + 25)
 		}
 		this.size() && this.get(0).clientLeft
-    //console.log(this.size(), this.get(0).clientLeft)
-    console.log("cssValues",cssValues)
+    //$.log(this.size(), this.get(0).clientLeft)
+    $.log("cssValues",cssValues)
 		this.css(cssValues)
 	
 		return this
@@ -142,14 +146,14 @@
     let delay = properties2 && properties2?.delay?properties2.delay:0
     let callback = properties2 && properties2?.callback?properties2.callback:()=>{}
 
-		console.log("tween", properties, duration, ease, callback, delay)
+		$.log("tween", properties, duration, ease, callback, delay)
     if (duration >100) duration = duration / 1000
 		let stepNum = Math.floor(duration * 60), stepI = 0
 
 		if (stepNum < 1) { stepNum = 1 }
 		let attrs = [], attrType = "0", attrItem = [], attrStart = 0, attrEnd = 0
 		let a = 1, unit = ""
-    console.log(this)
+    $.log(this)
     //this.autoCss(properties)
 		for (key in properties) {
       //key=key.toLowerCase()
@@ -165,7 +169,7 @@
         if(['','x','y','scale','scalex','scaley','rotate'].indexOf(key)>0){
           attrStart =( getElementTransforms($(_this)[0]).get(getTransformKey(key))||"0").replace(getTransformUnit(key), "")
         }else{
-          console.log(key,dasherize(key),_this.css(key),this,_this) 
+          $.log(key,dasherize(key),_this.css(key),this,_this) 
           attrStart = _this.css(key).toString().replace("px", "")
         }
        
@@ -173,18 +177,18 @@
       if(['','x','y','scale','scalex','scaley','rotate'].indexOf(key)>0){
 			  attrEnd = properties[key].replace(getTransformUnit(key), "")
       }else{
-        console.log("key",key,dasherize(key),properties[key])
+        $.log("key",key,dasherize(key),properties[key])
         attrEnd = $.isNumber(properties[key])?properties[key]:properties[key].toString().replace("px", "")
       }
-      console.log("attrStart:",attrStart,"attrEnd:",attrEnd)
-			console.log(key, attrStart)
+      $.log("attrStart:",attrStart,"attrEnd:",attrEnd)
+			$.log(key, attrStart)
 			//attrItem.push(attrType)
 			for (let i = 0; i < stepNum-1; i++) {
 
 				attrs[key].push(easeFun(ease, attrStart, attrEnd, stepNum, i))
 			}
       attrs[key].push(attrEnd)
-			console.log(attrs[key])
+			$.log(attrs[key])
      
 		}
     
@@ -205,7 +209,7 @@
 					
 					}
 				}
-				//console.log("update", key, attrs[key][stepI])
+				//$.log("update", key, attrs[key][stepI])
 				if (stepI < stepNum - 1) {
 					stepI++;
 					update(stepI)
@@ -281,12 +285,12 @@
 	}
   $.fn.autoCss=function(props){
     const obj=["width","height","top","left","background-color","font-size","line-height"]
-    console.log("autoCss")
+    $.log("autoCss")
     const el = $(this)
    
     obj.forEach(properties => {
        let auto=props && !(properties in props)?0:1
-        //console.log(properties,auto,props,properties in props)
+        //$.log(properties,auto,props,properties in props)
         auto && el.css({[properties]:el.css(properties)})
     });
      
@@ -331,7 +335,7 @@ var penner = (function () {
   });
 
   Object.keys(functionEasings).forEach(function (name) {
-   // console.log(name)
+   // $.log(name)
     var easeIn = functionEasings[name];  
     eases[name] = easeIn;
     eases[name+'In'] =eases[name+'easeIn'] = easeIn;
@@ -341,7 +345,7 @@ var penner = (function () {
     eases[name+'OutIn'] = function (a, b) { return function (t) { return t < 0.5 ? (1 - easeIn(a, b)(1 - t * 2)) / 2 : 
       (easeIn(a, b)(t * 2 - 1) + 1) / 2; }; };
   });
-  //console.log(eases)
+  //$.log(eases)
   return eases;
 
 })();
@@ -432,7 +436,8 @@ function getTransformKey(key){
   return nkey
 }
 function getTransformUnit(key){
-  console.log("getTransformUnit",key)
+  $.log("getTransformUnit",key)
+  if(key=="scale"||key=="scaleX"||key=="scaleY") return ""
   return (key=='rotate'||key=='rotateX'||key=='rotateY')?'deg':'px'
 }
 function getElementTransforms(el) {

@@ -261,7 +261,12 @@ var Atu = (function () {
 			return value
 		}
 	}
-
+  $.debug=0
+  $.log=function(){
+    if($.debug){
+      console.log(...arguments)
+    }
+  }
 	$.type = type
 	$.isFunction = isFunction
 	$.isWindow = isWindow
@@ -552,7 +557,7 @@ var Atu = (function () {
       (0 in this ? this[0].outerHTML : null)
     },
 		outHtml:function(){
-      //console.log(this[0].outHtml)
+      //$.log(this[0].outHtml)
       return $('<div></div>').append(this.clone()).html()
 		},
 		text: function (text) {
@@ -782,7 +787,7 @@ var Atu = (function () {
     autoHeight: function (){
 
       let minHeight=this.attr("minHeight"),obj=this[0]
-      console.log(this.css("height").replace("px",''),minHeight,this.css("height").replace("px",'')<minHeight)
+      $.log(this.css("height").replace("px",''),minHeight,this.css("height").replace("px",'')<minHeight)
       if(minHeight && this.css("height").replace("px",'')<minHeight){
         obj.style.height =minHeight+ 'px'
       }

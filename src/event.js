@@ -395,9 +395,9 @@
       const scrollTop = isDocument? $this[0].documentElement.scrollTop:$this.scrollTop();
       const clientHeight =isDocument?$this[0].documentElement.clientHeight:$this.height();
  
-      console.log("scroll",isDocument,scrollHeight,scrollTop,clientHeight)
-      if (scrollTop + clientHeight >= scrollHeight && !isCheck) {
-        console.log('已滚动到底部');
+      $.log("scroll",isDocument,scrollHeight,scrollTop,clientHeight)
+      if (Math.abs(scrollTop + clientHeight - scrollHeight)<=1 && !isCheck) {
+        $.log('已滚动到底部');
         fn()
         isCheck=1
         setTimeout(()=>{isCheck=0},150)
