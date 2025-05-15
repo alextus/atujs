@@ -651,19 +651,26 @@ var Atu = (function () {
 				height: Math.round(obj.height)
 			}
 		},
-
+    styleValue:function(element,property){
+      var computedStyle= getComputedStyle(element, '')
+      let v=element.style[camelize(property)] || computedStyle.getPropertyValue(property)
+      let regex = /width|height|top|left/i
+      if(v=='' && regex.test(property)){
+        v=0
+      }
+      return v;
+    },
 
 		css: function (property, value) {
 			if (arguments.length < 2) {
-				var computedStyle, element = this[0]
+				var  element = this[0]
 				if (!element) return
-				computedStyle = getComputedStyle(element, '')
 				if (typeof property == 'string')
-					return element.style[camelize(property)] || computedStyle.getPropertyValue(property)
+					return this.styleValue(element,property)
 				else if (isArray(property)) {
 					var props = {}
 					$.each(property, function (_, prop) {
-						props[prop] = (element.style[camelize(prop)] || computedStyle.getPropertyValue(prop))
+						props[prop] = this.styleValue(element,prop) 
 					})
 					return props
 				}
@@ -835,6 +842,7 @@ var Atu = (function () {
 				v1='top'
 				v2="bottom"
 			}
+      console.log(dimension,el[dimension](),$(this).height()+parseFloat(el.css('margin-'+v1))+parseFloat($(this).css('margin-'+v2)),parseFloat(el.css('border-'+v1+"-"+dimension)),el.css('border-'+v1+"-"+dimension),"1")
 			return el[dimension]()+parseFloat(el.css('margin-'+v1))+parseFloat($(this).css('margin-'+v2))+parseFloat(el.css('border-'+v1+"-"+dimension))+parseFloat($(this).css('border-'+v2+"-"+dimension))
 		}
 	})

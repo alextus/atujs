@@ -4,13 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OutHtml</title>
-  <script src="../src/atu.js?v=1.14"></script>
+  <script src="../src/atu.js?v=1.15"></script>
 </head>
 <body>
   <div class="test">adfadf</div>
+  outHtml()  <=>htmls()
+  htmls('')  <=> replaceWith()
   <script>
+    console.log($(".test")[0].innerHTML,$(".test")[0].outerHTML)
       console.log($(".test").html(),$(".test").outHtml())
+      console.log($(".test").htmls())
 
+      $(".test").htmls('<span>1111</span>')
   </script>
 </body>
 </html>
