@@ -207,13 +207,13 @@ function delCookie(name) {
 
 function RandArr(arr) {
 	num = arr.length
-	var temp_array = arr;
-	var return_array = new Array();
-	for (var i = 0; i < num; i++) {
+	let temp_array = [].concat(arr);
+	let return_array = new Array();
+	for (let i = 0; i < num; i++) {
 
 		if (temp_array.length >= 0) {
 
-			var arrIndex = Math.floor(Math.random() * temp_array.length);
+			let arrIndex = Math.floor(Math.random() * temp_array.length);
 			return_array[i] = temp_array[arrIndex];
 			temp_array.splice(arrIndex, 1);
 		} else {
@@ -222,6 +222,14 @@ function RandArr(arr) {
 	}
 	return return_array;
 }
+function arrRand(arr) { return RandArr(arr);}
+function arrRemove(array,o) {
+  let arr = [].concat(array);
+  let t = arr.indexOf(o);
+	t > -1 && arr.splice(t, 1)
+  return arr
+}
+function arrDelete(array,o) { return arrRemove(array,o);}
 
 function getXY(e) {
 
