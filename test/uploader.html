@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="../build/atu.1.2.3.js"></script>
+  <script src="../src/upload.js"></script>
+</head>
+<body>
+  <input name="file1" type="file" value="浏览上传" id="upfile"/>
+  <script>
+      let _upload=new atuUpload({isOss:false,name:'file1'})
+    
+      $("#upfile").on("change",function(){
+        let file = this.files[0]
+     
+        _upload.upload(file,(per)=>{
+          console.log(per)
+        },(url)=>{
+          console.log(url)
+          //$("body").append(`<img src="${url}" alt="" width="320">`)
+        })
+      })
+  </script>
+</body>
+</html>

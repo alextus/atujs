@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>时间函数相关</title>
+  <script src="../src/common.js"></script>
+  <style>
+    p{padding:0 0 0 20px;margin: 0;}
+  </style>
+</head>
+<body>
+  timestamp(t=0)
+  <p>获取时间戳</p>
+  <script>
+    document.write(timestamp())
+  </script>
+  <br/><br/>
+  newDate(t)
+  <p>重新格式化时间，t可以为时间戳，但不可缺少</p>
+  <script>
+    document.write(newDate())
+  </script>
+<br/><br/>
+  year(t='')、month(t='')、  week(t='')、  day(t='')、  hour(t='')
+  <p>获取年、月、周、日、时</p>
+  <script>
+    document.write(year()+","+month()+","+week()+","+day()+","+hour())
+  </script>
+<br/>
+<br/>
+  now(t=0)与
+  Alexdate(t=0,split='')
+<P>now中的t只能是空或者date，Alexdate中的t还可以是timestamp</P>
+  <p></p>
+  <script>
+    document.write(now()+"<br/>")
+    document.write(newDate(1716088060)+"<br/>")
+    console.log(new Date(1716094470668))
+    document.write(":::"+now(newDate(1280193965))+"<br/>")
+    
+    document.write(Alexdate()+"<br/>")
+    document.write(Alexdate(1716088060)+"<br/>")
+    document.write(Alexdate("-")+"<br/>")
+  </script>
+<br/>
+<br/>
+
+  getTime2Time(t)
+  getLeftTime(endTime)
+  getPassTime(startTime)
+  format(time)
+
+  <script>
+    function abc(t){
+      console.log(t)
+    }
+    abc()
+  </script>
+</body>
+</html>

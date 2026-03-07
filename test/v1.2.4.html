@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="../build/atu.1.2.4.js"></script>
+  <link rel="stylesheet" href="../atu.css?v=1">
+  <style>
+    #test {
+      width: 100px;
+      height: 100px;
+      background-color: red;
+   
+    }
+
+  </style>
+</head>
+<body>
+  <div id="test2"></div>
+  <div id="test" style="display: none;"></div>
+  1.保留Array.prototype.remove，但不推荐使用<br/>
+  &nbsp;&nbsp;&nbsp;因为影响原生Array内容,改用arrDelete 或arrRemove<br/>
+  <script>
+    let arr = [1, 2, 3, 4, 5];
+    arr.remove(3);
+    console.log(arr) // [1,2,4,5]
+    let arr2 = [1, 2, 3, 4, 5];
+    let arr3=arrDelete(arr2, 3);
+    console.log(arr3);
+    console.log(arr2) // [1,2,4,5]
+  </script>
+
+  2.修复css(width|height|top|left)默认值为0（之前版本为空）
+  <script>
+    console.log($("#test2").css("border-width")) // 0
+  </script>
+  3.新增originWidth,originHeight属性，获取元素原始宽高,fix元素隐藏时获取为0问题<br/>
+  <script>
+    let div = $("#test");
+   
+    console.log(div.width(),div.height(),div.originWidth(),div.originHeight()) // 100
+  </script>
+
+  4.sting新增startWith, endWith方法<br/>
+  <script>
+    let str = "hello world";
+    console.log(str.startWith("hello")) // true
+    console.log(str.endWith("world")) // true
+  </script>
+  5.loadFile修正,文件可包含?v=1.1
+  <script>
+    let loadImgNum = 0;
+    let loadFiles=['http://res.alextu.cn/2025/0218/f93429bddf28b28e7d51aadb6066d3a8.jpg','http://res.alextu.cn/2025/0203/fd26c8e6d3f18d4e93a18598c20c4878.jpg?v=1.1']
+     $.loadFile(loadFiles, {
+        each: function () {
+    
+      loadImgNum++;
+      per = Math.floor(loadImgNum * 100 / loadFiles.length)
+      console.log(per)
+   
+      if(per>=100  ){
+         console.log("all")
+      }
+    },
+    all: function (d) {
+      console.log("all")
+    }
+  });
+  </script>
+  6.$.alert参数长度修正
+  <script>
+    $.alert("hello world", function(){console.log('ok');});
+  </script>
+  7.新增isVisible方法，判断元素是否可见
+  8.新增parents(selector)方法，获取元素的所有父元素
+</body>
+</html>

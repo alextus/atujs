@@ -163,7 +163,7 @@ table{ border-collapse:collapse; }
 
 
 
-.tipBox{ position:absolute; top:0; left:0; z-index:999999999; width:100%; height:100%;}
+.tipBox{ position:fixed; top:0; left:0; z-index:999999999; width:100%; height:100%;}
 .tipBox .tip{ padding:20px 50px 20px 50px; color:#FFF; background:rgba(0,0,0,0.85); position:absolute; top:50%;  left:50%;transform:translate(-50%,-50%); -webkit-transform:translate(-50%,-50%); animation:tip 2s forwards; -webkit-animation:tip 2s forwards; display:block; border-radius:4px; }
 @-webkit-keyframes tip {
   0%{ margin-top:100px; opacity:0;}
@@ -214,12 +214,12 @@ table{ border-collapse:collapse; }
 }
 @media only screen and (min-width: 960px) {
   .msgTitle {
-    font-size:28px;line-height:48px;
+    font-size:18px;line-height:28px;
   }
   .tipBox .tip{border-radius: 8px;}
-  .alertBox .msg{border-radius: 26px;}
-  .msgTool a{ line-height:72px; font-size:28px;}
-  .tipBox .tip{font-size: 32px !important;}
+  .alertBox .msg{border-radius: 16px;}
+  .msgTool a{ line-height:42px; font-size:14px;}
+  .tipBox .tip{font-size: 22px !important;}
 }
 
 @media screen and (min-device-pixel-ratio: 1.0),

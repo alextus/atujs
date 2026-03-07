@@ -1,0 +1,38 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "browsers": ["IE >= 9", "Chrome >= 40", "Firefox >= 35", "Safari >= 9", "iOS >= 9", "Android >= 4.4"],
+          "node": "current"
+        },
+        "useBuiltIns": false,       // 禁用自动垫片（符合你的需求）
+        "corejs": false,            // 关闭 core-js 关联
+        "modules": "cjs",           // 关键：转为 CommonJS（适配 Gulp/Node 环境）
+        "exclude": [                // 仅保留必要排除项，减少冲突
+          "transform-typeof-symbol"
+        ]
+      }
+    ]
+  ],
+  "plugins": [
+    "@babel/plugin-proposal-optional-chaining",
+    "@babel/plugin-proposal-nullish-coalescing-operator"
+    // 以下插件全部删除：preset-env 已自动处理，重复配置会报错
+    // "@babel/plugin-transform-arrow-functions",
+    // "@babel/plugin-transform-block-scoping",
+    // "@babel/plugin-transform-template-literals",
+    // "@babel/plugin-transform-destructuring",
+    // "@babel/plugin-transform-object-rest-spread",
+    // "@babel/plugin-transform-parameters",
+    // "@babel/plugin-transform-for-of",
+    // ["babel-plugin-remove-imports", {...}] // 暂时移除，避免剔除必要代码
+  ],
+  "comments": false,
+  "minified": false,
+  "ignore": [
+    "./node_modules/**",
+    "./dist/**"
+  ]
+}

@@ -12,8 +12,8 @@ const fs = require('fs');
 const path = require('path');
 
 
-var version = "1.2.1"
-var time = "2024.03.29"
+var version = "1.2.5"
+var time = "2025.11.23"
 
                                       
 

@@ -88,7 +88,7 @@
             if (typeof blob === 'string') return download(blob, name, opts)
 
             var force = blob.type === 'application/octet-stream'
-            var isSafari = /constructor/i.test(_global.HTMLElement) || _global.safari
+            var isSafari = /constructor/i.test(window.HTMLElement) || window.safari
             var isChromeIOS = /CriOS\/[\d]+/.test(navigator.userAgent)
 
             if ((isChromeIOS || (force && isSafari)) && typeof FileReader !== 'undefined') {
@@ -103,7 +103,7 @@
                 }
                 reader.readAsDataURL(blob)
             } else {
-                var URL = _global.URL || _global.webkitURL
+                var URL = window.URL || window.webkitURL
                 var url = URL.createObjectURL(blob)
                 if (popup) popup.location = url
                 else location.href = url

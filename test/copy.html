@@ -10,8 +10,19 @@
     <input id="weixinhao" value="Alextus">
     <a href="javascript:copyTxt();">点击复制</a>
     <a href="javascript:goWeixin();">打开微信</a>
+  <a href="javascript:goCopy();">复制</a>
+  <textarea id="atuCopyInput" ></textarea>
     <script>
-
+function copy(txt){
+  let atuCopyInput=document.getElementById("atuCopyInput")
+  atuCopyInput.value=txt
+atuCopyInput.select()
+  console.log(document.execCommand('copy')?'复制成功':'复制失败')
+}
+function goCopy(){
+  let text="abc\ndef\naaa";
+  copy(text)
+}
 	function copyTxt() {
 		var wx = document.getElementById("weixinhao");
 		wx.select(); // 选择对象

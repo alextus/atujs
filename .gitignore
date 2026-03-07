@@ -4,6 +4,7 @@
 *.diff
 *.patch
 /*.html
+/src/atueditor
 .bower.json
 yarn.lock
 package-lock.json
@@ -13,3 +14,4 @@ package-lock.json
 /dist/*
 /build
 /node_modules
+gulpfile.js

@@ -10,14 +10,39 @@
   1.isTel更新，允许无区划码，但需要7-8位
 
   <script>
-    console.log($.isTel('19517810545'))
-    console.log($.isTel('13717810545'))
-    console.log($.isTel('65839045'))
-    console.log($.isTel('658390'))
+    $.debug=1
+    $.log($.isTel('19517810545'))
+    $.log($.isTel('13717810545'))
+    $.log($.isTel('65839045'))
+    $.log($.isTel('658390'))
   </script>
   <br/>
   2.新增scrollend事件，<a href="scrollend.html">demo</a><br/>
   3.动画事件完善，<a href="animate.html">animate</a>，<a href="tween.html">animation</a><br/>
-    放弃anime.js
+  &nbsp;&nbsp;&nbsp;放弃anime.js<br/>
+  4.新增$.debug $.log()<br/>
+  5.放弃Array.prototype.remove  因为影响原生Array内容,改用arrDelete 或arrRemove，<br/>
+  &nbsp;&nbsp;&nbsp;新增arrRand 为RandArr别名<br/>
+  &nbsp;&nbsp;&nbsp;arrRand,arrDelete不影响原先Array内容
+  <script>
+
+      let tools=["nolink","format","noquot","imgAutoWidth"]
+      tools.forEach(function (n) {
+        console.log(n)
+      })
+      for(let i in tools) {
+        n=tools[i]
+        console.log("n",n)
+      }
+      $.log('---------------------------')
+
+      $.log(arrRemove(tools, "imgAutoWidth"))
+      $.log(arrRand(tools))
+  
+  
+   
+   
+
+  </script>
 </body>
 </html>

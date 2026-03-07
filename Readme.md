@@ -1,10 +1,42 @@
 
-最新版本  1.2.1
+最新版本  1.2.5
+# 1.2.5 2025.08.15
+  fix get()函数无法识别?url=pdf/xxx.pdf 情况
+  fix $.alert("msg",fun1,fun2) 没有按钮2
+  fix copy函数，支持\n
+
+# 1.2.4 2025.05.15
+  新增$.isVisible,$.parents,$.styleValue
+  新增属性originWidth,originHeight
+  loadFile优化更新，支持文件带?参数
+  $.alert函数优化更新,自适应参数
+  String 方法 startWith(str),endWith(str)
+  Array 方法remove(o)
+  Atu.iniShare 代码优化
+# 1.2.3
+  新增 $.debug $.log  debug为ture是输出log,否则不输出log
+  isTel更新，手机号精确化
+  新增事件 scrollend和longPress
+  动画机制优化  CSS动画
+  新增 showLoading,hideLoading
+  函数RandArr更新
+  新增函数arrRand,arrRemove,arrDelete
+  Arrray属性remove删除
+  新增函数copy,download
+# 1.2.2
+  新增htmls 包含自身标签的html
+  outHtml优化更新
+  新增aoutHeight
+  动画机制更新
+  borwser优化
+  新增函数capitalizeFirstLetter
+  时间函数优化更新
 # 1.2.1
   两个发布版本都过滤注释，只是min会压缩变量
   新增string.replaceAll
       isTouchDevice
       $.touch, $.touchmove, $.touchend
+
 
   新增 $.isString $(id).scale()
 # 1.2.0

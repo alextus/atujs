@@ -21,18 +21,19 @@ var browser = {
 	language: (navigator.browserLanguage || navigator.language).toLowerCase()
 }
 
-let bs=['presto','chrome','safari','firefox','android','linux','iPhone','iPad','iPod','alipay','xiaomi','redmi','vivo','oppo','honor','huawei','weibo','eleme','qq']
-bs.forEach(item => {
+let _bs=['presto','chrome','safari','firefox','android','linux','iPhone','iPad','iPod','alipay','xiaomi','redmi','vivo','oppo','honor','huawei','weibo','eleme','qq']
+_bs.forEach(item => {
   window["is"+capitalizeFirstLetter(item)]=window["is_"+item.toLowerCase()]=browser[item]= browser[item.toLowerCase()]= ua.indexOf(item.toLowerCase()) > -1
 });
 browser.type=browser.ie ? "IE" : browser.opera ? "Opear" :  browser.edge ? "Edge" :
 browser.weixin ? "Weixin" :browser.chrome ? "Chrome" : browser.safari ? "Safari" : "other";
 browser.engine=browser.webKit?"Webkit":browser.gecko?"Gecko":browser.ie?"Trident":"other"
 
-var isWeixin = is_weixin = browser.weixin
-var isPc=is_pc  =(browser.android||browser.iPhone||browser.iPad||browser.iPod||browser.SymbianOS||browser.WindowsPhone)?false:true;
-var isMob =is_mob = !isPc
-var isLocal=is_local=location.href.indexOf("localhosts")>0
+var isWeixin =  browser.weixin
+var isPc  =(browser.android||browser.iPhone||browser.iPad||browser.iPod||browser.SymbianOS||browser.WindowsPhone)?false:true;
+var isLocal=location.href.indexOf("localhosts")>0
+var is_weixin = isWeixin,is_pc = isPc,isMob  = !isPc,is_mob = isMob,is_local=isLocal
+
 var system = {win: up.indexOf("win") == 0, mac: up.indexOf("mac") == 0, linux: up.indexOf("linux") == 0, xll: false, ipad:isIpad }; 
 system.type=system.win?"Win":system.mac?"Mac":system.ipad?"Ipad":browser.android?"Android":system.linux?"linux":"other"
 
@@ -88,7 +89,8 @@ if (browser.webkit) version = parseFloat(ua.match(/ applewebkit\/(\d+)/)[1]);
 browser.version=version
 browser.isCompatible= !browser.mobile && ((browser.ie && version >= 6) || (browser.gecko && version >= 10801) || (browser.opera && version >= 9.5) || (browser.air && version >= 1) || (browser.webkit && version >= 522) || false)
 
-var isStorageSupport =is_storagesupport= localStorageSupported() //全局变量，判断是否支持
+var isStorageSupport = localStorageSupported() //全局变量，判断是否支持
+var is_storagesupport=isStorageSupport
 var supportsOrientationChange = "onorientationchange" in window, //是否开启手机横竖屏
 	orientationEvent = supportsOrientationChange ? "orientationchange" : "resize",
   isTouchDevice=('ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0);
@@ -134,9 +136,9 @@ function trim(str){
 }
 //获取Request
 function get(sProp) {
-	var re = new RegExp("[&,?]" + sProp + "=([^//&]*)", "i");
+	var re = new RegExp(`[?&]${sProp}=([^&]*)`, 'i');
 	var a = re.exec(document.location.search);
-	return a == null?"":a[1];
+	return a == null?"":decodeURIComponent(a[1]);
 };
 
 
@@ -156,7 +158,7 @@ function localStorageSupported() {
 function getData(name) {
 	//注：只有数字型或者字符型，没有Boolean,空为false,有值哪怕是false都为true
 	if (isStorageSupport) {
-		v = localStorage.getItem(name)
+		var v = localStorage.getItem(name)
 		if (v == undefined) {
 			v = "";
 		}
@@ -283,12 +285,12 @@ var log = {
 		}
 	},
 	add: function () {
-		v = Array.prototype.slice.apply(arguments);
+		var v = Array.prototype.slice.apply(arguments);
 		this.ini();
 		$("#log").html(v.join(" ") + "<br/>" + $("#log").html());
 	},
 	val: function () {
-		v = Array.prototype.slice.apply(arguments);
+		var v = Array.prototype.slice.apply(arguments);
 		this.ini();
 		$("#log").html(v.join(" ") + "<br/>");
 	}
@@ -333,6 +335,14 @@ String.prototype.byteLength = function () {
 String.prototype.replaceAll = function (find, replace) {
   return this.replace(new RegExp(find, 'g'), replace);
 }
+String.prototype.startWith = function (str) {
+  const reg = new RegExp("^" + str);
+  return reg.test(this);
+}
+String.prototype.endWith = function (str) {
+  const reg = new RegExp(str+"$");
+  return reg.test(this);
+}
 Array.prototype.indexOf = function (o) {
 	for (var t = 0; t < this.length; t++)
 		if (this[t] == o) return t;
@@ -342,7 +352,18 @@ Array.prototype.remove = function (o) {
 	var t = this.indexOf(o);
 	t > -1 && this.splice(t, 1)
 };
-
+if (!String.prototype.replaceAll) {
+  const escapeRegExp = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  String.prototype.replaceAll = function(search, replacement) {
+    let regex;
+    if (search instanceof RegExp) {
+      regex = search.global ? search : new RegExp(search.source, search.flags + 'g');
+    } else {
+      regex = new RegExp(escapeRegExp(String(search)), 'g');
+    }
+    return this.replace(regex, replacement);
+  };
+}
 function e(element) {
 	var elements = new Array();
 	for (var i = 0; i < arguments.length; i++) {
@@ -488,7 +509,7 @@ function FormatNum(num, weishu) {
 }
 function copy(txt){
   if($("#atuCopyInput").length==0){
-      $("body").append('<input id="atuCopyInput" style="opacity: 0;position: absolute;"/>')
+      $("body").append('<textarea id="atuCopyInput" style="opacity: 0;position: absolute;"></textarea>')
   }
   $("#atuCopyInput").val(txt)
   $("#atuCopyInput")[0].select()
@@ -593,7 +614,7 @@ Atu.iniWx = function (s) {
 			timestamp: d.timestamp,
 			nonceStr: d.nonceStr,
 			signature: d.signature,
-			jsApiList: ['checkJsApi', 'onMenuShareTimeline', 'onMenuShareAppMessage','onMenuShareWeibo', 'updateAppMessageShareData', 'updateTimelineShareData', 'startRecord', 'stopRecord', 'onVoiceRecordEnd', 'playVoice', 'pauseVoice', 'stopVoice', 'onVoicePlayEnd','uploadVoice','downloadVoice','translateVoice', 'chooseImage', 'previewImage','uploadImage','downloadImage', 'getNetworkType','getLocation','openLocation','closeWindow','scanQRCode','hideOptionMenu','showOptionMenu','hideMenuItems','showMenuItems','hideAllNonBaseMenuItem','showAllNonBaseMenuItem','openEnterpriseChat','openEnterpriseContact'],
+			jsApiList: ['checkJsApi', 'onMenuShareTimeline', 'onMenuShareAppMessage','onMenuShareWeibo', 'updateAppMessageShareData', 'updateTimelineShareData', 'startRecord', 'stopRecord', 'onVoiceRecordEnd', 'playVoice', 'pauseVoice', 'stopVoice', 'onVoicePlayEnd','uploadVoice','downloadVoice','translateVoice', 'chooseImage','getLocalImgData', 'previewImage','uploadImage','downloadImage', 'getNetworkType','getLocation','openLocation','closeWindow','scanQRCode','hideOptionMenu','showOptionMenu','hideMenuItems','showMenuItems','hideAllNonBaseMenuItem','showAllNonBaseMenuItem','openEnterpriseChat','openEnterpriseContact'],
 			openTagList: ['wx-open-launch-weapp', 'wx-open-launch-app']
 		});
 		wx.ready(function () {
@@ -606,32 +627,12 @@ Atu.iniWx = function (s) {
 	}, "jsonp")
 }
 Atu.iniShare = function (s) {
-	wx.updateAppMessageShareData({
-		title: s.title,
-		desc: s.desc,
-		link: s.link,
-		imgUrl: s.imgUrl,
-	}, function (res) { });
-	wx.updateTimelineShareData({
-		title: s.title2 || s.title,
-		link: s.link,
-		imgUrl: s.imgUrl,
-	}, function (res) { });
-
-	wx.onMenuShareAppMessage({
-		title: s.title,
-		desc: s.desc,
-		link: s.link,
-		imgUrl: s.imgUrl,
-		success: function (res) { }
-	});
-	wx.onMenuShareTimeline({
-		title: s.title2 || s.title,
-		link: s.link,
-		imgUrl: s.imgUrl,
-		success: function (res) { }
-	});
-
+  let _d={title: s.title,desc: s.desc,link: s.link,imgUrl: s.imgUrl,function (res) { }}
+	wx.updateAppMessageShareData(_d);
+	wx.onMenuShareAppMessage(_d);
+  _d.title = s.title2 || s.title;
+  wx.updateTimelineShareData(_d);
+	wx.onMenuShareTimeline(_d);
 }
 Atu.iniClick = function (site) {
 	this.site = site
@@ -652,8 +653,8 @@ Atu.addClick = function (str) {
 }
 
 //12秒内提示一次，多次引用只显示一次
-let ct=Math.floor(getData("ct")),nt=new Date().getTime()
-if(nt>ct){
+let _ct=Math.floor(getData("ct")),_nt=new Date().getTime()
+if(_nt>_ct){
 	console.log("%c— ATTUS™,13717810545,作品 —%c ", "padding:8px 15px; color:#f2efe8; background-color:#070e1d; line-height:25px;", "padding:8px 5px 5px 0; color:#070e1d; ")
-	setData("ct",nt+12000)
+	setData("ct",_nt+12000)
 }

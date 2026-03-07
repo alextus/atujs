@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .item{ width: 100px; height: 50px; position:absolute; top:50px;left: 100px; border:1px solid #000; }
+    .hide{ display: none;}
+  </style>
+  <script src="http://oss.alextu.cn/js/atu.1.2.3.js"></script>
+</head>
+<body>
+  <div class="item">1</div>
+  <div class="item hide">2</div>
+  <script>
+    console.log($('.item').eq(0).width(),$('.item').eq(0).height())
+    console.log($('.item').eq(1).width(),$('.item').eq(1).height())
+    
+
+    console.log($('.item').width(),$('.item').height())
+
+    console.log($('.item').eq(0).offset())
+
+    console.log($('.item').eq(1).offset())
+
+    console.log($('.item').eq(0)[0].getBoundingClientRect())
+
+console.log($('.item').eq(1)[0].getBoundingClientRect())
+
+
+
+!function($) {
+  
+	$.fn.originWidth = function(){
+    let e = $(this).clone().css("display", "block").appendTo("body");
+    let width = e.width();
+    e.remove();
+    return width;
+  }
+	$.fn.originHeight = function(){
+    let e = $(this).clone().css("display", "block").appendTo("body");
+    let height = e.height();
+    e.remove();
+    return height;
+  }
+} (Atu);
+console.log("origin1",$('.item').eq(1).originWidth(),$('.item').eq(1).originHeight())
+console.log("origin2",$('.item').originWidth(),$('.item').originHeight())
+
+$('.item').eq(1).css({width:50,height:10})
+console.log($('.item').eq(1).width(),$('.item').eq(1).height())
+console.log("origin",$('.item').eq(1).originWidth(),$('.item').eq(1).originHeight())
+/*
+   
+console.log(height);
+*/
+  </script>
+</body>
+</html>

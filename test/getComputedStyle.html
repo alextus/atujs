@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>getComputedStyle</title>
+  <style>
+    .one {
+        width: 100px;
+        background-color: pink;
+        border: 10px solid green;
+        padding: 10px;
+        margin: 0 auto;
+        position: relative;
+        left: 0px;
+        top: 50px;
+    }
+    .one::after {
+        content: "哈哈哈";
+        background-color: blue;
+    }
+</style>
+</head>
+<body>
+<xmp>
+  元素属性操作           特点                             	         应用场景   
+  点语法                可以修改任意样式，无法获取行外样式             修改元素样式 
+  attribute           	操作自定义样式                        	     操作自定义样式
+  getComputedStyle()  	不可以修改样式，可以获取任意样式（行内+行外）  获取元素样式 
+  element.currentStyle	与getComputedStyle一致（仅限IE8及以前使用）	  获取元素样式 
+</xmp>
+
+ 
+
+<div class="one" id="box" style="height: 100px"></div>
+
+<script>
+    let box = document.getElementById('box');
+
+    /*1.点语法特点 
+        a.只能获取行内，无法获取行外
+        b.获取的是string，带单位
+        c.既可以获取，也可以修改
+    */
+   console.log(box.style.height);//100px
+   console.log(box.style.width);//空字符串
+   box.style.width = '500px';
+   
+   /*2. getComputedStyle() 获取元素一切样式属性 
+        a.既可以获取行内，也可以获取行外
+        b.获取的是string，带单位
+        c.只能获取不能修改
+    */
+
+    /*2.getComputedStyle() 获取元素一切样式属性 
+    第一个参数：元素
+    第二个参数：伪元素   一般不传或者传null
+    返回值： CSSStyleDeclaration 对象：存储元素一切样式属性
+     */
+
+    let style =  window.getComputedStyle(box,null);
+    console.log(style);
+    
+
+    console.log(style.backgroundColor);
+    console.log(style.padding);
+    console.log(style.border);
+    console.log(style.width);
+
+    style.width = '1000px';//程序报错 只能获取不能修改
+
+
+    /*3.三种语法操作元素属性总结
+    a.点语法： 修改元素属性
+    b. getComputedStyle():获取元素属性
+    c.attribute: 操作自定义属性
+    
+    */
+    
+</script>
+</body>
+</html>

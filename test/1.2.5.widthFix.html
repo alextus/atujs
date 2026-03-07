@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .abc{ width: 100px; height: 100px; background-color: red; display: none;}
+  </style>
+  <script src="../src/atu.js?v=1.1"></script>
+</head>
+<body>
+  <div class="abc">111</div>
+  <script>
+    console.log($(".abc").width())
+    console.log($(".abc").css('display'))
+    function getHiddenElementRect(element) {
+  if (!element || window.getComputedStyle(element).display !== 'none') {
+    return element.getBoundingClientRect();
+  }
+
+  // 保存原样式
+  const originalDisplay = element.style.display;
+  const originalPosition = element.style.position;
+  
+  // 临时显示并脱离文档流
+  element.style.display = 'block';
+  element.style.position = 'absolute';
+  element.style.visibility = 'hidden';
+
+  // 获取矩形信息（包含 width/height/x/y 等）
+  const rect = element.getBoundingClientRect();
+
+  // 恢复原样式
+  element.style.display = originalDisplay;
+  element.style.position = originalPosition;
+  element.style.visibility = '';
+
+  return rect;
+}
+
+
+  </script>
+</body>
+</html>

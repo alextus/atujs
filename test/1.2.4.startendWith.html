@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+</head>
+<body>
+  
+  <script>
+    String.prototype.startWith = function (str) {
+      const reg = new RegExp("^" + str);
+      return reg.test(this);
+    }
+    String.prototype.endWith = function (str) {
+      const reg = new RegExp(str+"$");
+      return reg.test(this);
+    }
+    console.log("http://www.baidu.com/test.html".endWith("test.html"))
+    console.log("http://www.baidu.com/test.html?page=1&key=1".endWith("test.html"))
+    console.log("http://www.baidu.com/test.html".startWith("http://www.baidu.com"))
+    console.log("http://www.baidu.com/test.html".startWith("https://www.baidu.com"))
+  </script>
+</body>
+</html>

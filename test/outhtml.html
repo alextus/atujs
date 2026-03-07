@@ -4,18 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OutHtml</title>
-  <script src="../src/atu.js?v=1.15"></script>
+  <script src="../src/atu.js?v=1.17"></script>
+  <style>
+    .test2 {
+      width: 100px;
+      padding: 20px;
+      margin: 30px;
+      height: 80px;
+      border: 1px solid #000;
+      box-sizing: border-box;
+    }
+  </style>
 </head>
 <body>
   <div class="test">adfadf</div>
   outHtml()  <=>htmls()
   htmls('')  <=> replaceWith()
+  <div class="test2">adfadf</div>
   <script>
     console.log($(".test")[0].innerHTML,$(".test")[0].outerHTML)
       console.log($(".test").html(),$(".test").outHtml())
       console.log($(".test").htmls())
 
       $(".test").htmls('<span>1111</span>')
+
+    console.log($(".test2").outerHeight())
+    console.log(parseFloat(''))
   </script>
 </body>
 </html>

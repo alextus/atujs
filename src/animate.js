@@ -68,7 +68,7 @@
     $.log("getElementTransforms",getElementTransforms($(this)[0]))
     
     $.log("anim",properties, duration, ease, callback, delay)
-		var key, cssValues = {}, cssProperties, transforms = '',
+		var key,nkey,nval, cssValues = {}, cssProperties, transforms = '',
 			that = this, wrappedCallback, endEvent = $.fx.transitionEnd, fired = false
 
 		if (duration === undefined) duration = $.fx.speeds._default / 1000
