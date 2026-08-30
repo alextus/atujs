@@ -169,7 +169,7 @@ function setData(name, cookievalue) {
 		localStorage.setItem(name, cookievalue);
 	}
 }
-const cookieBaseName = "alextu_"
+let cookieBaseName = "alextu_"
 
 function getCookie(name) {
 	//注：只有数字型或者字符型，没有Boolean,空为false,有值哪怕是false都为true
