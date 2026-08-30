@@ -1,63 +1,80 @@
 (function ($) {
   let jsonpID = 0
-  const document = window.document;
-  const rscript = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
-  const scriptTypeRE = /^(?:text|application)\/javascript/i;
-  const xmlTypeRE = /^(?:text|application)\/xml/i;
-  const jsonType = "application/json";
-  const htmlType = "text/html";
-  const blankRE = /^\s*$/;
-  const originAnchor = document.createElement("a");
-  
+  const  document = window.document,
+    rscript = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+    scriptTypeRE = /^(?:text|application)\/javascript/i,
+    xmlTypeRE = /^(?:text|application)\/xml/i,
+    jsonType = "application/json",
+    htmlType = "text/html",
+    blankRE = /^\s*$/,
+    originAnchor = document.createElement("a"),
+    encode = encodeURIComponent;
 
   originAnchor.href = window.location.href;
-  $.active = 0;
 
   function triggerAndReturn(context, eventName, data) {
-    const event = $.Event(eventName);
+    let event = $.Event(eventName);
     $(context).trigger(event, data);
     return !event.isDefaultPrevented();
   }
+
   function triggerGlobal(settings, context, eventName, data) {
-    if (settings.global) return triggerAndReturn(context || document, eventName, data);
+    if (settings.global)
+      return triggerAndReturn(context || document, eventName, data);
   }
+  $.active = 0;
 
   function ajaxStart(settings) {
-    if (settings.global && $.active++ === 0) triggerGlobal(settings, null, "ajaxStart");
+    if (settings.global && $.active++ === 0)
+      triggerGlobal(settings, null, "ajaxStart");
   }
+
   function ajaxStop(settings) {
-    if (settings.global && !--$.active) triggerGlobal(settings, null, "ajaxStop");
+    if (settings.global && !--$.active)
+      triggerGlobal(settings, null, "ajaxStop");
   }
+
   function ajaxBeforeSend(xhr, settings) {
-    const context = settings.context;
-    if (settings.beforeSend.call(context, xhr, settings) === false ||
-      triggerGlobal(settings, context, "ajaxBeforeSend", [xhr, settings]) === false) {
+    let context = settings.context;
+    if (
+      settings.beforeSend.call(context, xhr, settings) === false ||
+      triggerGlobal(settings, context, "ajaxBeforeSend", [xhr, settings]) ===
+        false
+    )
       return false;
-    }
+
     triggerGlobal(settings, context, "ajaxSend", [xhr, settings]);
   }
+
   function ajaxSuccess(data, xhr, settings, deferred) {
-    const context = settings.context;
-    const status = "success";
+    let context = settings.context,
+      status = "success";
     settings.success.call(context, data, status, xhr);
     deferred && deferred.resolveWith(context, [data, status, xhr]);
     triggerGlobal(settings, context, "ajaxSuccess", [xhr, settings, data]);
     ajaxComplete(status, xhr, settings);
   }
+
   function ajaxError(error, type, xhr, settings, deferred) {
-    const context = settings.context;
+    let context = settings.context;
     settings.error.call(context, xhr, type, error);
     deferred && deferred.rejectWith(context, [xhr, type, error]);
-    triggerGlobal(settings, context, "ajaxError", [xhr, settings, error || type]);
+    triggerGlobal(settings, context, "ajaxError", [
+      xhr,
+      settings,
+      error || type,
+    ]);
     ajaxComplete(type, xhr, settings);
   }
+
   function ajaxComplete(status, xhr, settings) {
-    const context = settings.context;
+    let context = settings.context;
     settings.complete.call(context, xhr, status);
     triggerGlobal(settings, context, "ajaxComplete", [xhr, settings]);
     ajaxStop(settings);
   }
-  function empty() { }
+
+  function empty() {}
 
   $.ajaxJSONP = function (options, deferred) {
     if (!("type" in options)) return $.ajax(options);
@@ -141,13 +158,21 @@
 
   function mimeToDataType(mime) {
     if (mime) mime = mime.split(";", 2)[0];
-    return (mime && (mime === htmlType ? "html" :
-      mime === jsonType ? "json" :
-        scriptTypeRE.test(mime) ? "script" :
-          xmlTypeRE.test(mime) && "xml")) || "text";
+    return (
+      (mime &&
+        (mime == htmlType
+          ? "html"
+          : mime == jsonType
+          ? "json"
+          : scriptTypeRE.test(mime)
+          ? "script"
+          : xmlTypeRE.test(mime) && "xml")) ||
+      "text"
+    );
   }
+
   function appendQuery(url, query) {
-    if (query === "") return url;
+    if (query == "") return url;
     return (url + "&" + query).replace(/[&?]{1,2}/, "?");
   }
 
@@ -160,19 +185,21 @@
   }
 
   $.ajax = function (options) {
-    let settings = $.extend({}, $.ajaxSettings, options || {}),
-      deferred = $.Deferred && $.Deferred();
+    let settings = $.extend({}, options || {}),
+      deferred = $.Deferred && $.Deferred(),
+      urlAnchor;
+    for (let key in $.ajaxSettings)
+      if (settings[key] === undefined) settings[key] = $.ajaxSettings[key];
 
-
-    
     ajaxStart(settings);
 
     if (!settings.crossDomain) {
-      const urlAnchor = document.createElement("a");
+      urlAnchor = document.createElement("a");
       urlAnchor.href = settings.url;
       settings.crossDomain = originAnchor.origin !== urlAnchor.origin;
     }
-    if (!settings.url) settings.url = location.href;
+
+    if (!settings.url) settings.url = window.location.toString();
     serializeData(settings);
 
     let dataType = settings.dataType,
@@ -212,7 +239,6 @@
       xhr = settings.xhr(),
       nativeSetHeader = xhr.setRequestHeader,
       abortTimeout;
-  
 
     deferred && deferred.promise(xhr);
 
@@ -314,23 +340,22 @@
   };
 
   $.post = function (/* url, data, success, dataType */) {
-    const opt = parseArguments.apply(null, arguments);
-    opt.type = "POST";
-    return $.ajax(opt);
+    let options = parseArguments.apply(null, arguments);
+    options.type = "POST";
+    return $.ajax(options);
   };
 
   $.getJSON = function (/* url, data, success */) {
-    const opt = parseArguments.apply(null, arguments);
-    opt.dataType = "json";
-    return $.ajax(opt);
+    let options = parseArguments.apply(null, arguments);
+    options.dataType = "json";
+    return $.ajax(options);
   };
 
   $.fn.load = function (url, data, success) {
     if (!this.length) return this;
-    const self = this,parts = url.split(/\s/),
+    let self = this,parts = url.split(/\s/),selector,
       options = parseArguments(url, data, success),
       callback = options.success;
-    let selector
     if (parts.length > 1) (options.url = parts[0]), (selector = parts[1]);
     options.success = function (response) {
       self.html(selector? $("<div>").html(response.replace(rscript, "")).find(selector): response,);
@@ -342,27 +367,27 @@
 })(Atu);
 
 (function ($) {
-  const encode = encodeURIComponent;
   function serialize(params, obj, traditional, scope) {
-    const array = $.isArray(obj);
-    const hash = $.isPlainObject(obj);
+    let type,
+      array = $.isArray(obj),
+      hash = $.isPlainObject(obj);
     $.each(obj, function (key, value) {
-      const type = $.type(value);
-      if (scope) {
-        key = traditional ? scope : scope + "[" + (hash || type === "object" || type === "array" ? key : "") + "]";
-      }
+      type = $.type(value);
+      if (scope)
+        key = traditional? scope: scope +"[" +(hash || type == "object" || type == "array" ? key : "") +"]";
       if (!scope && array) params.add(value.name, value.value);
-      else if (type === "array" || (!traditional && type === "object")) {
+      else if (type == "array" || (!traditional && type == "object"))
         serialize(params, value, traditional, key);
-      } else params.add(key, value);
+      else params.add(key, value);
     });
   }
+
   $.param = function (obj, traditional) {
-    const params = [];
-    params.add = function (k, v) {
-      if ($.isFunction(v)) v = v();
-      if (v == null) v = "";
-      params.push(encode(k) + "=" + encode(v));
+    let params = [];
+    params.add = function (key, value) {
+      if ($.isFunction(value)) value = value();
+      if (value == null) value = "";
+      this.push(encode(key) + "=" + encode(value));
     };
     serialize(params, obj, traditional);
     return params.join("&").replace(/%20/g, "+");
@@ -404,11 +429,7 @@
                 newDefer.resolveWith(this, [res]);
               }
             } else {
-              //console.log("catch2,", err);
-              //newDefer.rejectWith(this, [err]);
-              if (typeof callback === "function") {
-                callback.apply(this, [err]);
-              }
+              console.log("catch2,", err);
               newDefer.rejectWith(this, [err]);
             }
           } catch (e) {
@@ -421,12 +442,18 @@
       this.fail(handle(onFail, false));
       return newDefer.promise();
     };
-    function triggerFinal(stateName, callbackList, ctx, args) {
+    function triggerFinal(stateName, callbackList, context, args) {
       if (state !== "pending") return;
       state = stateName;
-      stateName === "resolved" ? (resolveCtx = ctx, resolveArgs = args) : (rejectCtx = ctx, rejectArgs = args);
-      callbackList.forEach(function(f){f.apply(ctx, args)});
-      finallyList.forEach(function(f){f.apply(ctx, args)});
+      if (stateName === "resolved") {
+        resolveCtx = context;
+        resolveArgs = args;
+      } else {
+        rejectCtx = context;
+        rejectArgs = args;
+      }
+      callbackList.forEach((f) => f.apply(context, args));
+      finallyList.forEach((f) => f.apply(context, args));
     }
     deferred.resolveWith = function (context, args) {
       triggerFinal("resolved", doneList, context, args);

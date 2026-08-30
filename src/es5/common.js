@@ -2,45 +2,45 @@
  * browser 浏览器类型检测，已通过chrome 93，ie 11
  */
 
-const ua = navigator.userAgent.toLowerCase()
-const up = navigator.platform.toLowerCase(); 
-const browser = {
-	ua,
-	ie: ua.indexOf('trident')!== -1, //IE内核
+var ua = navigator.userAgent.toLowerCase()
+var up = navigator.platform.toLowerCase(); 
+var browser = {
+	ua: ua,
+	ie: ua.indexOf('trident') > -1 ? true : false, //IE内核
 	opera: !!window.opera && window.opera.version,
-	webKit: ua.indexOf('applewebkit') !== -1, //苹果、谷歌内核
-	mac: ua.indexOf("macintosh")!== -1,
-	edge: ua.indexOf('edg') !== -1,
-	gecko: ua.indexOf('gecko')!== -1  && ua.indexOf('khtml')== -1, //火狐内核
+	webKit: ua.indexOf('applewebkit') > -1, //苹果、谷歌内核
+	mac: ua.indexOf("macintosh") > -1,
+	edge: ua.indexOf('edg') > -1,
+	gecko: ua.indexOf('gecko') > -1 && ua.indexOf('khtml') == -1, //火狐内核
 	mobile: !!ua.match(/applewebkit.*mobile.*/), //是否为移动终端
 	ios: !!ua.match(/\(i[^;]+;( u;)? cpu.+mac os x/), //ios终端
-	SymbianOS: ua.indexOf('symbian')!== -1 ||ua.indexOf('symbianos')!== -1, 
-	WindowsPhone: ua.indexOf('windows phone')!== -1, 
-	weixin: ua.indexOf('micromessenger') !== -1,
+	SymbianOS: ua.indexOf('symbian') > -1||ua.indexOf('symbianos') > -1, 
+	WindowsPhone: ua.indexOf('windows phone') > -1, 
+	weixin: ua.indexOf('micromessenger') > -1,
 	quirks: document.compatMode == "BackCompat",
 	language: (navigator.browserLanguage || navigator.language).toLowerCase()
 }
 
-const _bs=['presto','chrome','safari','firefox','android','linux','iPhone','iPad','iPod','alipay','xiaomi','redmi','vivo','oppo','honor','huawei','weibo','eleme','qq']
+let _bs=['presto','chrome','safari','firefox','android','linux','iPhone','iPad','iPod','alipay','xiaomi','redmi','vivo','oppo','honor','huawei','weibo','eleme','qq']
 _bs.forEach(item => {
-  window["is"+capitalizeFirstLetter(item)]=window["is_"+item.toLowerCase()]=browser[item]= browser[item.toLowerCase()]= ua.indexOf(item.toLowerCase())!== -1
+  window["is"+capitalizeFirstLetter(item)]=window["is_"+item.toLowerCase()]=browser[item]= browser[item.toLowerCase()]= ua.indexOf(item.toLowerCase()) > -1
 });
-browser.type=browser.ie ? "IE" : browser.opera ? "Opera" :  browser.edge ? "Edge" :
+browser.type=browser.ie ? "IE" : browser.opera ? "Opear" :  browser.edge ? "Edge" :
 browser.weixin ? "Weixin" :browser.chrome ? "Chrome" : browser.safari ? "Safari" : "other";
 browser.engine=browser.webKit?"Webkit":browser.gecko?"Gecko":browser.ie?"Trident":"other"
 
-const isWeixin =  browser.weixin
-const isPc  = !(browser.android||browser.iPhone||browser.iPad||browser.iPod||browser.SymbianOS||browser.WindowsPhone);
-const isLocal=location.href.indexOf("localhost")>0
-const is_weixin = isWeixin,is_pc = isPc,isMob  = !isPc,is_mob = isMob,is_local=isLocal
+var isWeixin =  browser.weixin
+var isPc  =(browser.android||browser.iPhone||browser.iPad||browser.iPod||browser.SymbianOS||browser.WindowsPhone)?false:true;
+var isLocal=location.href.indexOf("localhosts")>0
+var is_weixin = isWeixin,is_pc = isPc,isMob  = !isPc,is_mob = isMob,is_local=isLocal
 
-const system = {win: up.indexOf("win") == 0, mac: up.indexOf("mac") == 0, linux: up.indexOf("linux") == 0, xll: false, ipad:isIpad }; 
+var system = {win: up.indexOf("win") == 0, mac: up.indexOf("mac") == 0, linux: up.indexOf("linux") == 0, xll: false, ipad:isIpad }; 
 system.type=system.win?"Win":system.mac?"Mac":system.ipad?"Ipad":browser.android?"Android":system.linux?"linux":"other"
 
-let version = 0;
+var version = 0;
 if (browser.ie) {
-	const v1 = ua.match(/(?:msie\s([\w.]+))/);
-	const v2 = ua.match(/(?:trident.*rv:([\w.]+))/);
+	var v1 = ua.match(/(?:msie\s([\w.]+))/);
+	var v2 = ua.match(/(?:trident.*rv:([\w.]+))/);
 
 	if (v1 && v2 && v1[1] && v2[1]) {
 		version = Math.max(v1[1] * 1, v2[1] * 1);
@@ -64,48 +64,42 @@ if (browser.ie) {
 }
 
 if (browser.firefox) {
-	let geckoRelease = ua.match(/rv:([\d\.]+)/);
+	var geckoRelease = ua.match(/rv:([\d\.]+)/);
 	if (geckoRelease) {
 		geckoRelease = geckoRelease[1].split(".");
 		version = geckoRelease[0] * 10000 + (geckoRelease[1] || 0) * 100 + (geckoRelease[2] || 0) * 1;
 	}
 }
-let match;
 if(browser.edg){
 	if (/edg\/([\d\.]+)/i.test(ua)) {
-		match =  ua.match(/edg\/(\d+\.\d)/i);
-    if (match) version = match[1];
+		version =  ua.match(/edg\/(\d+\.\d)/i)[1];
 	}
 }else if(browser.chrome){
 	if (/chrome\/([\d\.]+)/i.test(ua)) {
-		match =  ua.match(/chrome\/(\d+\.\d)/i);
-    if (match) version = match[1];
+		version =  ua.match(/chrome\/(\d+\.\d)/i)[1];
 	}
 }
 
 // Opera 9.50+
-if (browser.opera) version = parseFloat(opera.version);
+if (browser.opera) version = parseFloat(opera.version());
 
 // WebKit 522+ (Safari 3+)
-if (browser.webkit){
-  	match =  ua.match(/ applewebkit\/(\d+)/);
-    if (match) version = parseFloat(match[1]);
-};
+if (browser.webkit) version = parseFloat(ua.match(/ applewebkit\/(\d+)/)[1]);
 
 browser.version=version
 browser.isCompatible= !browser.mobile && ((browser.ie && version >= 6) || (browser.gecko && version >= 10801) || (browser.opera && version >= 9.5) || (browser.air && version >= 1) || (browser.webkit && version >= 522) || false)
 
-const isStorageSupport = localStorageSupported() //全局变量，判断是否支持
-const is_storagesupport=isStorageSupport
-const supportsOrientationChange = "onorientationchange" in window, //是否开启手机横竖屏
+var isStorageSupport = localStorageSupported() //全局变量，判断是否支持
+var is_storagesupport=isStorageSupport
+var supportsOrientationChange = "onorientationchange" in window, //是否开启手机横竖屏
 	orientationEvent = supportsOrientationChange ? "orientationchange" : "resize",
   isTouchDevice=('ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0);
 
-const touch = isTouchDevice ? "touchstart" : "mousedown";
-const touchmove = isTouchDevice ? "touchmove" : "mousemove";
-const touchend = isTouchDevice ? "touchend" : "mouseup";
+var touch = isTouchDevice ? "touchstart" : "mousedown";
+var touchmove = isTouchDevice ? "touchmove" : "mousemove";
+var touchend = isTouchDevice ? "touchend" : "mouseup";
 
-const reqAnimationFrame = requestAnimationFrame = window.requestAnimationFrame ||
+var reqAnimationFrame = requestAnimationFrame = window.requestAnimationFrame ||
 	window.mozRequestAnimationFrame ||
 	window.webkitRequestAnimationFrame ||
 	window.msRequestAnimationFrame ||
@@ -117,17 +111,17 @@ const reqAnimationFrame = requestAnimationFrame = window.requestAnimationFrame |
 //创建空console对象，避免JS报错  
 if (!window.console) {
 	window.console = {};
-	const console = window.console;
+	var console = window.console;
 
-	const funcs = ['assert', 'clear', 'count', 'debug', 'dir', 'dirxml',
+	var funcs = ['assert', 'clear', 'count', 'debug', 'dir', 'dirxml',
 		'error', 'exception', 'group', 'groupCollapsed', 'groupEnd',
 		'info', 'log', 'markTimeline', 'profile', 'profileEnd',
 		'table', 'time', 'timeEnd', 'timeStamp', 'trace', 'warn'
 	];
-	for (let i = 0, l = funcs.length; i < l; i++) {
-		const func = funcs[i];
+	for (var i = 0, l = funcs.length; i < l; i++) {
+		var func = funcs[i];
 		if (!console[func])
-			console[func] = () => {};
+			console[func] = function () {};
 	}
 	if (!console.memory)
 		console.memory = {};
@@ -142,14 +136,15 @@ function trim(str){
 }
 //获取Request
 function get(sProp) {
-	const re = new RegExp(`[?&]${sProp}=([^&]*)`, 'i');
-	const a = re.exec(document.location.search);
+	var re = new RegExp(`[?&]${sProp}=([^&]*)`, 'i');
+	var a = re.exec(document.location.search);
 	return a == null?"":decodeURIComponent(a[1]);
 };
 
 
 
 function localStorageSupported() {
+
 	try {
 		localStorage.setItem("test", "test");
 		localStorage.removeItem("test");
@@ -162,20 +157,34 @@ function localStorageSupported() {
 
 function getData(name) {
 	//注：只有数字型或者字符型，没有Boolean,空为false,有值哪怕是false都为true
-	return isStorageSupport ? localStorage.getItem(name) || '' : '';
+	if (isStorageSupport) {
+		var v = localStorage.getItem(name)
+		if (v == undefined) {
+			v = "";
+		}
+		return v;
+	}else{
+		console.log('not support getData')
+	}
+	return "";
+
 }
+
 function setData(name, cookievalue) {
+	var date = new Date();
+	date.setTime(date.getTime() + 365 * 24 * 3600 * 1000);
 	if (isStorageSupport) {
 		localStorage.setItem(name, cookievalue);
 	}
+
 }
-const cookieBaseName = "alextu_"
+var cookieBaseName = "alextu_"
 
 function getCookie(name) {
 	//注：只有数字型或者字符型，没有Boolean,空为false,有值哪怕是false都为true
 	name = cookieBaseName + name
-	const _cookie = document.cookie;
-	let firstchar = _cookie.indexOf(name + "="),lastchar;
+	var _cookie = document.cookie;
+	var firstchar = _cookie.indexOf(name + "="),lastchar='';
 	if (firstchar != -1) {
 		firstchar += name.length + 1;
 		lastchar = _cookie.indexOf(";", firstchar);
@@ -186,24 +195,38 @@ function getCookie(name) {
 }
 function setCookie(name, value) {
 	name = cookieBaseName + name
-	const date = new Date();
+	var date = new Date();
 	date.setTime(date.getTime() + 365 * 24 * 3600 * 1000);
 	document.cookie = name + '=' + escape(value) + ';path=/;  expires=' + date.toGMTString()
 
 }
 
 function delCookie(name) {
-	const exp = new Date();
+	var exp = new Date();
 	exp.setTime(exp.getTime() - 1);
 	document.cookie = name + "=;path=/;expires=" + exp.toGMTString();
 }
 
 function RandArr(arr) {
-	 return [...arr].sort(() => Math.random() - 0.5)
+	num = arr.length
+	let temp_array = [].concat(arr);
+	let return_array = new Array();
+	for (let i = 0; i < num; i++) {
+
+		if (temp_array.length >= 0) {
+
+			let arrIndex = Math.floor(Math.random() * temp_array.length);
+			return_array[i] = temp_array[arrIndex];
+			temp_array.splice(arrIndex, 1);
+		} else {
+			break;
+		}
+	}
+	return return_array;
 }
 function arrRand(arr) { return RandArr(arr);}
 function arrRemove(array,o) {
-  let arr = [...array];
+  let arr = [].concat(array);
   let t = arr.indexOf(o);
 	t > -1 && arr.splice(t, 1)
   return arr
@@ -211,8 +234,14 @@ function arrRemove(array,o) {
 function arrDelete(array,o) { return arrRemove(array,o);}
 
 function getXY(e) {
+
 	e = e.originalEvent || e
-	let _e = false
+
+	var _x = 0,
+		_y = 0,
+		_cx = 0,
+		_cy = 0,
+		_e = false
 	if (/(iPhone|iPad|iPod|iOS|Android)/i.test(navigator.userAgent) || isTouchDevice) {
 		if (e.targetTouches || e.changedTouches || e.touches) {
 			if (e.targetTouches[0] != undefined) {
@@ -236,9 +265,9 @@ function getXY(e) {
 }
 
 function newImg(src) {
-	let obj = new Image();
+	var obj = new Image();
 	obj.src = src;
-	obj.onload = () => {}
+	obj.onload = function () {}
 	return obj;
 }
 
@@ -249,31 +278,37 @@ function urlencode(url) {
 function urldecode(url) {
 	return decodeURIComponent(url);
 }
-const log = {
-	ini () {
+var log = {
+	ini: function () {
 		if ($("#log").length == 0) {
 			$("body").append('<div id="log" style="position:fixed; top:0;z-index:999; padding:10px; background:#FFF; color:#000;"></div>')
 		}
 	},
-	add () {
-		const v = Array.prototype.slice.apply(arguments);
+	add: function () {
+		var v = Array.prototype.slice.apply(arguments);
 		this.ini();
 		$("#log").html(v.join(" ") + "<br/>" + $("#log").html());
 	},
-	val () {
-		const v = Array.prototype.slice.apply(arguments);
+	val: function () {
+		var v = Array.prototype.slice.apply(arguments);
 		this.ini();
 		$("#log").html(v.join(" ") + "<br/>");
 	}
 }
 
 function getEvtUrl() {
-	return location.href.substring(0, location.href.lastIndexOf('/') + 1);
+	var v = window.location.href,
+		u = v.split("/"),
+		s = "";
+	for (i = 0; i < u.length - 1; i++) {
+		s += u[i] + "/"
+	}
+	return s;
 }
 
 
 function convertCanvasToImage(o) {
-	const t = new Image();
+	var t = new Image;
 	return t.src = o.toDataURL("image/png"), t
 }
 
@@ -281,15 +316,25 @@ function convertCanvasToImgData(o) {
 
 	return o.toDataURL("image/jpeg")
 }
-
-String.prototype.byteLength = function(){
-  let len = 0;
-  for (let i = 0; i < this.length; i++) {
-    len += this.charCodeAt(i) > 255 ? 2 : 1;
-  }
-  return len;
+String.prototype.byteLength = function () {
+	var b = 0;
+	l = this.length;
+	if (l) {
+		for (var i = 0; i < l; i++) {
+			if (this.charCodeAt(i) > 255) {
+				b += 2;
+			} else {
+				b++;
+			}
+		}
+		return b;
+	} else {
+		return 0;
+	}
 }
-
+String.prototype.replaceAll = function (find, replace) {
+  return this.replace(new RegExp(find, 'g'), replace);
+}
 String.prototype.startWith = function (str) {
   const reg = new RegExp("^" + str);
   return reg.test(this);
@@ -299,19 +344,30 @@ String.prototype.endWith = function (str) {
   return reg.test(this);
 }
 Array.prototype.indexOf = function (o) {
-	for (let t = 0; t < this.length; t++)
+	for (var t = 0; t < this.length; t++)
 		if (this[t] == o) return t;
 	return -1
 },
 Array.prototype.remove = function (o) {
-	const t = this.indexOf(o);
+	var t = this.indexOf(o);
 	t > -1 && this.splice(t, 1)
 };
-
+if (!String.prototype.replaceAll) {
+  const escapeRegExp = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  String.prototype.replaceAll = function(search, replacement) {
+    let regex;
+    if (search instanceof RegExp) {
+      regex = search.global ? search : new RegExp(search.source, search.flags + 'g');
+    } else {
+      regex = new RegExp(escapeRegExp(String(search)), 'g');
+    }
+    return this.replace(regex, replacement);
+  };
+}
 function e(element) {
-	const elements = [];
-	for (let i = 0; i < arguments.length; i++) {
-		let element = arguments[i];
+	var elements = new Array();
+	for (var i = 0; i < arguments.length; i++) {
+		var element = arguments[i];
 		if (typeof element == 'string')
 			element = document.getElementById(element);
 
@@ -332,73 +388,76 @@ function ce(tagName) {
 }
 
 
-window.onerror =  (message, url, line, column, error)=>{
+window.onerror = function (message, url, line, column, error) {
 	console.log('error::', message, url, line, column, error);
 }
 
 function timestamp(t=0){
-  const s = String(t)
-  if (s.length === 10) return +s * 1000
-  if (s.length === 13) return +s
-  if (s === '0') return Date.now()
-  return ''
+  let t2=t.toString()
+  if(t2.length==10){
+    return Number(t2)*1000
+  }else if(t2.length==13){
+    return Number(t2)
+  }else if(t2=="0"){
+    return new Date().getTime()
+  }else{
+    return '';
+  }
 }
 function newDate(dateStr='') {
   if(!dateStr){return new Date();}
   if(!isNaN(dateStr) ){
-    const t=timestamp(dateStr)
+    let t=timestamp(dateStr)
     if(!t){  return ''}
     dateStr= now(t);
   }
-  const dateArr = dateStr.split(/[- : \/]/);
-  const l = dateArr.length
+  var dateArr = dateStr.split(/[- : \/]/);
+  var l = dateArr.length
   return new Date(dateArr[0], dateArr[1] - 1, dateArr[2], l <= 3 ? 0 : dateArr[3], l <= 3 ? 0 : dateArr[4], l <= 3 ? 0 : dateArr[5]);
   
 }
 
 function year(t='') {
-	const nt = newDate(t) 
+	var nt = newDate(t) 
 	return nt.getFullYear();
 }
 
 function month(t='') {
-	const nt = newDate(t) 
+	var nt = newDate(t) 
 	return nt.getMonth() + 1;
 }
 
 function week(t='') {
-	const nt = newDate(t) 
+	var nt = newDate(t) 
 	return nt.getDay();
 }
 
 function day(t='') {
-	const nt = newDate(t) 
+	var nt = newDate(t) 
 	return nt.getDate();
 }
 
 function hour(t='') {
-	const nt = newDate(t) 
+	var nt = newDate(t) 
 	return nt.getHours();
 }
 
 function now(t='') {
  
-	const d = t?new Date(t):new Date()
-  function pad(n) {
-    return n < 10 ? '0' + n : n;
-  }
-  return d.getFullYear() + '-'
-    + pad(d.getMonth() + 1) + '-'
-    + pad(d.getDate()) + ' '
-    + pad(d.getHours()) + ':'
-    + pad(d.getMinutes()) + ':'
-    + pad(d.getSeconds());
+	var date = t?new Date(t):new Date()
+	var year = date.getFullYear();
+	var month = FormatNum(date.getMonth() + 1);
+	var day = FormatNum(date.getDate());
+	var hour = FormatNum(date.getHours(), 2);
+	var min = FormatNum(date.getMinutes(), 2);
+	var second = FormatNum(date.getSeconds(), 2)
+	return year + "-" + month + "-" + day + " " + hour + ":" + min + ":" + second;
 }
 
 function getTime2Time(t) {
-	const time1 = new Date().getTime() / 1000;
-	const time2 = new Date(t).getTime() / 1000
-	const time_ = time1 - time2;
+	time1 = new Date().getTime() / 1000;
+	time2 = new Date(t).getTime() / 1000
+	var time_ = time1 - time2;
 	return time_;
 }
 
@@ -412,16 +471,16 @@ function getPassTime(startTime) {
 }
 //时间格式化
 function format(time) {
-	time = parseInt(time);
-	const d = parseInt((time / 3660 * 24) % 365);
-	const h = parseInt((time / 3660) % 24);
-	let m = parseInt((time / 60) % 60);
-	let s = parseInt(time % 60);
+	var time = parseInt(time);
+	var d = parseInt((time / 3660 * 24) % 365);
+	var h = parseInt((time / 3660) % 24);
+	var m = parseInt((time / 60) % 60);
+	var s = parseInt(time % 60);
 	m = FormatNum(m, 2);
 	s = FormatNum(s, 2);
 
-	const t = m + ":" + s;
-	h ? t = (h + ":" + t): t
+	var t = m + ":" + s;
+	(h || d || y) ? t = (h + ":" + t): t
 	d ? t = (d + " " + t) : t
 	return t
 }
@@ -432,19 +491,20 @@ function Alexdate(t=0,split='') {
     split=t,t=0;
   }
 
-	const sd = newDate(t),
-	y = FormatNum(sd.getFullYear(), 4),
-	m = FormatNum(sd.getMonth() + 1, 2),
+	var sd = t=newDate(t);
+	y = FormatNum(sd.getFullYear(), 4);
+	m = FormatNum(sd.getMonth() + 1, 2);
 	d = FormatNum(sd.getDate(), 2);
 
 	return y + split + m + split + d;
 }
 
 function FormatNum(num, weishu) {
-	let s = num.toString()
-  while (str.length < weishu) {
-    s = '0' + s;
-  }
+	s = num.toString()
+  console.log(s,s.length,weishu)
+	for (i = s.length; i < weishu; i++) {
+		s = "0" + s;
+	}
 	return s;
 }
 function copy(txt){
@@ -455,28 +515,32 @@ function copy(txt){
   $("#atuCopyInput")[0].select()
   console.log(document.execCommand('copy')?'复制成功':'复制失败')
 }
-function download(url, name) {
-  const xhr = new XMLHttpRequest();
-  xhr.open('GET', url, true);
-  xhr.responseType = 'blob';
-  xhr.onload = () => {
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(xhr.response);
-    a.download = name || 'download';
-    a.rel = 'noopener';
-    a.target = '_blank';
-    a.click();
-    URL.revokeObjectURL(a.href);
-  };
-  xhr.onerror = () => console.error('could not download file');
-  xhr.send();
+function download(url,name){
+  console.log("save",url)
+  const xhr=new window.XMLHttpRequest()
+  xhr.open('GET',url,true)
+  xhr.responseType='blob'
+  xhr.onload= function () {
+      console.log(11111)
+      const blob=window.URL.createObjectURL(x.response)
+      var a = document.createElement('a')
+      name = name || url.name || 'download'
+      a.download = name
+      a.rel = 'noopener' 
+      console.log("blob:",blob)
+      a.href = blob
+      click(a, a.target = '_blank')
+  }
+  xhr.onerror = function () {
+      console.error('could not download file')
+  }
+  xhr.send()
 }
-
 function click (node) {
   try {
       node.dispatchEvent(new MouseEvent('click'))
   } catch (e) {
-      const evt = document.createEvent('MouseEvents')
+      var evt = document.createEvent('MouseEvents')
       evt.initMouseEvent('click', true, true, window, 0, 0, 0, 80,
           20, false, false, false, false, 0, null)
       node.dispatchEvent(evt)
@@ -484,8 +548,8 @@ function click (node) {
 }
 
 if(!window.Atu){window.Atu={}}
-Atu.ini = function() {
-	const v = arguments
+Atu.ini = function () {
+	var v = arguments
 	cookieBaseName += v[0];
 	this.evtUrl = v[1] ? v[1] : location.href;
 	this.wxUrl = v[2] ? v[2] : "//atuad.cn/wx/";
@@ -502,12 +566,12 @@ Atu.ini = function() {
 Atu.iniUser = function (callback, callback2) {
 
 	if (!this.openid) {
-		const wx = get("wx")
-		const d = {}
+		var wx = get("wx")
+		var d = {}
 		if (wx) {
 
 			d.wx = wx
-			const wxArr = wx.split("|")
+			wxArr = wx.split("|")
 			console.log(wxArr)
 		}
 		this.sendDataBack("ini", d, function (p) {
@@ -529,7 +593,7 @@ Atu.iniUser = function (callback, callback2) {
 	}
 }
 Atu.act = Atu.sendDataBack = Atu.sendMsgBack = function (act, u, callback) {
-	const d = u || {}
+	var d = u || {}
 	d.act = typeof (act) == "object" ? act : { "act": act }
 	d.openid = this.openid
 
@@ -553,7 +617,7 @@ Atu.iniWx = function (s) {
 			jsApiList: ['checkJsApi', 'onMenuShareTimeline', 'onMenuShareAppMessage','onMenuShareWeibo', 'updateAppMessageShareData', 'updateTimelineShareData', 'startRecord', 'stopRecord', 'onVoiceRecordEnd', 'playVoice', 'pauseVoice', 'stopVoice', 'onVoicePlayEnd','uploadVoice','downloadVoice','translateVoice', 'chooseImage','getLocalImgData', 'previewImage','uploadImage','downloadImage', 'getNetworkType','getLocation','openLocation','closeWindow','scanQRCode','hideOptionMenu','showOptionMenu','hideMenuItems','showMenuItems','hideAllNonBaseMenuItem','showAllNonBaseMenuItem','openEnterpriseChat','openEnterpriseContact'],
 			openTagList: ['wx-open-launch-weapp', 'wx-open-launch-app', 'wx-open-subscribe','wx-open-launch-profile']
 		});
-		wx.ready(() => {
+		wx.ready(function () {
 			Atu.iniShare(s);
 		});
 		wx.error(function (res) {
@@ -563,7 +627,7 @@ Atu.iniWx = function (s) {
 	}, "jsonp")
 }
 Atu.iniShare = function (s) {
-  const _d={title: s.title,desc: s.desc,link: s.link,imgUrl: s.imgUrl,success(res){ },cancel() { console.log('取消分享');}}
+  let _d={title: s.title,desc: s.desc,link: s.link,imgUrl: s.imgUrl,function (res) { }}
 	wx.updateAppMessageShareData(_d);
 	wx.onMenuShareAppMessage(_d);
   _d.title = s.title2 || s.title;
@@ -576,7 +640,7 @@ Atu.iniClick = function (site) {
 	this.addClick()
 }
 Atu.addClick = function (str) {
-	const d = {}
+	var d = {}
 	d.url = location.href
 	d.type = (!str || str == document.title) ? 0 : 1;
 	d.title = str ? str : document.title
@@ -589,8 +653,7 @@ Atu.addClick = function (str) {
 }
 
 //12秒内提示一次，多次引用只显示一次
-const _ct=Math.floor(getData("ct"))
-const _nt=new Date().getTime()
+let _ct=Math.floor(getData("ct")),_nt=new Date().getTime()
 if(_nt>_ct){
 	console.log("%c— ATTUS™,13717810545,作品 —%c ", "padding:8px 15px; color:#f2efe8; background-color:#070e1d; line-height:25px;", "padding:8px 5px 5px 0; color:#070e1d; ")
 	setData("ct",_nt+12000)

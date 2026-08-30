@@ -295,9 +295,8 @@ var Atu = (function () {
     return patrn.test(s)
   }
   $.isUrl = function (s) {
-    if (!s || typeof s !== 'string') return false;
-    const patrn = /^(https?|ftp):\/\/([a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)*|\d{1,3}(\.\d{1,3}){3})(:\d+)?(\/[^#]*)?$/;
-    return patrn.test(s);
+    patrn = /(^[0-9]{3,4}\-[0-9]{7,8}$)|(^\([0-9]{3,4}\)[0-9]{3,8}$)|(^0{0,1}1[3-9]\d{9}$)|(1[3-9]\d{9}$)/;
+    return patrn.exec(s) ? true : false;
   }
   $.isEmail = function (s) {
     var patrn = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
@@ -691,19 +690,12 @@ var Atu = (function () {
     },
 
     css: function (property, value) {
-      if(this.length ===0) return
       if (arguments.length < 2) {
         var element = this[0]
         if (!element) return
-        if (typeof property == 'string'){
-          const transformProps = ['translateX','translateY','translateZ','scale','scaleX','scaleY','scaleZ','rotate','rotateX','rotateY','rotateZ'];
-          if (transformProps.includes(property)) {
-            const transformStr = this.styleValue(element, 'transform');
-            const transform = parseTransform(transformStr);
-            return transform[property];
-          }
+        if (typeof property == 'string')
           return this.styleValue(element, property)
-        }else if (isArray(property)) {
+        else if (isArray(property)) {
           var props = {}
           $.each(property, function (_, prop) {
             props[prop] = this.styleValue(element, prop)
@@ -893,41 +885,6 @@ var Atu = (function () {
       return v;
     }
   })
-  function parseTransform(transformStr) {
-    const result = {
-      translateX: 0, translateY: 0, translateZ: 0,
-      scale: 1, scaleX: 1, scaleY: 1, scaleZ: 1,
-      rotate: 0, rotateX: 0, rotateY: 0, rotateZ: 0
-    };
-    if (!transformStr || transformStr === 'none') return result;
-
-    const matrix2D = transformStr.match(/matrix\((.+)\)/);
-    const matrix3D = transformStr.match(/matrix3d\((.+)\)/);
-
-    if (matrix2D) {
-      const [a, b, c, d, tx, ty] = matrix2D[1].split(',').map(Number);
-      result.translateX = tx;
-      result.translateY = ty;
-      result.scaleX = a;
-      result.scaleY = d;
-      result.scale = Math.sqrt(a * a + b * b);
-      result.rotate = result.rotateZ = Math.atan2(b, a) * 180 / Math.PI;
-    }
-
-    if (matrix3D) {
-      const v = matrix3D[1].split(',').map(Number);
-      result.translateX = v[12];
-      result.translateY = v[13];
-      result.translateZ = v[14];
-      result.scaleX = Math.hypot(v[0], v[1], v[2]);
-      result.scaleY = Math.hypot(v[4], v[5], v[6]);
-      result.scaleZ = Math.hypot(v[8], v[9], v[10]);
-      result.rotateZ = Math.atan2(v[1], v[0]) * 180 / Math.PI;
-      result.rotate = result.rotateZ;
-    }
-    Object.keys(result).forEach(k => result[k] = parseFloat(result[k].toFixed(2)));
-    return result;
-  }
   function traverseNode(node, fun) {
     fun(node)
     for (var i = 0, len = node.childNodes.length; i < len; i++)
