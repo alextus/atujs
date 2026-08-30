@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="../build/atu.1.2.6.js"></script>
+  <link rel="stylesheet" href="../atu.css?v=1">
+
+</head>
+<body>
+  <input type="text" name="abc" required="true" value="123">
+  <script>
+    let require=$("input[name='abc']").attr("required")
+    console.log(require)
+    $("input[name='abc']").attr("required",false)
+    require=$("input[name='abc']").attr("required")
+    if(require){
+      console.log("true")
+    }else{
+      console.log("false")
+    }
+
+
+     $("input[name='abc']").prop("required",false)
+    require=$("input[name='abc']").prop("required")
+    if(require){
+      console.log("true")
+    }else{
+      console.log("false")
+    }
+  </script>
+ 
+</body>
+</html>

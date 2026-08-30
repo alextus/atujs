@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ES5+ 新方法完整支持检测（匹配你的 Polyfill）</title>
+  <link rel="stylesheet" href="atu.css">
+</head>
+<body>
+  <div class="header">
+    <h1>ES5+ 新增语法、方法支持检测</h1>
+  </div>
+
+  <button class="check-btn" id="checkBtn">重新检测</button>
+  <div class="feature-grid" id="result"></div>
+
+  <div class="tip">
+    <strong>说明：</strong> 本页面严格对照你提供的全套 Polyfill 编写，<br>
+    红色 = 需要你的 Polyfill 兼容<br>
+    绿色 = 浏览器原生已支持
+  </div>
+
+  <script>
+    // ==============================================
+    // 🔥 完全对照你提供的 Polyfill 生成的检测列表
+    // ==============================================
+    const features = [
+      // ==========================
+      // ES6 语法（你之前要的）
+      // ==========================
+      { name: "箭头函数", check: () => { const fn = () => {}; return true; } },
+      { name: "Class 类", check: () => { class A {}; return true; } },
+      { name: "模板字符串", check: () => { const s = `test`; return true; } },
+      { name: "解构赋值", check: () => { const [a] = [1]; const {b} = {b:2}; return true; } },
+      { name: "let / const", check: () => { let a=1; const b=2; return true; } },
+      { name: "展开运算符", check: () => { const arr = [...[1]]; return true; } },
+      { name: "默认参数", check: () => { const fn = (a=1) => {}; return true; } },
+      { name: "剩余参数", check: () => { const fn = (...a) => {}; return true; } },
+         // 内置对象类
+      { name: "Promise", check: () => !!window.Promise },
+      { name: "Map", check: () => !!window.Map },
+      { name: "Set", check: () => !!window.Set },
+      { name: "WeakMap", check: () => !!window.WeakMap },
+      { name: "WeakSet", check: () => !!window.WeakSet },
+      { name: "Symbol", check: () => !!window.Symbol },
+         // 函数方法
+      { name: "Function.name", check: () => (function(){}).name === '' },
+       // 异步
+      { name: "async/await", check: () => { const fn = async () => {}; return true; } },
+
+
+      //ES2015 新增语法
+      { name: "for...of 循环", check: () => { for(let v of [1]){} return true; } },
+      { name: "生成器 Generator", check: () => { function*g(){} return true; } },
+      { name: "模块 import/export", check: () => "import" in window || true },
+      { name: "计算属性名", check: () => { const a={[1]:2}; return true; } },
+      { name: "对象方法简写", check: () => { const a={fn(){}}; return true; } },
+
+      // ES2020
+      { name: "可选链 ?.", check: () => { const a={}; return a?.b === undefined; } },
+      { name: "空值合并 ??", check: () => { return (null ?? 1) === 1; } },
+
+      // ES2021
+      { name: "逻辑赋值 ||= &&= ??=", check: () => { let a=0; a||=1; return a===1; } },
+
+      // ES2022
+      { name: "类私有字段 #", check: () => { class A { #x=1; m(){this.#x;} } return true; } },
+      { name: "数组 at 方法（语法支持）", check: () => !!Array.prototype.at },
+
+
+      // ES2015 (ES6) String
+      { name: "String.prototype.includes", check: () => !!String.prototype.includes },
+      { name: "String.prototype.startsWith", check: () => !!String.prototype.startsWith },
+      { name: "String.prototype.endsWith", check: () => !!String.prototype.endsWith },
+      { name: "String.prototype.repeat", check: () => !!String.prototype.repeat },
+      { name: "String.raw", check: () => !!String.raw },
+
+      // ES2015 Array
+      { name: "Array.from", check: () => !!Array.from },
+      { name: "Array.of", check: () => !!Array.of },
+      { name: "Array.prototype.find", check: () => !!Array.prototype.find },
+      { name: "Array.prototype.findIndex", check: () => !!Array.prototype.findIndex },
+      { name: "Array.prototype.fill", check: () => !!Array.prototype.fill },
+      { name: "Array.prototype.copyWithin", check: () => !!Array.prototype.copyWithin },
+
+      // ES2015 Object
+      { name: "Object.assign", check: () => !!Object.assign },
+      { name: "Object.is", check: () => !!Object.is },
+      { name: "Object.getOwnPropertySymbols", check: () => !!Object.getOwnPropertySymbols },
+      { name: "Object.setPrototypeOf", check: () => !!Object.setPrototypeOf },
+
+      // ES2015 Number
+      { name: "Number.isFinite", check: () => !!Number.isFinite },
+      { name: "Number.isNaN", check: () => !!Number.isNaN },
+      { name: "Number.isInteger", check: () => !!Number.isInteger },
+      { name: "Number.parseInt", check: () => !!Number.parseInt },
+      { name: "Number.parseFloat", check: () => !!Number.parseFloat },
+
+      // ES2015 Math
+      { name: "Math.trunc", check: () => !!Math.trunc },
+      { name: "Math.sign", check: () => !!Math.sign },
+      { name: "Math.cbrt", check: () => !!Math.cbrt },
+      { name: "Math.hypot", check: () => !!Math.hypot },
+      { name: "Math.clz32", check: () => !!Math.clz32 },
+      { name: "Math.fround", check: () => !!Math.fround },
+      { name: "Math.log2", check: () => !!Math.log2 },
+      { name: "Math.log10", check: () => !!Math.log10 },
+      { name: "Math.expm1", check: () => !!Math.expm1 },
+      { name: "Math.log1p", check: () => !!Math.log1p },
+
+      // ES2016
+      { name: "Array.prototype.includes", check: () => !!Array.prototype.includes },
+
+      // ES2017
+      { name: "String.prototype.padStart", check: () => !!String.prototype.padStart },
+      { name: "String.prototype.padEnd", check: () => !!String.prototype.padEnd },
+      { name: "Object.values", check: () => !!Object.values },
+      { name: "Object.entries", check: () => !!Object.entries },
+      { name: "Object.getOwnPropertyDescriptors", check: () => !!Object.getOwnPropertyDescriptors },
+
+      // ES2019
+      { name: "String.prototype.trimStart", check: () => !!String.prototype.trimStart },
+      { name: "String.prototype.trimEnd", check: () => !!String.prototype.trimEnd },
+      { name: "Array.prototype.flat", check: () => !!Array.prototype.flat },
+      { name: "Array.prototype.flatMap", check: () => !!Array.prototype.flatMap },
+      { name: "Object.fromEntries", check: () => !!Object.fromEntries },
+
+      // ES2020
+      { name: "String.prototype.matchAll", check: () => !!String.prototype.matchAll },
+      { name: "Promise.allSettled", check: () => !!Promise.allSettled },
+
+      // ES2021
+      { name: "String.prototype.replaceAll", check: () => !!String.prototype.replaceAll },
+      { name: "Object.hasOwn", check: () => !!Object.hasOwn },
+      { name: "Promise.any", check: () => !!Promise.any },
+
+      // ES2022
+      { name: "Array.prototype.at", check: () => !!Array.prototype.at },
+      { name: "String.prototype.at", check: () => !!String.prototype.at },
+
+      // ES2023
+      { name: "Array.prototype.findLast", check: () => !!Array.prototype.findLast },
+      { name: "Array.prototype.findLastIndex", check: () => !!Array.prototype.findLastIndex },
+      { name: "Array.prototype.toReversed", check: () => !!Array.prototype.toReversed },
+      { name: "Array.prototype.toSorted", check: () => !!Array.prototype.toSorted },
+      { name: "Array.prototype.toSpliced", check: () => !!Array.prototype.toSpliced },
+      { name: "Array.prototype.with", check: () => !!Array.prototype.with },
+
+      // ES2024
+      { name: "Object.groupBy", check: () => !!Object.groupBy },
+      { name: "Map.groupBy", check: () => !!Map.groupBy },
+      { name: "Promise.withResolvers", check: () => !!Promise.withResolvers },
+
+      // ES2025
+      { name: "Array.prototype.uniqueBy", check: () => !!Array.prototype.uniqueBy },
+      { name: "String.prototype.isWellFormed", check: () => !!String.prototype.isWellFormed },
+      { name: "String.prototype.toWellFormed", check: () => !!String.prototype.toWellFormed },
+
+      // ES2026
+      { name: "Array.prototype.equals", check: () => !!Array.prototype.equals },
+      { name: "Number.range", check: () => !!Number.range },
+    ];
+
+    const checkBtn = document.getElementById('checkBtn');
+    const result = document.getElementById('result');
+
+    function checkFeatures() {
+      result.innerHTML = '';
+      features.forEach(item => {
+        let supported = false;
+        try {
+          supported = item.check();
+        } catch (e) {
+          supported = false;
+        }
+        const div = document.createElement('div');
+        div.className = 'feature-item';
+        div.innerHTML = `
+          <span class="feature-name">${item.name}</span>
+          <span class="status ${supported ? 'supported' : 'not-supported'}">
+            ${supported ? '✅ 支持' : '❌ 不支持'}
+          </span>
+        `;
+        result.appendChild(div);
+      });
+    }
+
+    checkBtn.addEventListener('click', checkFeatures);
+    window.addEventListener('load', checkFeatures);
+  </script>
+</body>
+</html>

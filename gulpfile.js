@@ -12,15 +12,37 @@ const fs = require('fs');
 const path = require('path');
 
 
-var version = "1.2.6.1"
-var time = "2026.04.14"
+const VERSION_FILE = path.join(__dirname, 'version.txt');
 
+/**
+ * 读取版本，最后位+1，写回文件，返回当前版本字符串
+ */
+function getAndIncVersion() {
+    //读文件，去除换行空格
+    let raw = fs.readFileSync(VERSION_FILE, 'utf8').trim();
+    let arr = raw.split('.');
+    //最后一段转数字 +1
+    let last = Number(arr.pop());
+    arr.push(String(last + 1));
+    let newVer = arr.join('.');
+    //写回version.txt
+    fs.writeFileSync(VERSION_FILE, newVer, 'utf8');
+    console.log(`版本更新：${raw}  →  ${newVer}`);
+    return newVer;
+}
+
+// 构建时读取并自动+1
+var version = getAndIncVersion();
+
+const d = new Date();
+const pad = n => String(n).padStart(2, '0');
+var time = `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())}`;
                                       
 
 var redeme = "/*   ___          ___          ___           ___            ___        \r\n    /\\  \\        /\\  \\        /\\  \\         /\\__\\          /\\  \\       \r\n   /::\\  \\       \\:\\  \\       \\:\\  \\       /:/  /         /::\\  \\      \r\n  /:/\\:\\  \\       \\:\\  \\       \\:\\  \\     /:/  /         /:/\\:\\  \\     \r\n /::\\~\\:\\  \\      /::\\  \\      /::\\  \\   /:/  /  ___     \\:\\~\\:\\  \\    \r\n/:/\\:\\ \\:\\__\\    /:/\\:\\__\\    /:/\\:\\__\\ /:/__/  /\\__\\  /\\ \\:\\ \\:\\__\\   \r\n\\/__\\:\\/:/  /   /:/  \\/__/   /:/  \\/__/ \\:\\  \\ /:/  /  \\:\\ \\:\\ \\/__/   \r\n     \\::/  /   /:/  /       /:/  /       \\:\\  /:/  /    \\:\\ \\:\\__\\     \r\n     /:/  /   /:/  /       /:/  /         \\:\\/:/  /      \\:\\/:/  /     \r\n    /:/  /    \\/__/        \\/__/           \\::/  /        \\::/  /      \r\n    \\/__/                                   \\/__/          \\/__/       \r\n\r\n	艾特图斯 https://www.attus.cn\r\n	" + time + " Beijing.Shanghai.Ningbo.China\r\n	Wechat:alextus\r\n	Mobile:13717810545\r\n	Atu.js不兼容IE6、8、9、10 浏览器，移动项目专用\r\n	version:v" + version + "\r\n*/"
 
 var paths = {
-  scripts: ['src/atu.js', 'src/event.js', 'src/ajax.js', 'src/tween.js','src/animate.js', 'src/loadFile.js', 'src/message.js',  'src/common.js']
+  scripts: ['src/atu.js', 'src/event.js', 'src/ajax.js', 'src/animate.js', 'src/loadFile.js', 'src/message.js',  'src/common.js']
   //,'src/anime.js','src/tabSwitch.js',
 }
 

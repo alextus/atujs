@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="../src/atu.js"></script>
+    <script src="../src/event.js"></script>
+    <script src="../src/animate.js"></script>
+    <style>
+      .demo{ background: #000;color:#fff;}
+      .demo1{ position:absolute;top:0;left:500;}
+    </style>
+</head>
+<body>
+  <div> 
+    标签属性  Attribute 
+    id、class、name、title、src、href、alt、data-*
+target
+rel
+className
+
+placeholder
+for
+tabindex
+value
+checked
+selected
+disabled
+readonly
+multiple
+form
+type
+width /height（img/video 标签原生属性，非 CSS）
+innerHTML（内容载体，也算本身属性）
+textContent
+
+elem.getAttribute(name)
+elem.setAttribute(name, value)
+
+    特征属性  Property
+    可通过JS直接访问的DOM 对象属性
+scrollTop
+scrollLeft
+offsetTop
+offsetLeft
+offsetWidth
+offsetHeight
+clientTop
+clientLeft
+clientWidth
+clientHeight
+scrollWidth
+scrollHeight
+length
+childElementCount 
+
+
+hidden
+disabled
+checked
+selected
+readOnly
+multiple
+isContentEditable
+focused（状态）
+
+
+style（对象）
+dataset（对象）
+classList（对象）
+  classList.add/remove/toggle
+
+click()
+focus()
+blur()
+setAttribute()
+getAttribute()
+appendChild()
+remove()
+getBoundingClientRect () 返回的对象
+事件对象 event
+四、文本 / 内容类
+innerHTML
+innerText / textContent
+value（input/textarea）
+五、事件绑定（行为）
+click、mouseover、mouseout
+scroll、resize
+input、change、focus、blur
+touchstart、touchmove、touchend
+六、DOM 节点关系（结构）
+parentNode
+children、childNodes
+nextSibling、previousSibling
+firstChild、lastChild
+
+
+<h1>element.style.xxx 属性清单</h1>
+getComputedStyle 
+必带单位（px/%/rem/em/vh 等）
+<h2>1. 盒子模型 / 布局、边框</h2>
+<xmp>
+box-sizing
+width
+height
+minWidth
+minHeight
+maxWidth
+maxHeight
+padding
+paddingTop
+paddingRight
+paddingBottom
+paddingLeft
+margin
+marginTop
+marginRight
+marginBottom
+marginLeft
+boxSizing
+borderSpacing
+emptyCells
+captionSide
+border
+borderWidth
+borderStyle
+borderColor
+borderTop
+borderTopWidth
+borderTopStyle
+borderTopColor
+borderRight
+borderRightWidth
+borderRightStyle
+borderRightColor
+borderBottom
+borderBottomWidth
+borderBottomStyle
+borderBottomColor
+borderLeft
+borderLeftWidth
+borderLeftStyle
+borderLeftColor
+borderRadius
+borderTopLeftRadius
+borderTopRightRadius
+borderBottomLeftRadius
+borderBottomRightRadius
+borderImage
+borderImageSource
+borderImageSlice
+borderImageWidth
+borderImageOutset
+borderImageRepeat
+boxShadow
+outline
+outlineWidth
+outlineStyle
+outlineColor
+outlineOffset
+</xmp>
+<h2>2. 定位 / 层级</h2>
+<xmp>
+position
+top
+right
+bottom
+left
+zIndex
+float
+clear
+</xmp>
+<h2>3. 显示 / 溢出</h2>
+<xmp>
+display
+visibility
+opacity
+overflow
+overflowX
+overflowY
+clip
+clipPath
+</xmp>
+
+<h2>5. 背景</h2>
+<xmp>
+background
+backgroundColor
+backgroundImage
+backgroundRepeat
+backgroundAttachment
+backgroundPosition
+backgroundPositionX
+backgroundPositionY
+backgroundSize
+backgroundClip
+backgroundOrigin
+backgroundBlendMode
+</xmp>
+<h2>6. 文字 / 字体</h2>
+<xmp>
+color
+font
+fontFamily
+fontSize
+fontStyle
+fontWeight
+fontVariant
+fontStretch
+lineHeight
+textAlign
+textAlignLast
+textJustify
+textIndent
+textDecoration
+textDecorationLine
+textDecorationColor
+textDecorationStyle
+textDecorationSkip
+textTransform
+textOverflow
+textShadow
+letterSpacing
+wordSpacing
+whiteSpace
+wordBreak
+wordWrap
+direction
+writingMode
+textCombineUpright
+textOrientation
+</xmp>
+<h2>7. 列表</h2>
+<xmp>
+listStyle
+listStyleImage
+listStylePosition
+listStyleType
+</xmp>
+<h2>8. 表格</h2>
+<xmp>
+tableLayout
+borderCollapse
+borderSpacing
+captionSide
+emptyCells
+</xmp>
+<h2>9. Flex 布局</h2>
+<xmp>
+flex
+flexGrow
+flexShrink
+flexBasis
+flexDirection
+flexWrap
+justifyContent
+alignItems
+alignContent
+alignSelf
+order
+</xmp>
+<h2>10. Grid 布局</h2>
+<xmp>
+grid
+gridTemplate
+gridTemplateRows
+gridTemplateColumns
+gridTemplateAreas
+gridAutoRows
+gridAutoColumns
+gridAutoFlow
+gridRowGap
+gridColumnGap
+gap
+gridArea
+gridRow
+gridRowStart
+gridRowEnd
+gridColumn
+gridColumnStart
+gridColumnEnd
+</xmp>
+<h2>11. 变形 / 过渡 / 动画</h2>
+<xmp>
+transform
+transformOrigin
+transformStyle
+perspective
+perspectiveOrigin
+backfaceVisibility
+transition
+transitionProperty
+transitionDuration
+transitionTimingFunction
+transitionDelay
+animation
+animationName
+animationDuration
+animationTimingFunction
+animationIterationCount
+animationDirection
+animationFillMode
+animationPlayState
+animationDelay
+</xmp>
+<h2>12. 光标 / 交互</h2>
+<xmp>
+cursor
+caretColor
+pointerEvents
+touchAction
+userSelect
+resize
+</xmp>
+<h2>13. 滤镜 / 混合</h2>
+<xmp>
+filter
+backdropFilter
+mixBlendMode
+isolation
+</xmp>
+<h2>14. 多列布局</h2>
+<xmp>
+columns
+columnWidth
+columnCount
+columnRule
+columnRuleWidth
+columnRuleStyle
+columnRuleColor
+columnSpan
+columnFill
+columnGap
+</xmp>
+<h2>15. 其他（不常用但完整）</h2>
+<xmp>
+content
+counterIncrement
+counterReset
+quotes
+pageBreakBefore
+pageBreakAfter
+pageBreakInside
+scrollBehavior
+objectFit
+objectPosition
+imageRendering
+mask
+maskImage
+maskSize
+maskPosition
+maskRepeat
+all
+</xmp>
+</div>
+    <div class="demo demo1">obj</div><br/>
+    <script>
+      $(".demo").css({top:100,left:500})
+      console.log("top",$(".demo").css("top"))
+      let a=['translateX','translateY','translateZ','scale','scaleX','scaleY','scaleZ','rotate','rotateX','rotateY','rotateZ']
+      a.forEach(att => {
+         console.log(att, $(".demo").css(att))
+      });
+      console.log($(".demo"))
+
+    </script>
+    
+
+</body>
+</html>

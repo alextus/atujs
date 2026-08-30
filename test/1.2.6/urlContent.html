@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="../../build/atu.1.2.6.1.js"></script>
+</head>
+
+<body>
+  <script>
+    function iniTitleContent(url, d) {
+      let title = $(d).find("h1").eq(0).text();
+      let content = '';
+      if (url.indexOf("cctv.com") > -1) {
+        content = $(d).find("#content_area").html();
+        const regex = /var\s+contentdate\s*=\s*[']([^']*)[']/;
+        const match = d.match(regex);
+        if (match) {
+          content = match[1];
+        }
+      }
+
+      if (url.indexOf("thepaper.cn") > -1) {
+        content = $(d).find(".cententWrap__UojXm").html();
+      }
+      const result = { title, content };
+
+    }
+    function urlContent(url, callback) {
+      return new Promise((resolve, reject) => {
+        $.get("http://www.alextu.cn/manage/main?act=getHtml", { url }, function (d) {
+          const result = iniTitleContent(url, d);
+          if (typeof callback === 'function') {
+            callback(result);
+          }
+          resolve(result);
+        }, "html").fail(function (err) {
+          if (typeof callback === 'function') {
+            callback({ title: '', content: '', error: err });
+          }
+          reject(err);
+        });
+      });
+    }
+
+
+    function urlContent2(url, callback) {
+      return new Promise((resolve, reject) => {
+        $.get("http://www.alextu.cn/manage/main?act=getHtml", { url }, "html").then(function (d) {
+          const result = iniTitleContent(url, d);
+          if (typeof callback === 'function') callback(result);
+          resolve(result);
+        }, function (err) {
+          if (typeof callback === 'function') callback({ title: '', content: '', error: err });
+          reject(err);
+        });
+      });
+    }
+
+
+    $.get("http://www.alextu.cn/manage/main?act=getHtml2", {}, "html").then(function (d) {
+      console.log(d);
+    }, function (err) {
+      console.log('error', err)
+    });
+  </script>
+</body>
+
+</html>

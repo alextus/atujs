@@ -8,7 +8,6 @@
   <script src="../src/atu.js?v=1.13"></script>
   <script src="../src/event.js?v=1.13"></script>
   <script src="../src/common.js?v=1.13"></script>
-  <script src="../src/tween.js?v=1.14"></script>
   <script src="../src/animate.js?v=1.13"></script>
 </head>
 <body>
@@ -79,10 +78,10 @@
         }
         function toRight2(){
         
-            $("#kuai").tween({width: 200}, 1.2,{ease:"Sine.easeIn"});
-            $("#kuai2").tween({width: 200}, 1.2,{ease:"Sine.easeOut"});
-            $("#kuai3").tween({width: 200}, 1.2,{ease:"Sine.easeInOut"});
-            $("#kuai4").tween({width: 200}, 1.2,{easne:"Bounce.easeIn"});
+            $("#kuai").tween({width: 200,ease:"Sine.easeIn"}, 1.2);
+            $("#kuai2").tween({width: 200,ease:"Sine.easeOut"}, 1.2);
+            $("#kuai3").tween({width: 200,ease:"Sine.easeInOut"}, 1.2);
+            $("#kuai4").tween({width: 200,easne:"Bounce.easeIn"}, 1.2);
          
            
         }
@@ -93,7 +92,7 @@
         function scrollTop(){
             console.log("scrollTo")
            //   $(window).scrollTop(0)
-           $("body,html").tween({scrollTop: 0},400,'easeInOutQuad')
+           $("body,html").tween({scrollTop: 0,ease:'easeInOutQuad'},400)
           //$(window).scrollTo(0)
         }
     </script>

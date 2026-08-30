@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ES5+ 新方法完整支持检测（匹配你的 Polyfill）</title>
+  <link rel="stylesheet" href="atu.css">
+  <script src="../build/atu.1.2.6.1.js?v=1.1"></script>
+</head>
+
+<body>
+  <div class="header">
+    <h1>ES5+ 新增语法、方法支持检测</h1>
+  </div>
+
+  <button class="check-btn" id="checkBtn">重新检测</button>
+  <div class="" id="result"></div>
+
+  <div class="tip">
+    <strong>说明：</strong> 本页面严格对照你提供的全套 Polyfill 编写，<br>
+    红色 = 需要你的 Polyfill 兼容<br>
+    绿色 = 浏览器原生已支持
+  </div>
+
+  <script>
+
+    const features = [{
+      'title': ' 一、全局核心对象',
+      'features': [
+        { name: "Atu 全局对象", check: () => !!window.Atu },
+        { name: "$ 别名", check: () => !!window.$ },
+        { name: "jQuery 兼容别名", check: () => !!window.jQuery },
+        { name: "Atu.atu 核心实例", check: () => !!window.Atu?.atu },
+      ]
+    }, {
+      'title': ' 二、静态工具方法',
+      'features': [
+         { name: "$.type", check: () => !!$.type && $.type({}) === 'object' },
+        { name: "$.isFunction", check: () => !!$.isFunction && $.isFunction(function(){}) === true },
+        { name: "$.isWindow", check: () => !!$.isWindow && $.isWindow(window) === true },
+        { name: "$.isArray", check: () => !!$.isArray && $.isArray([]) === true },
+        { name: "$.isPlainObject", check: () => !!$.isPlainObject && $.isPlainObject({}) === true },
+        { name: "$.isEmptyObject", check: () => !!$.isEmptyObject && $.isEmptyObject({}) === true },
+        { name: "$.isNumber", check: () => !!$.isNumber && $.isNumber(123) === true },
+        { name: "$.isString", check: () => !!$.isString && $.isString('test') === true },
+        { name: "$.inArray", check: () => !!$.inArray && $.inArray(2, [1,2,3]) === 1 },
+        { name: "$.camelCase", check: () => !!$.camelCase && $.camelCase('test-case') === 'testCase' },
+        { name: "$.trim", check: () => !!$.trim && $.trim('  test  ') === 'test' },
+        // 验证类
+        { name: "$.isTel", check: () => !!$.isTel && $.isTel('010-12345678') === true },
+        { name: "$.isMobile", check: () => !!$.isMobile && $.isMobile('13800138000') === true },
+        { name: "$.isUrl", check: () => !!$.isUrl && $.isUrl('https://www.baidu.com') === true },
+        { name: "$.isEmail", check: () => !!$.isEmail && $.isEmail('test@test.com') === true },
+        { name: "$.isIdcard", check: () => !!$.isIdcard },
+        { name: "$.isQQ", check: () => !!$.isQQ && $.isQQ('123456') === true },
+
+        // 工具类
+       { name: "$.map", check: () => !!$.map && $.map([1], x=>x+1)[0] === 2 },
+        { name: "$.each", check: () => !!$.each },
+        { name: "$.grep", check: () => !!$.grep },
+        { name: "$.parseJSON", check: () => !!$.parseJSON && $.parseJSON('{"a":1}').a === 1 },
+        { name: "$.param", check: () => !!$.param && $.param({a:1}) === 'a=1' },
+        { name: "$.proxy", check: () => !!$.proxy },
+        { name: "$.Deferred", check: () => !!$.Deferred },
+
+        // AJAX
+        { name: "$.ajax", check: () => !!$.ajax },
+        { name: "$.get", check: () => !!$.get },
+        { name: "$.post", check: () => !!$.post },
+        { name: "$.getJSON", check: () => !!$.getJSON },
+        { name: "$.ajaxJSONP", check: () => !!$.ajaxJSONP },
+
+        // 日志 & 调试
+        { name: "$.debug", check: () => $.debug !== undefined },
+        { name: "$.log", check: () => !!$.log },
+
+        // 文件加载
+        { name: "$.loadFile", check: () => !!$.loadFile },
+
+        // 弹窗工具
+        { name: "$.tip", check: () => !!$.tip },
+        { name: "$.alert", check: () => !!$.alert },
+        { name: "$.showLoading", check: () => !!$.showLoading },
+        { name: "$.hideLoading", check: () => !!$.hideLoading }]
+    }, {
+      'title': ' 三、DOM 实例方法',
+      'features': [
+        { name: "addClass", check: () => !!$('<div>').addClass('test').hasClass('test') },
+        { name: "removeClass", check: () => $('<div class="a">').removeClass('a')[0].className === '' },
+        { name: "toggleClass", check: () => !!$('<div>').toggleClass('test') },
+        { name: "hasClass", check: () => !!$('<div class="a">').hasClass('a') },
+
+        { name: "html", check: () => $('<div>').html('<b>test</b>').html() === '<b>test</b>' },
+        { name: "htmls", check: () => !!$().htmls },
+        { name: "text", check: () => $('<div>').text('test').text() === 'test' },
+        { name: "outHtml", check: () => !!$('<div>').outHtml() },
+
+         { name: "attr", check: () => $('<div>').attr('a','1').attr('a') === '1' },
+        { name: "removeAttr", check: () => $('<div a="1">').removeAttr('a').attr('a') == null },
+        { name: "prop", check: () => $('<input>').prop('checked',true).prop('checked') === true },
+        { name: "removeProp", check: () => !!$().removeProp },
+        { name: "data", check: () => $('<div>').data('k','v').data('k') === 'v' },
+        { name: "val", check: () => $('<input>').val('test').val() === 'test' },
+
+
+         { name: "css", check: () => $('<div>').css('color','red').css('color') },
+        { name: "styleValue", check: () => !!$().styleValue },
+        { name: "width", check: () => $('<div>').width(100).width() === 100 },
+        { name: "height", check: () => $('<div>').height(100).height() === 100 },
+        { name: "innerWidth", check: () => !!$('<div>').innerWidth() },
+        { name: "innerHeight", check: () => !!$('<div>').innerHeight() },
+        { name: "outerWidth", check: () => !!$('<div>').outerWidth() },
+        { name: "outerHeight", check: () => !!$('<div>').outerHeight() },
+
+
+         { name: "show", check: () => !!$('<div>').show() },
+        { name: "hide", check: () => !!$('<div>').hide() },
+        { name: "toggle", check: () => !!$('<div>').toggle() },
+        { name: "isVisible", check: () => $('<div>').isVisible()===false && $('.tip').isVisible() === true },
+
+         { name: "append", check: () => !!$('<div>').append('<span>') },
+        { name: "prepend", check: () => !!$('<div>').prepend('<span>') },
+        { name: "after", check: () => !!$('<div>').after('<span>') },
+        { name: "before", check: () => !!$('<div>').before('<span>') },
+        { name: "remove", check: () => !!$('<div>').remove() },
+        { name: "empty", check: () => $('<div>a</div>').empty().html() === '' },
+        { name: "clone", check: () => !!$('<div>').clone() },
+        { name: "replaceWith", check: () => !!$('<div>').replaceWith('<p>') },
+
+         { name: "find", check: () => !!$('<div><span></span></div>').find('span') },
+        { name: "parent", check: () => !!$('<span>').appendTo('<div>').parent() },
+        { name: "parents", check: () => !!$().parents },
+        { name: "children", check: () => !!$('<div><a></a></div>').children() },
+        { name: "siblings", check: () => !!$('<div><p></p><b></b></div>').find('p').siblings() },
+        { name: "closest", check: () => !!$().closest },
+        { name: "contents", check: () => !!$().contents },
+
+        { name: "eq", check: () => !!$('<div><p></p><p></p></div>').find('p').eq(0) },
+        { name: "first", check: () => !!$('div,p').first() },
+        { name: "last", check: () => !!$('div,p').last() },
+        { name: "filter", check: () => !!$('.a,.b').filter('.a') },
+        { name: "not", check: () => !!$('.a,.b').not('.a') },
+        { name: "has", check: () => !!$('div').has('span') },
+        { name: "is", check: () => !!$('<div class="a"/>').is('.a') },
+
+        { name: "offset", check: () => !!$('<div>').offset() },
+        { name: "position", check: () => !!$('<div>').position() },
+        { name: "offsetParent", check: () => !!$('<div>').offsetParent() },
+        { name: "scrollTop", check: () => !!$('body').scrollTop() !== undefined },
+        { name: "scrollLeft", check: () => !!$('body').scrollLeft() !== undefined },
+
+        { name: "wrap", check: () => !!$('<span>').wrap('<div>') },
+        { name: "wrapAll", check: () => !!$('<span>').wrapAll('<div>') },
+        { name: "wrapInner", check: () => !!$('<div>').wrapInner('<span>') },
+        { name: "unwrap", check: () => !!$('<div><span></span></div>').find('span').unwrap() },
+
+        { name: "autoHeight", check: () => !!$().autoHeight },
+        { name: "scale", check: () => !!$().scale }
+      ]
+    }, {
+      'title': ' 四、事件方法',
+      'features': [
+        { name: "on", check: () => !!$().on },
+        { name: "off", check: () => !!$().off },
+        { name: "bind", check: () => !!$().bind },
+        { name: "unbind", check: () => !!$().unbind },
+        { name: "delegate", check: () => !!$().delegate },
+        { name: "undelegate", check: () => !!$().undelegate },
+        { name: "one", check: () => !!$().one },
+        { name: "trigger", check: () => !!$().trigger },
+        { name: "triggerHandler", check: () => !!$().triggerHandler },
+
+        // 触摸事件
+        { name: "touchLeft", check: () => !!$().touchLeft },
+        { name: "touchRight", check: () => !!$().touchRight },
+        { name: "touchUp", check: () => !!$().touchUp },
+        { name: "touchDown", check: () => !!$().touchDown },
+        { name: "longPress", check: () => !!$().longPress },
+        { name: "scrollEnd", check: () => !!$().scrollEnd }
+      ]
+    }, {
+      'title': ' 五、动画 & Tween 方法',
+      'features': [
+        { name: "animate", check: () => !!$().animate },
+        { name: "animateTo", check: () => !!$().animateTo },
+        { name: "animateFrom", check: () => !!$().animateFrom },
+        { name: "anim", check: () => !!$().anim },
+        { name: "tween", check: () => !!$().tween },
+        { name: "pause", check: () => !!$().pause },
+
+        // 渐变动画
+        { name: "fadeIn", check: () => !!$().fadeIn },
+        { name: "fadeOut", check: () => !!$().fadeOut },
+        { name: "fadeToggle", check: () => !!$().fadeToggle },
+        { name: "fadeTo", check: () => !!$().fadeTo },
+
+        // Tween 全局
+        { name: "Tween", check: () => !!window.Tween },
+        { name: "Tween.to", check: () => !!Tween.to },
+        { name: "Tween.fromTo", check: () => !!Tween.fromTo }
+      ]
+    }, {
+      'title': ' 六、全局工具函数',
+      'features': [
+        { name: "getXY", check: () => !!window.getXY },
+        { name: "trim", check: () => !!window.trim && trim('  a  ') === 'a' },
+        { name: "get", check: () => !!window.get },
+        { name: "copy", check: () => !!window.copy },
+        { name: "download", check: () => !!window.download },
+         { name: "timestamp", check: () => !!window.timestamp && timestamp() > 0 },
+        { name: "newDate", check: () => !!window.newDate },
+        { name: "format", check: () => !!window.format },
+        { name: "arrRand", check: () => !!window.arrRand },
+        { name: "arrRemove", check: () => !!window.arrRemove },
+
+        { name: "getData", check: () => !!window.getData },
+        { name: "setData", check: () => !!window.setData },
+        { name: "getCookie", check: () => !!window.getCookie },
+        { name: "setCookie", check: () => !!window.setCookie },
+
+        { name: "at", check: () => !!window.at },
+        { name: "e", check: () => !!window.e },
+        { name: "ce", check: () => !!window.ce },
+
+    
+      ]
+    },{
+      'title': ' 七、全局变量',
+      'features': [
+
+
+        { name: "isPc", check: () => isPc !== undefined },
+        { name: "isMob", check: () => isMob !== undefined },
+        { name: "isWeixin", check: () => isWeixin !== undefined },
+        { name: "browser", check: () => browser!== undefined }
+      ]
+    }, {
+      'title': ' 八、Atu 业务扩展方法',
+      'features': [
+        { name: "Atu.ini", check: () => !!Atu.ini },
+        { name: "Atu.iniUser", check: () => !!Atu.iniUser },
+        { name: "Atu.act", check: () => !!Atu.act },
+        { name: "Atu.iniWx", check: () => !!Atu.iniWx },
+        { name: "Atu.iniShare", check: () => !!Atu.iniShare },
+        { name: "Atu.addClick", check: () => !!Atu.addClick }
+      ]
+    }
+    ];
+
+    const checkBtn = document.getElementById('checkBtn');
+    const result = document.getElementById('result');
+ function checkFeatures() {
+    features.forEach(group => {
+      // 创建分组外层容器
+      const groupDiv = document.createElement('div');
+      groupDiv.className = '';
+
+      // 关键：内部结构 = 标题 + 列表容器
+      groupDiv.innerHTML = `
+      <h1>${group.title}</h1>
+      <div class="list feature-grid"></div>
+    `;
+
+      // 获取列表容器（用来放功能项）
+      const listContainer = groupDiv.querySelector('.list');
+
+      // 遍历当前分组的所有功能项
+      group.features.forEach(item => {
+        let supported = false;
+        try {
+          supported = item.check();
+        } catch (e) {
+          supported = false;
+        }
+
+        // 创建单个功能项
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'feature-item';
+        itemDiv.innerHTML = `
+        <span class="feature-name">${item.name}</span>
+        <span class="status ${supported ? 'supported' : 'not-supported'}">
+          ${supported ? '✅ 支持' : '❌ 不支持'}
+        </span>
+      `;
+
+        // 关键：把项 插入到 list 里面
+        listContainer.appendChild(itemDiv);
+      });
+
+      // 把整个分组加到结果里
+      result.appendChild(groupDiv);
+    });
+  }
+    checkBtn.addEventListener('click', checkFeatures);
+    window.addEventListener('load', checkFeatures);
+
+    console.log("isMob",isMob,window.isMob)
+   console.log($('<div>').show())
+     
+  </script>
+</body>
+
+</html>

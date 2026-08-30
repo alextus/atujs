@@ -43,8 +43,11 @@
       }
       
     </script>
-    <br/><br/>
-    animate(properties, duration, ease, callback, delay)<br/>
+    <br/>
+    <h2>CSS 方式实现：</h2>
+    <div style="padding-left: 20px;">
+    $(e).animate(properties, duration, ease, callback, delay)<br/>
+    $(e).animateFrom(propertiesStart,propertiesEnd, duration, ease, callback, delay)<br/>
     css 方式实现,缺点是无法中间暂停<br/>
     <div style="position: relative;height: 32px;">
       <div class="demo demo2" >obj</div>
@@ -59,7 +62,6 @@
     <a href="javascript:goAnim({'x':'200px'});">x+200</a> <br/>
     <a href="javascript:goAnim({'y':200});">y+200</a> <br/>
     <a href="javascript:goAnim({'rotate':'180deg'});">rotate+180</a> <br/>
-    <a href="javascript:pause();">暂停</a> <br/>
     <script>
       function goAnim(properties){
       
@@ -68,29 +70,29 @@
        // 
       //  $(".demo2").css({width:$(".demo2").width(),height:$(".demo2").height()})
         $(".demo2").animate(properties, 1000,"ease", function(){})
-        setTimeout(function(){
-          $(".demo2").pause()
-        },500)
+  
       }
-      function pause(){
-        $(".demo2").pause()
-      }
+ 
 
     </script>
-    <br/><br/>各类缓动<br/>
+   <br/>各类缓动<br/>
+    css 无法实现Bounce和Elastic
     <div class="goXList">
       
     </div> 
 
 
-
+animate<br/>
     left+300 :<a href="javascript:goX('In');" class="btn">easeIn</a>
     <a href="javascript:goX('Out');" class="btn"> easeOut</a>
     <a href="javascript:goX('InOut');" class="btn"> easeInOut</a><br/>
-
+animateFrom<br/>
+    left+300 :<a href="javascript:goX2('In');" class="btn">easeIn</a>
+    <a href="javascript:goX2('Out');" class="btn"> easeOut</a>
+    <a href="javascript:goX2('InOut');" class="btn"> easeInOut</a><br/>
 
     <script>
-      easeList=['linear', 'Sine', 'Circ', 'Back', 'Bounce', 'Elastic', 'Quad', 'Cubic', 'Quart', 'Quint','Expo']
+      easeList=['linear', 'Sine', 'Circ', 'Back', 'Quad', 'Cubic', 'Quart', 'Quint','Expo']
       for(var i=0;i<easeList.length;i++){
         $(".goXList").append('<div class="goX" data-ease="'+easeList[i]+'" style="position: relative; height: 32px;">\
           <div class="demo demo3">滑动'+easeList[i]+' </div>\
@@ -101,30 +103,84 @@
         $(".goX").each(function(){
           let eased=$(this).data("ease")+ease
           console.log(eased)
-            $( $(this).find(".demo3")).animateFrom({left:0},{left:300}, 1000,eased, function(){})
+            $( $(this).find(".demo3")).animate({left:300}, 1000,eased, function(){})
+        })
+       
+      }
+       function goX2(ease){
+        $(".goX").each(function(){
+          let eased=$(this).data("ease")+ease
+          console.log(eased)
+            $( $(this).find(".demo3")).animateFrom({left:0}, {left:300}, 1000,eased, function(){})
         })
        
       }
     </script><br/><br/>
-tween(properties, duration, ease, callback, delay)<br/>
+    </div>
+    <hr/>
+    <h2>JS实现</h2>
+    <div style="padding-left: 20px;">
+ $(e).tween(properties, duration)<br/>
+ tween(properties, duration)<br/>
+ tween(properties1,properties2, duration)<br/>
+properties: ease, callback|onComplete, delay
 分节奏 setTimeout 方式实现
 <div style="position: relative; height: 32px;">
   <div class="demo demo4">自定义动画</div> 
 </div>
+<div class="prop">
+  <input type="checkbox" data-p="x"  data-v="100">x</input>
+  <input type="checkbox" data-p="y"  data-v="100">y</input>
+  <input type="checkbox" data-p="z"  data-v="100">z</input>
+  <input type="checkbox" data-p="top"   data-v="100">top</input>
+  <input type="checkbox" data-p="left"  data-v="100" >left</input>
+  <input type="checkbox" data-p="width"   data-v="100">width</input>
+  <input type="checkbox" data-p="height"   data-v="100">height</input>
+  <input type="checkbox" data-p="rotate"  data-v="180deg" >rotate</input>
+  <input type="checkbox" data-p="scale"  data-v="2">scale</input>
+  <input type="checkbox" data-p="color"  data-v="green" >color</input>
+  <input type="checkbox" data-p="background-color"  data-v="red" >background-color</input>
+<input type="checkbox" data-p="font-size"  data-v="42" >font-size</input>
+
+
+
+</div>
 <div class="demo4List" >
   <a href="javascript:goTween();" >goTween</a><br/>
 </div>
+</div>
 
-  <br/> <br/> <br/> <br/> <br/> <br/> <br/>
     <script>
+      easeList.push('Bounce')
+      easeList.push('Elastic')
+
       for(var i=0;i<easeList.length;i++){
         $(".demo4List").append("<a href=\"javascript:goTween('"+easeList[i]+"In');\" class='btn'>"+easeList[i]+"In</a>&nbsp;&nbsp;")
         $(".demo4List").append("<a href=\"javascript:goTween('"+easeList[i]+"Out');\" class='btn'>"+easeList[i]+"Out</a>&nbsp;&nbsp;")
         $(".demo4List").append("<a href=\"javascript:goTween('"+easeList[i]+"InOut');\" class='btn'>"+easeList[i]+"InOut</a><br/>")
       }
       function goTween(ease){
- $(".demo4").tween({left:300},1000,{ease:ease?ease:"easeInOut"})
+        let prop={}
+        $(".prop input:checked").each(function(){
+          let p=$(this).data("p"),v=$(this).data("v")
+          prop[p]=v
+
+      })
+      prop.ease=ease?ease:"easeInOut"
+      prop.onComplete=function(){console.log("onComplete")}
+      console.log(prop)
+        $(".demo4").tween(prop,1000)
       }
+    </script>
+    <br/>
+    <div style="background: #000; display: inline-block;border:1px solid #000; ">
+      <div class="k" style="width: 100px;height: 100px; background: #fff;"></div>
+    </div>
+    <a href="javascript:goTween2();">autoAlpha</a>
+    <script>
+      function goTween2(){
+        $(".k").tween({autoAlpha:0},1000)
+      } 
     </script>
 </body>
 </html>
