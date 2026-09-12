@@ -298,11 +298,7 @@ String.prototype.endWith = function (str) {
   const reg = new RegExp(str+"$");
   return reg.test(this);
 }
-Array.prototype.indexOf = function (o) {
-	for (let t = 0; t < this.length; t++)
-		if (this[t] == o) return t;
-	return -1
-},
+
 Array.prototype.remove = function (o) {
 	const t = this.indexOf(o);
 	t > -1 && this.splice(t, 1)
@@ -420,7 +416,7 @@ function format(time) {
 	m = FormatNum(m, 2);
 	s = FormatNum(s, 2);
 
-	const t = m + ":" + s;
+	let t = m + ":" + s;
 	h ? t = (h + ":" + t): t
 	d ? t = (d + " " + t) : t
 	return t
@@ -442,7 +438,7 @@ function Alexdate(t=0,split='') {
 
 function FormatNum(num, weishu) {
 	let s = num.toString()
-  while (str.length < weishu) {
+  while (s.length < weishu) {
     s = '0' + s;
   }
 	return s;
