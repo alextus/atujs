@@ -23,7 +23,17 @@ function getAndIncVersion() {
     let arr = raw.split('.');
     //最后一段转数字 +1
     let last = Number(arr.pop());
-    arr.push(String(last + 1));
+
+    const currentMonth = new Date().getMonth() + 1;
+
+    let nextVal;
+    if (last + 1 > currentMonth) {
+        nextVal = currentMonth; 
+    } else {
+        nextVal = last + 1;
+    }
+
+    arr.push(String(nextVal));
     let newVer = arr.join('.');
     //写回version.txt
     fs.writeFileSync(VERSION_FILE, newVer, 'utf8');
@@ -33,6 +43,21 @@ function getAndIncVersion() {
 
 // 构建时读取并自动+1
 var version = getAndIncVersion();
+
+// 形如 1.2.6.4 时，去掉最后一段得到 3 段版本别名 1.2.6（仅当版本超过 3 段时才生成别名）
+var versionParts = version.split('.');
+var shortVersion = versionParts.slice(0, -1).join('.');
+var hasAliasVersion = versionParts.length > 3;
+
+/**
+ * 等待 gulp 写盘完成（gulp.dest 在所有文件写完后触发 finish）
+ */
+function waitStream(stream) {
+  return new Promise((resolve, reject) => {
+    stream.on('error', reject);
+    stream.on('finish', resolve);
+  });
+}
 
 const d = new Date();
 const pad = n => String(n).padStart(2, '0');
@@ -121,20 +146,36 @@ gulp.task('default', async () => {
 
   // 一次性处理：正常版 + 压缩版
   const buildScripts = (isMin = false,isEs6=false) => {
-    return gulp.src(paths.scripts)
+    const fileName = `atu.${version}${isEs6?'':'.es5'}${isMin ? '.min' : ''}.js`;
+    const stream = gulp.src(paths.scripts)
       .pipe(!isEs6 ? babel(babelConfig) : gutil.noop())
       .pipe(replace('13717810545', time.substring(0,7)))
       .pipe(replace('/* readme */', redeme+'"use strict";'))
-      .pipe(concat(`atu.${version}${isEs6?'':'.es5'}${isMin ? '.min' : ''}.js`))
+      .pipe(concat(fileName))
       .pipe(uglify(isMin ? uglifyOpts.min : uglifyOpts.normal))
       .pipe(gulp.dest('build'))
       .on('error', err => gutil.log(gutil.colors.red('[Error]'), err.toString()));
+    // 4 段版本写盘完成后，用同一份内容覆盖对应的 3 段版本
+    return waitStream(stream).then(() => {
+      if (!hasAliasVersion) return;
+      const aliasName = fileName.replace(`atu.${version}`, `atu.${shortVersion}`);
+      const srcPath = path.join(__dirname, 'build', fileName);
+      const destPath = path.join(__dirname, 'build', aliasName);
+      if (fs.existsSync(srcPath)) {
+        fs.copyFileSync(srcPath, destPath);
+        console.log('  -> 同步 3 段版本：' + aliasName);
+      } else {
+        console.error('  -> 源文件不存在，跳过：' + srcPath);
+      }
+    });
   };
-  // 执行构建
-  buildScripts(0); // 生成 atu.x.x.x..es5.js
-  buildScripts(1);  // 生成 atu.x.x.x.es5.min.js
-  buildScripts(0,1); // 生成 atu.x.x.x.js
-  buildScripts(1,1);  // 生成 atu.x.x.x.min.js
+  // 执行构建：每个 4 段版本生成后，同步覆盖 3 段版本
+  await Promise.all([
+    buildScripts(0),   // atu.x.x.x.x.es5.js     -> atu.x.x.x.es5.js
+    buildScripts(1),   // atu.x.x.x.x.es5.min.js -> atu.x.x.x.es5.min.js
+    buildScripts(0,1), // atu.x.x.x.x.js         -> atu.x.x.x.js
+    buildScripts(1,1), // atu.x.x.x.x.min.js     -> atu.x.x.x.min.js
+  ]);
 
 });
 

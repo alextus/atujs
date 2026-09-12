@@ -116,7 +116,7 @@
       cssValues[animationTiming] = cssEase(ease) || "linear";
       endEvent = $.fx.animationEnd;
     } else {
-      if (properties == "string") {
+      if (typeof properties == "string") {
         properties = cssString2Object(properties);
       }
       cssProperties = this.data("properties")? this.data("properties").split(","): [];

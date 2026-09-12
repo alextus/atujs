@@ -287,11 +287,11 @@ var Atu = (function () {
     return str == null ? "" : String.prototype.trim.call(str)
   }
   $.isTel = function (s) {
-    var patrn = /(^[0-9]{3,4}\-[0-9]{7,8}$)|(^\([0-9]{3,4}\)[0-9]{7,8}$)|([0-9]{7,8}$)/;
+    const patrn = /(^[0-9]{3,4}\-[0-9]{7,8}$)|(^\([0-9]{3,4}\)[0-9]{7,8}$)|([0-9]{7,8}$)/;
     return patrn.exec(s) || $.isMobile(s) ? true : false;
   }
   $.isMobile = function (s) {
-    var patrn = /^0{0,1}(13[0-9]|14(0|1|[4-9])|15([0-3]|[5-9])|16(2|5|6|7)|17[0-8]|18[0-9]|19([0-3]|[5-9]))+\d{8}$/
+    const patrn = /^0{0,1}(13[0-9]|14(0|1|[4-9])|15([0-3]|[5-9])|16(2|5|6|7)|17[0-8]|18[0-9]|19([0-3]|[5-9]))+\d{8}$/
     return patrn.test(s)
   }
   $.isUrl = function (s) {
@@ -300,15 +300,15 @@ var Atu = (function () {
     return patrn.test(s);
   }
   $.isEmail = function (s) {
-    var patrn = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+    const patrn = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
     return patrn.exec(s) ? true : false;
   }
   $.isIdcard = function (s) {
-    patrn = /(^[0-9]{3,4}\-[0-9]{7,8}$)|(^\([0-9]{3,4}\)[0-9]{3,8}$)|(^0{0,1}1[3-9]\d{9}$)|(1[3-9]\d{9}$)/;
+    const patrn = /(^[0-9]{3,4}\-[0-9]{7,8}$)|(^\([0-9]{3,4}\)[0-9]{3,8}$)|(^0{0,1}1[3-9]\d{9}$)|(1[3-9]\d{9}$)/;
     return patrn.exec(s) ? true : false;
   }
   $.isQQ = function (s) {
-    var patrn = /^[1-9][0-9]{4,10}$/;
+    const patrn = /^[1-9][0-9]{4,10}$/;
     return patrn.exec(s) ? true : false;
   }
 
@@ -880,11 +880,15 @@ var Atu = (function () {
       v2 = dimension == 'width' ? 'right' : 'bottom'
       return el[dimension]() - parseFloat(el.css('padding-' + v1)) - parseFloat(el.css('padding-' + v2))
     }
-    $.fn["outer" + dimensionProperty] = function () {
-      var el = $(this), v1, v2
-      v1 = dimension == 'width' ? 'left' : 'top'
-      v2 = dimension == 'width' ? 'right' : 'bottom'
-      return el[dimension]() + parseFloat(el.css('margin-' + v1)) + parseFloat($(this).css('margin-' + v2)) + parseFloat(el.css('border-' + v1 + "-" + dimension)) + parseFloat($(this).css('border-' + v2 + "-" + dimension))
+    $.fn["outer" + dimensionProperty] = function (margin) {
+        var el = $(this), elem = this[0], v = 0
+        if (!elem) return 0
+        var v1 = dimension == 'width' ? 'left' : 'top'
+        var v2 = dimension == 'width' ? 'right' : 'bottom'
+        // ① 原生 offsetHeight/offsetWidth：布局尺寸，含 padding+border、不受 transform 影响
+        v = dimension == 'width' ? elem.offsetWidth : elem.offsetHeight
+        // ② 不再手动加 border（offset 已含）；margin 仅当传 true 时加
+        return v + (margin ? parseFloat(el.css('margin-' + v1)) + parseFloat(el.css('margin-' + v2)) : 0)
     }
     $.fn["origin" + dimensionProperty] = function () {
       let e = $(this).clone().css("display", "block").appendTo("body");

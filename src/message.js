@@ -24,7 +24,7 @@
        if(obj.ok){fun1 = obj.ok;}
        if(obj.cancel){fun2 = obj.cancel;}
        if(obj.content){msg=obj.content;}
-       if(obj.oktxt){tag1 = obj.oktext;}
+       if(obj.oktxt){tag1 = obj.oktxt;}
        if(obj.canceltxt){tag2 = obj.canceltxt;}
     }
     if(arguments.length == 3 && typeof tag1 == "function" && typeof fun1 == "function"){
@@ -66,11 +66,11 @@
     $(".atu-loading").hide();
 
   }
-	a.fn.tip = function (b) {
+	a.fn.tip = function (msg) {
 		a.tip(msg);
 		return this
 	};
-	a.fn.alert = function (b) {
+	a.fn.alert = function (msg) {
 		a.alert(msg);
 		return this
 	};
