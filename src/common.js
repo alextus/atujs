@@ -38,31 +38,6 @@ const system = {win: up.indexOf("win") == 0, mac: up.indexOf("mac") == 0, linux:
 system.type=system.win?"Win":system.mac?"Mac":system.ipad?"Ipad":browser.android?"Android":system.linux?"linux":"other"
 
 let version = 0;
-if (browser.ie) {
-	const v1 = ua.match(/(?:msie\s([\w.]+))/);
-	const v2 = ua.match(/(?:trident.*rv:([\w.]+))/);
-
-	if (v1 && v2 && v1[1] && v2[1]) {
-		version = Math.max(v1[1] * 1, v2[1] * 1);
-	} else if (v1 && v1[1]) {
-		version = v1[1] * 1;
-	} else if (v2 && v2[1]) {
-		version = v2[1] * 1;
-	} else {
-		version = 0;
-	}
-	browser.ie11Compat = document.documentMode == 11;
-	browser.ie9Compat = document.documentMode == 9;
-	browser.ie8 = !!document.documentMode;
-	browser.ie8Compat = document.documentMode == 8;
-	browser.ie7Compat = (version == 7 && !document.documentMode) || document.documentMode == 7;
-	browser.ie6Compat = version < 7 || browser.quirks;
-	browser.ie9above = version > 8;
-	browser.ie9below = version < 9;
-	browser.ie11above = version > 10;
-	browser.ie11below = version < 11;
-}
-
 if (browser.firefox) {
 	let geckoRelease = ua.match(/rv:([\d\.]+)/);
 	if (geckoRelease) {
@@ -138,7 +113,7 @@ function capitalizeFirstLetter(str) {
   return str.toLowerCase().replace(/\b[a-z]/g, function(match) { return match.toUpperCase();});
 }
 function trim(str){
-	return str.replace(/(^\s*)|(\s*$)/g, ""); 
+	return $.trim(str);
 }
 //获取Request
 function get(sProp) {
@@ -339,56 +314,46 @@ function timestamp(t=0){
   if (s === '0') return Date.now()
   return ''
 }
-function newDate(dateStr='') {
-  if(!dateStr){return new Date();}
-  if(!isNaN(dateStr) ){
-    const t=timestamp(dateStr)
-    if(!t){  return ''}
-    dateStr= now(t);
+function newDate(t = "") {
+  if (!t) return new Date();
+  // 数字一律当秒/毫秒时间戳处理：new Date(1780000000) 会把它当毫秒解析成功，
+  // 导致 10 位秒级时间戳被误判成 1970 年，所以数字要跳过下面的原生解析快路径
+  if (typeof t !== "number") {
+    const testDate = new Date(t);
+    if (!isNaN(testDate.getTime())) return testDate;
   }
-  const dateArr = dateStr.split(/[- : \/]/);
-  const l = dateArr.length
-  return new Date(dateArr[0], dateArr[1] - 1, dateArr[2], l <= 3 ? 0 : dateArr[3], l <= 3 ? 0 : dateArr[4], l <= 3 ? 0 : dateArr[5]);
-  
+  if (!isNaN(t)) {
+    const ms = timestamp(t);
+    if (!ms) return "";
+    return new Date(ms);
+  }
+  const e = t.split(/[- : \/]/);
+  const len = e.length;
+  return new Date(e[0], e[1] - 1, e[2], len <= 3 ? 0 : e[3], len <= 3 ? 0 : e[4], len <= 3 ? 0 : e[5]);
 }
 
-function year(t='') {
-	const nt = newDate(t) 
-	return nt.getFullYear();
-}
-
-function month(t='') {
-	const nt = newDate(t) 
-	return nt.getMonth() + 1;
-}
-
-function week(t='') {
-	const nt = newDate(t) 
-	return nt.getDay();
-}
-
-function day(t='') {
-	const nt = newDate(t) 
-	return nt.getDate();
-}
-
-function hour(t='') {
-	const nt = newDate(t) 
-	return nt.getHours();
-}
+const _dateGetters = {
+	year: d => d.getFullYear(),
+	month: d => d.getMonth() + 1,
+	week: d => d.getDay(),
+	day: d => d.getDate(),
+	hour: d => d.getHours()
+};
+Object.keys(_dateGetters).forEach(function (name) {
+	window[name] = function (t = '') {
+		return _dateGetters[name](newDate(t));
+	};
+});
 
 function now(t='') {
  
 	const d = t?new Date(t):new Date()
-  function pad(n) {
-    return n < 10 ? '0' + n : n;
-  }
   return d.getFullYear() + '-'
-    + pad(d.getMonth() + 1) + '-'
-    + pad(d.getDate()) + ' '
-    + pad(d.getHours()) + ':'
-    + pad(d.getMinutes()) + ':'
-    + pad(d.getSeconds());
+    + FormatNum(d.getMonth() + 1, 2) + '-'
+    + FormatNum(d.getDate(), 2) + ' '
+    + FormatNum(d.getHours(), 2) + ':'
+    + FormatNum(d.getMinutes(), 2) + ':'
+    + FormatNum(d.getSeconds(), 2);
 }
 
 function getTime2Time(t) {
