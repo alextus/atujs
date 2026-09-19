@@ -2,7 +2,7 @@
 	var _zid = 1, undefined,
 		slice = Array.prototype.slice,
 		isFunction = $.isFunction,
-		isString = function (obj) { return typeof obj == 'string' },
+		isString = $.isString,
 		handlers = {},
 		specialEvents = {},
 		focusinSupported = 'onfocusin' in window,
@@ -322,89 +322,35 @@
   $.fn.touchend=function(fun){
       $(this).on(touchend, function (e) {  fun()})
   }
-  $.fn.touchLeft = function (fn) {
-      //左滑
-      var $this = this;
-     // console.log($this)
-      for (var i = 0; i < $this.length; i++) {
-          (function (target) {
-              iniTouchXY(target,0,fn)
-          })($this[i]);
-          
-      }
+  // 合并四个滑动手势方法
+  ;['Left', 'Right', 'Up', 'Down'].forEach(function (dir, i) {
+    $.fn['touch' + dir] = function (fn) {
+      return this.each(function () { iniTouchXY(this, i, fn); });
+    };
+  });
+
+  $.fn.longPress = function (fn, trsTime) {
+    return this.each(function () {
+      var timeout;
+      this.addEventListener('touchstart', function (e) {
+        timeout = setTimeout(function () { fn(e); }, trsTime || 200);
+      }, false);
+      this.addEventListener('touchend', function (e) {
+        clearTimeout(timeout);
+      }, false);
+    });
   };
-  $.fn.touchRight = function (fn) {
-      //右滑
-      var $this = this;
-     // console.log($this)
-      for (var i = 0; i < $this.length; i++) {
-          (function (target) {
-              iniTouchXY(target,1,fn)
-          })($this[i]);
-          
-      }
-      
-  };
-  $.fn.touchUp = function (fn) {
-      //右滑
-      var $this = this;
-      //console.log($this)
-      for (var i = 0; i < $this.length; i++) {
-          (function (target) {
-              iniTouchXY(target,2,fn)
-          })($this[i]);
-          
-      }
-      
-  };
-  $.fn.touchDown = function (fn) {
-      //右滑
-      var $this = this;
-     // console.log($this)
-      for (var i = 0; i < $this.length; i++) {
-          (function (target) {
-              iniTouchXY(target,3,fn)
-          })($this[i]);
-          
-      }
-      
-  };
-  $.fn.longPress = function (fn, trsTime) {   //长按监听
-		var $this = this;
-		for (var i = 0; i < $this.length; i++) {
-			(function (target) {
-				var timeout;
-				target.addEventListener('touchstart', function (event) {
-					timeout = setTimeout(function () {
-						fn(event);
-					}, trsTime ? trsTime : 200);
-				}, false);
-				target.addEventListener('touchend', function (event) {
-					clearTimeout(timeout);
-				}, false);
-			})($this[i]);
-		}
-	};
+
   $.fn.scrollEnd = function (fn) {
-    //右滑
-    var $this = this;
-    let isCheck=0,isDocument=$this[0] instanceof Document
-    $this.on("scroll", function () {
-      
-      const scrollHeight = isDocument?$this[0].documentElement.scrollHeight:$this.prop('scrollHeight');
-      const scrollTop = isDocument? $this[0].documentElement.scrollTop:$this.scrollTop();
-      const clientHeight =isDocument?$this[0].documentElement.clientHeight:$this.height();
- 
-      $.log("scroll",isDocument,scrollHeight,scrollTop,clientHeight)
-      if (Math.abs(scrollTop + clientHeight - scrollHeight)<=1 && !isCheck) {
-        $.log('已滚动到底部');
-        fn()
-        isCheck=1
-        setTimeout(()=>{isCheck=0},150)
+    var isDoc = this[0] instanceof Document;
+    return this.on("scroll", function () {
+      var $this = $(this);
+      var scrollHeight = isDoc ? this.documentElement.scrollHeight : $this.prop('scrollHeight');
+      var scrollTop = isDoc ? this.documentElement.scrollTop : $this.scrollTop();
+      var clientHeight = isDoc ? this.documentElement.clientHeight : $this.height();
+      if (Math.abs(scrollTop + clientHeight - scrollHeight) <= 1) {
+        fn();
       }
-    })
-    
-};
-
-
+    });
+  };
 })(Atu);

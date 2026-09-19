@@ -1,5 +1,6 @@
 (function ($, undefined) {
   var prefix = "",
+    dasherize = $.dasherize,
     eventPrefix,
     vendors = { Webkit: "webkit", Moz: "", O: "o" },
     testEl = document.createElement("div"),
@@ -29,9 +30,6 @@
       "rotateZ",
     ];
 
-  function dasherize(str) {
-    return str.replace(/([A-Z])/g, "-$1").toLowerCase();
-  }
   function normalizeEvent(name) {
     return eventPrefix ? eventPrefix + name : name.toLowerCase();
   }
