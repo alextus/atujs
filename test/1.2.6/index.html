@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>atu.1.2.6.js 功能测试（对照 docs/atu.1.2.6.md）</title>
+  <link rel="stylesheet" href="../atu.css">
+  <script src="../../build/atu.1.2.6.js?v=1"></script>
+  <style>
+    .summary {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 25px;
+    }
+
+    .summary span {
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
+    }
+
+    .group-title {
+      margin: 28px 0 12px;
+      padding-left: 10px;
+      border-left: 4px solid #4299e1;
+      font-size: 19px;
+      color: #2d3748;
+    }
+
+    .feature-name small {
+      display: block;
+      color: #a0aec0;
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .skipped {
+      background: #feebc8;
+      color: #7b341e;
+    }
+
+    .err {
+      color: #742a2a;
+      font-size: 12px;
+      margin-top: 6px;
+      word-break: break-all;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <h1>atu.1.2.6.js 功能测试</h1>
+    <p>被测文件：<code>build/atu.1.2.6.js</code> · 用例对照 <code>docs/atu.1.2.6.md</code> 编写</p>
+  </div>
+
+  <div class="summary" id="summary"></div>
+  <button class="check-btn" id="checkBtn">重新检测</button>
+  <div id="result"></div>
+
+  <div class="tip">
+    <strong>说明：</strong><br>
+    ✅ 通过　❌ 失败（会显示实际报错）　⚠️ 跳过（当前环境不具备条件）<br>
+    DOM / 尺寸类用例会把节点挂到页面的离屏沙箱里再测，因为 <code>offset()</code> 对未挂载节点只返回
+    <code>{top:0,left:0}</code>，游离节点上 <code>width()</code> 恒为 <code>undefined</code>。<br>
+    用例共十二组，按 <code>docs/atu.1.2.6.md</code> 的章节编号排列；已知缺陷只记录在文档第 6 节，不再写成"断言缺陷必须存在"的反向用例。
+  </div>
+
+  <script>
+    /* ---------- 沙箱：DOM / 尺寸类用例必须挂到文档上 ---------- */
+    function host() {
+      var h = document.getElementById('__atu_host')
+      if (!h) {
+        h = document.createElement('div')
+        h.id = '__atu_host'
+        h.style.cssText = 'position:absolute;left:-9999px;top:0;width:400px;height:400px'
+        document.body.appendChild(h)
+      }
+      h.innerHTML = ''
+      return h
+    }
+    function el(html) {
+      var h = host()
+      h.innerHTML = html || '<div></div>'
+      return h.firstElementChild
+    }
+    function box(css) {
+      var d = el('<div></div>')
+      d.style.cssText = css || ''
+      return d
+    }
+
+    /* ---------- 用例表：分组对应 docs/atu.1.2.6.md 的章节 ---------- */
+    var GROUPS = [{
+      title: '零、加载与全局导出',
+      items: [
+        { name: 'window.Atu', note: 'typeof Atu === function', check: () => typeof window.Atu === 'function' },
+        { name: 'window.$ 与 Atu 同对象', note: '$ === Atu', check: () => window.$ === window.Atu },
+        { name: 'window.jQuery 被指向 Atu', note: 'jQuery === Atu（无条件覆盖）', check: () => window.jQuery === window.Atu },
+        { name: '$.fn 原型', note: '$.fn.each 是函数', check: () => !!$.fn && typeof $.fn.each === 'function' },
+        { name: '$.atu 内部工具集', note: '$.atu.matches', check: () => !!$.atu && typeof $.atu.matches === 'function' }
+      ]
+    }, {
+      title: '一、静态工具方法（4.1）',
+      items: [
+        { name: '$.extend', check: () => $.extend({ a: 1 }, { b: 2 }).b === 2 },
+        { name: '$.parseJSON', check: () => $.parseJSON('{"a":1}').a === 1 },
+        { name: '$.param', note: 'src/ajax.js 定义，旧文档误记为不存在', check: () => typeof $.param === 'function' && $.param({ a: 1, b: 2 }) === 'a=1&b=2' },
+        { name: '$.Deferred', note: 'src/ajax.js 定义，$.ajax 内部使用', check: () => typeof $.Deferred === 'function' && typeof $.Deferred().then === 'function' },
+        { name: '$.type', check: () => $.type({}) === 'object' && $.type([]) === 'array' },
+        { name: '$.isFunction', check: () => $.isFunction(function () { }) === true },
+        { name: '$.isWindow', check: () => $.isWindow(window) === true },
+        { name: '$.isArray', check: () => $.isArray([]) === true && $.isArray({}) === false },
+        { name: '$.isPlainObject', check: () => $.isPlainObject({}) === true },
+        { name: '$.isEmptyObject', check: () => $.isEmptyObject({}) === true && $.isEmptyObject({ a: 1 }) === false },
+        { name: '$.isNumber', check: () => $.isNumber(1) === true },
+        { name: '$.isString', check: () => $.isString('a') === true },
+        { name: '$.isTel', check: () => $.isTel('010-12345678') === true },
+        { name: '$.isMobile', check: () => $.isMobile('13800138000') === true },
+        { name: '$.isUrl', check: () => $.isUrl('https://www.baidu.com') === true },
+        { name: '$.isEmail', check: () => $.isEmail('test@test.com') === true },
+        { name: '$.isQQ', check: () => $.isQQ('123456') === true },
+        {
+          name: '$.isIdcard', note: '18 位合法身份证应 true，手机号应 false',
+          check: () => $.isIdcard('11010519491231002X') === true && $.isIdcard('13800138000') === false
+        },
+        { name: '$.inArray', check: () => $.inArray(2, [1, 2, 3]) === 1 },
+        { name: '$.camelCase', check: () => $.camelCase('test-case') === 'testCase' },
+        { name: '$.trim', check: () => $.trim('  a  ') === 'a' },
+        { name: '$.map', check: () => $.map([1, 2], function (v) { return v * 2 })[1] === 4 },
+        { name: '$.each', check: () => { var n = 0; $.each([1, 2, 3], function () { n++ }); return n === 3 } },
+        { name: '$.grep', check: () => $.grep([1, 2, 3], function (v) { return v > 1 }).length === 2 },
+        { name: '$.contains', check: () => { var d = el('<i></i>'); return $.contains(document.body, d) === true } },
+        { name: '$.debug', check: () => $.debug !== undefined },
+        { name: '$.log', check: () => typeof $.log === 'function' }
+      ]
+    }, {
+      title: '二、DOM 实例方法（4.2）',
+      items: [
+        { name: 'addClass / hasClass', check: () => $('<div>').addClass('x').hasClass('x') === true },
+        { name: 'removeClass', check: () => $('<div class="a">').removeClass('a')[0].className === '' },
+        { name: 'toggleClass', check: () => $('<div>').toggleClass('x').hasClass('x') === true },
+
+        { name: 'html', check: () => $('<div>').html('<b>t</b>').html() === '<b>t</b>' },
+        { name: 'htmls', note: 'getter 返回 outerHTML', check: () => $('<div><b>t</b></div>').htmls().indexOf('<b>') > -1 },
+        { name: 'outHtml', check: () => $('<div><b>t</b></div>').outHtml().indexOf('<b>') > -1 },
+        { name: 'text', check: () => $('<div>').text('t').text() === 't' },
+
+        { name: 'attr', check: () => $('<div>').attr('a', '1').attr('a') === '1' },
+        { name: 'removeAttr', check: () => $('<div a="1">').removeAttr('a').attr('a') == null },
+        { name: 'prop', check: () => $('<input>').prop('checked', true).prop('checked') === true },
+        { name: 'removeProp', check: () => { var d = el('<div></div>'); $(d).prop('__atu_p', 1); var has = $(d).prop('__atu_p') === 1; $(d).removeProp('__atu_p'); return has && $(d).prop('__atu_p') === undefined } },
+        { name: 'data', check: () => $('<div>').data('k', 'v').data('k') === 'v' },
+        { name: 'val', check: () => $('<input>').val('t').val() === 't' },
+
+        { name: 'css（写后读）', check: () => { var d = el(); return $(d).css('color', 'red').css('color') === 'red' } },
+        { name: 'styleValue', check: () => { var d = box('width:50px'); return $(d).styleValue(d, 'width') === '50px' } },
+        { name: 'width()', note: '挂载节点，border-box', check: () => $(box('width:100px;height:50px;padding:0;border:0;margin:0')).width() === 100 },
+        { name: 'height()', check: () => $(box('width:100px;height:50px;padding:0;border:0;margin:0')).height() === 50 },
+        { name: 'innerWidth()', note: '100 - padding 10*2 = 80', check: () => $(box('width:100px;padding:10px;border:0;margin:0')).innerWidth() === 80 },
+        { name: 'outerWidth()', note: 'offsetWidth，含 border，不加 margin', check: () => $(box('width:100px;padding:0;border:0;margin:10px')).outerWidth() === 100 },
+        { name: 'outerWidth(true)', note: '100 + margin 10*2 = 120', check: () => $(box('width:100px;padding:0;border:0;margin:10px')).outerWidth(true) === 120 },
+        { name: 'originWidth / originHeight', note: '1.2.6 源码未实现（1.2.4 测试页里是临时补丁），缺失即跳过', check: () => { if (typeof $().originWidth !== 'function' || typeof $().originHeight !== 'function') return null; var d = box('width:30px;height:20px;display:block'); return $(d).originWidth() === 30 && $(d).originHeight() === 20 } },
+
+        { name: 'hide()', check: () => { var d = box('width:10px;height:10px'); return $(d).hide().css('display') === 'none' } },
+        { name: 'show() + isVisible()', check: () => { var d = box('width:10px;height:10px'); $(d).hide(); return $(d).show().isVisible() === true } },
+        { name: 'toggle', check: () => { var d = box('width:10px;height:10px'); var $d = $(d); $d.hide(); $d.toggle(); var a = $d.css('display') !== 'none'; $d.toggle(false); var b = $d.css('display') === 'none'; $d.toggle(true); return a && b && $d.css('display') !== 'none' } },
+
+        { name: 'append / prepend / after / before', check: () => ['append', 'prepend', 'after', 'before'].every(function (m) { return typeof $('<div>')[m] === 'function' }) },
+        { name: 'empty', check: () => $('<div>a</div>').empty().html() === '' },
+        { name: 'remove', check: () => { var h = host(); h.innerHTML = '<i></i><b></b>'; $(h.firstElementChild).remove(); return h.children.length === 1 && h.firstElementChild.tagName === 'B' } },
+        { name: 'clone', check: () => $('<div>').clone()[0].tagName === 'DIV' },
+        { name: 'replaceWith', check: () => { var h = host(); h.innerHTML = '<div><i></i></div>'; $(h.querySelector('i')).replaceWith('<b></b>'); return h.querySelector('div').innerHTML === '<b></b>' } },
+        {
+          name: 'wrap / wrapAll / wrapInner / unwrap',
+          check: () => {
+            var h = host()
+            h.innerHTML = '<i class="a"></i>'
+            $(h.firstElementChild).wrap('<div class="w"></div>')
+            var okWrap = h.firstElementChild.className === 'w' && h.firstElementChild.firstElementChild.className === 'a'
+
+            h.innerHTML = '<u class="b"></u><u class="c"></u>'
+            $(h).children().wrapAll('<div class="wa"></div>')
+            var okWrapAll = h.children.length === 1 && h.firstElementChild.className === 'wa' && h.firstElementChild.children.length === 2
+
+            h.innerHTML = '<div class="d">hi</div>'
+            $(h.firstElementChild).wrapInner('<span class="wi"></span>')
+            var okWrapInner = !!h.querySelector('.d .wi') && h.querySelector('.wi').textContent === 'hi'
+
+            h.innerHTML = '<div class="p"><i class="u"></i></div>'
+            $(h.querySelector('.u')).unwrap()
+            return okWrap && okWrapAll && okWrapInner && h.firstElementChild.className === 'u'
+          }
+        },
+
+        { name: 'find', check: () => $('<div><span></span></div>').find('span').length === 1 },
+        { name: 'children', check: () => $('<div><a></a></div>').children().length === 1 },
+        { name: 'parent', check: () => { var h = host(); h.innerHTML = '<div><i></i></div>'; return $(h.firstElementChild.firstElementChild).parent().length === 1 } },
+        { name: 'parents', note: '按 selector 向上就近匹配', check: () => { var h = host(); h.innerHTML = '<div class="gp"><p class="p"><b class="b"></b></p></div>'; var r = $(h.querySelector('.b')).parents('.p'); return r.length === 1 && r[0].className === 'p' } },
+        { name: 'siblings', check: () => { var h = host(); h.innerHTML = '<p></p><b></b>'; return $(h.firstElementChild).siblings().length === 1 } },
+        { name: 'prev / next', check: () => { var h = host(); h.innerHTML = '<p></p><b></b>'; return $(h.firstElementChild).next()[0].tagName === 'B' && $(h.lastElementChild).prev()[0].tagName === 'P' } },
+        { name: 'closest', check: () => { var h = host(); h.innerHTML = '<div class="p"><i class="b"></i></div>'; var r = $(h.querySelector('.b')).closest('.p'); return r.length === 1 && r[0].className === 'p' } },
+        { name: 'contents', check: () => { var h = host(); h.innerHTML = '<div>text</div>'; var c = $(h.firstElementChild).contents(); return c.length === 1 && c[0].nodeType === 3 && c[0].textContent === 'text' } },
+
+        { name: 'eq / first / last', check: () => { var h = host(); h.innerHTML = '<i></i><i></i><i></i>'; var $i = $(h).children(); return $i.eq(1)[0] === h.children[1] && $i.first()[0] === h.children[0] && $i.last()[0] === h.children[2] } },
+        { name: 'filter / not', check: () => { var h = host(); h.innerHTML = '<i class="a"></i><i class="b"></i>'; var $i = $(h).children(); return $i.filter('.a').length === 1 && $i.not('.a').length === 1 } },
+        { name: 'has / is', check: () => { var h = host(); h.innerHTML = '<i><u></u></i>'; return $(h).children().has('u').length === 1 && $(h).children().is('.a') === false } },
+        { name: 'index', check: () => { var h = host(); h.innerHTML = '<i></i><i></i>'; return $(h.children[1]).index() === 1 } },
+        { name: 'map / slice / get / toArray / size', check: () => { var $i = $('<div></div><div></div>'); return $i.size() === 2 && $i.get(0).tagName === 'DIV' && $i.toArray().length === 2 && $i.slice(0, 1).length === 1 && $i.map(function () { return 1 }).length === 2 } },
+        { name: 'pluck', check: () => { var h = host(); h.innerHTML = '<i id="p1"></i><i id="p2"></i>'; return $(h).children().pluck('id').join(',') === 'p1,p2' } },
+        { name: 'ready', note: '文档已就绪时应同步回调', check: () => { var ok = false; var ret = $(document).ready(function () { ok = true }); return ok === true && !!ret && ret.length === 1 } },
+
+        { name: 'offset', check: () => { var d = box('width:100px;height:50px'); var o = $(d).offset(); return o && o.width === 100 && o.height === 50 } },
+        { name: 'position', note: '返回相对 offsetParent 的 top / left', check: () => { var h = host(); h.innerHTML = '<div style="width:50px;height:50px"></div>'; var p = $(h.firstElementChild).position(); return !!p && typeof p.top === 'number' && typeof p.left === 'number' && !isNaN(p.top) && !isNaN(p.left) } },
+        { name: 'offsetParent', check: () => { var h = host(); h.innerHTML = '<div></div>'; var op = $(h.firstElementChild).offsetParent(); return op.length === 1 && op[0].id === '__atu_host' } },
+        { name: 'scrollTop / scrollLeft', note: '可滚动容器写入后读回', check: () => { var d = el('<div style="width:60px;height:60px;overflow:auto"></div>'); d.innerHTML = '<div style="width:300px;height:300px"></div>'; $(d).scrollTop(20); $(d).scrollLeft(30); return $(d).scrollTop() === 20 && $(d).scrollLeft() === 30 } },
+        { name: 'scale', note: 'scale(2) → transform 变成 matrix(2,0,0,2,…)', check: () => { var d = box('width:10px;height:10px'); var ret = $(d).scale(2); var t = $(d).css('transform'); return !!ret && !!t && t !== 'none' && /matrix\(2,\s*0,\s*0,\s*2|scale\(2/.test(t) } },
+        { name: 'autoHeight', note: '按 minHeight 撑开 textarea', check: () => { var t = el('<textarea minHeight="100"></textarea>'); $(t).autoHeight(); return t.style.height === '100px' } }
+      ]
+    }, {
+      title: '三、事件（4.3）',
+      items: [
+        { name: 'on + trigger', check: () => { var hit = false, d = el(); $(d).on('atutest', function () { hit = true }); $(d).trigger('atutest'); return hit === true } },
+        { name: 'off', check: () => { var n = 0, d = el(); $(d).on('atutest', function () { n++ }); $(d).trigger('atutest'); $(d).off('atutest'); $(d).trigger('atutest'); return n === 1 } },
+        { name: 'one', check: () => { var n = 0, d = el(); $(d).one('atutest', function () { n++ }); $(d).trigger('atutest'); $(d).trigger('atutest'); return n === 1 } },
+        { name: 'delegate（事件委托）', check: () => { var hit = false, h = host(); h.innerHTML = '<div><b class="t"></b></div>'; $(h).delegate('.t', 'click', function () { hit = true }); $(h).find('.t').trigger('click'); return hit === true } },
+        { name: 'bind / unbind', check: () => { var n = 0, d = el(), fn = function () { n++ }; $(d).bind('atutest', fn); $(d).trigger('atutest'); var a = n === 1; $(d).unbind('atutest', fn); $(d).trigger('atutest'); return a && n === 1 } },
+        { name: 'undelegate', check: () => { var h = host(); h.innerHTML = '<div><b class="ud"></b></div>'; var n = 0, fn = function () { n++ }; $(h).delegate('.ud', 'click', fn); $(h).find('.ud').trigger('click'); var a = n === 1; $(h).undelegate('.ud', 'click', fn); $(h).find('.ud').trigger('click'); return a && n === 1 } },
+        { name: 'live / die（委托到 document.body）', check: () => { var h = host(); h.innerHTML = '<button class="lv"></button>'; var n = 0, fn = function () { n++ }; $('.lv').live('click', fn); $(h.firstElementChild).trigger('click'); var a = n === 1; $('.lv').die('click', fn); $(h.firstElementChild).trigger('click'); return a && n === 1 } },
+        { name: 'triggerHandler', note: '只执行自身 handler，不冒泡', check: () => { var h = host(); h.innerHTML = '<i></i>'; var n = 0, pn = 0; $(h).on('click', function () { pn++ }); $(h.firstElementChild).on('click', function () { n++ }); $(h.firstElementChild).triggerHandler('click'); return n === 1 && pn === 0 } },
+        { name: 'change', note: '派发 change 事件', check: () => { var i = el('<input>'); var n = 0; i.addEventListener('change', function () { n++ }); $(i).change(); return n === 1 } },
+        { name: 'touch / touchmove / touchend', note: '按 touch 常量合成事件', check: () => { var d = el(), a = 0, b = 0, c = 0; $(d).touch(function () { a++ }); $(d).touchmove(function () { b++ }); $(d).touchend(function () { c++ }); d.dispatchEvent(new MouseEvent(touch, { bubbles: true, clientX: 10, clientY: 10 })); d.dispatchEvent(new MouseEvent(touchmove, { bubbles: true, clientX: 10, clientY: 10 })); d.dispatchEvent(new MouseEvent(touchend, { bubbles: true, clientX: 10, clientY: 10 })); return a === 1 && b === 1 && c === 1 } },
+        { name: 'touchLeft / touchRight / touchUp / touchDown', note: '合成滑动轨迹，位移需大于阈值', check: () => { var d = el('<div style="width:80px;height:80px"></div>'); var hit = { l: 0, r: 0, u: 0, dn: 0 }; $(d).touchLeft(function () { hit.l++ }); $(d).touchRight(function () { hit.r++ }); $(d).touchUp(function () { hit.u++ }); $(d).touchDown(function () { hit.dn++ }); var th = $(window).width() * 30 / 750 + 20, o = { x: 300, y: 300 }; function slide(ex, ey) { d.dispatchEvent(new MouseEvent(touch, { bubbles: true, clientX: o.x, clientY: o.y })); document.dispatchEvent(new MouseEvent(touchmove, { bubbles: true, clientX: ex, clientY: ey })); d.dispatchEvent(new MouseEvent(touchend, { bubbles: true })) } slide(o.x - th, o.y); slide(o.x + th, o.y); slide(o.x, o.y - th); slide(o.x, o.y + th); return hit.l === 1 && hit.r === 1 && hit.u === 1 && hit.dn === 1 } },
+        { name: 'longPress', note: '合成 touchstart 后等 200ms', check: () => new Promise(function (res) { var d = el(); var n = 0; try { $(d).longPress(function () { n++ }); var t = new Touch({ identifier: 0, target: d, clientX: 10, clientY: 10 }); d.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, touches: [t], targetTouches: [t], changedTouches: [t] })) } catch (err) { return res(null) } setTimeout(function () { res(n === 1) }, 320) }) },
+        { name: 'scrollEnd', note: '滚到底部后触发一次（内容只纵向溢出，避免横向滚动条干扰）', check: () => new Promise(function (res) { var d = el('<div style="width:60px;height:60px;overflow:auto"></div>'); d.innerHTML = '<div style="width:100%;height:300px"></div>'; var n = 0; $(d).scrollEnd(function () { n++ }); d.scrollTop = 9999; d.dispatchEvent(new Event('scroll')); setTimeout(function () { res(n >= 1) }, 50) }) },
+        { name: '$.proxy', check: () => $.proxy(function () { return this.v }, { v: 42 })() === 42 },
+        { name: '$.Event', check: () => $.Event('atux').type === 'atux' },
+        { name: '$.event.add / remove', check: () => !!$.event && typeof $.event.add === 'function' && typeof $.event.remove === 'function' }
+      ]
+    }, {
+      title: '四、Ajax（4.4）',
+      items: [
+        { name: '$.ajax', note: '真实 GET 本页自身，file:// 下跳过', check: () => new Promise(function (res) { if (location.protocol === 'file:') return res(null); $.ajax({ url: './index.html', type: 'GET', dataType: 'text', timeout: 3000, success: function (r) { res(typeof r === 'string' && r.indexOf('<html') > -1) }, error: function () { res(null) } }) }) },
+        { name: '$.get', note: '走 $.ajax，同样 GET 本页', check: () => new Promise(function (res) { if (location.protocol === 'file:') return res(null); $.get('./index.html', function (r) { res(typeof r === 'string' && r.indexOf('<html') > -1) }) }) },
+        { name: '$.post', note: '打桩 $.ajax：校验 type 被置为 POST', check: () => { var orig = $.ajax, cap = null; $.ajax = function (o) { cap = o; return {} }; try { $.post('/atu/test', { a: 1 }, function () { }) } finally { $.ajax = orig } return !!cap && cap.type === 'POST' && cap.url === '/atu/test' && cap.data.a === 1 } },
+        { name: '$.getJSON', note: '打桩 $.ajax：校验 dataType=json', check: () => { var orig = $.ajax, cap = null; $.ajax = function (o) { cap = o; return {} }; try { $.getJSON('/atu/test.json', function () { }) } finally { $.ajax = orig } return !!cap && cap.dataType === 'json' && !('type' in cap) } },
+        { name: '$.ajaxJSONP', note: '打桩 $.ajaxJSONP：校验自动补 callback=?', check: () => { var orig = $.ajaxJSONP, cap = null; $.ajaxJSONP = function (o) { cap = o; return {} }; try { $.ajax({ url: '/atu/test?a=1', dataType: 'jsonp' }) } finally { $.ajaxJSONP = orig } return !!cap && cap.url.indexOf('callback=?') > -1 } },
+        { name: '$.fn.load', note: '打桩 $.ajax：校验 url 与 selector 拆分', check: () => { var orig = $.ajax, cap = null; $.ajax = function (o) { cap = o; return {} }; var d = el('<div></div>'); try { $(d).load('./index.html #summary', function () { }) } finally { $.ajax = orig } return !!cap && cap.url === './index.html' && typeof cap.success === 'function' } },
+        { name: '$.ajaxSettings.type 默认 GET', check: () => !!$.ajaxSettings && $.ajaxSettings.type === 'GET' },
+        { name: '$.ajaxSettings.timeout 默认 0', check: () => $.ajaxSettings.timeout === 0 },
+        { name: '$.active', check: () => $.active !== undefined }
+      ]
+    }, {
+      title: '五、动画与补间（4.5）',
+      items: [
+        { name: 'animate() 执行并回调', note: '200ms 后校验宽度已变为 200px', check: () => new Promise(function (res) {
+          var d = box('width:10px;height:10px')
+          var done = false
+          $(d).animate({ width: '200px' }, 200, 'linear', function () {
+            done = true
+            res(Math.round(parseFloat($(d).css('width'))) === 200)
+          })
+          setTimeout(function () { if (!done) res(false) }, 2000)
+        }) },
+        { name: 'animateTo', check: () => typeof $().animateTo === 'function' },
+        { name: 'animateFrom', check: () => typeof $().animateFrom === 'function' },
+        { name: 'anim', check: () => typeof $().anim === 'function' },
+        { name: 'preAnim', check: () => typeof $().preAnim === 'function' },
+        { name: 'tween', check: () => typeof $().tween === 'function' },
+        { name: 'fadeIn / fadeOut / fadeToggle / fadeTo', check: () => ['fadeIn', 'fadeOut', 'fadeToggle', 'fadeTo'].every(function (m) { return typeof $()[m] === 'function' }) },
+        { name: 'Tween.to / Tween.fromTo', check: () => typeof window.Tween === 'object' && typeof Tween.to === 'function' && typeof Tween.fromTo === 'function' }
+      ]
+    }, {
+      title: '六、资源加载（4.6）',
+      items: [
+        { name: '$.loadFile', check: () => typeof $.loadFile === 'function' },
+        { name: '$.fn.loadFile.defaults', check: () => !!$.fn.loadFile && typeof $.fn.loadFile.defaults === 'object' }
+      ]
+    }, {
+      title: '七、弹层（4.7）',
+      items: [
+        { name: '$.tip', check: () => typeof $.tip === 'function' },
+        { name: '$.alert', check: () => typeof $.alert === 'function' },
+        { name: '$.showLoading', check: () => typeof $.showLoading === 'function' },
+        { name: '$.hideLoading', check: () => typeof $.hideLoading === 'function' }
+      ]
+    }, {
+      title: '八、环境判断（4.8）',
+      items: [
+        { name: 'browser', check: () => typeof browser !== 'undefined' && !!browser.ua },
+        { name: 'isPc / is_pc', check: () => typeof isPc !== 'undefined' && isPc === is_pc },
+        { name: 'isMob / is_mob', check: () => typeof isMob !== 'undefined' && isMob === is_mob },
+        { name: 'isWeixin / is_weixin', check: () => typeof isWeixin !== 'undefined' && isWeixin === is_weixin },
+        { name: 'isLocal / is_local', check: () => typeof isLocal !== 'undefined' && isLocal === is_local },
+        { name: 'isMob 与 isPc 互斥', check: () => isMob === !isPc },
+        { name: 'system', check: () => typeof system !== 'undefined' && system.type !== undefined },
+        { name: 'is 系列（isChrome 等）', note: '由 _bs 列表生成，挂在 window 上', check: () => typeof window.isChrome !== 'undefined' && typeof window.is_weibo !== 'undefined' },
+        { name: 'touch / touchmove / touchend 常量', check: () => (touch === 'touchstart' || touch === 'mousedown') && (touchend === 'touchend' || touchend === 'mouseup') }
+      ]
+    }, {
+      title: '九、时间日期（4.9）',
+      items: [
+        { name: 'timestamp()', check: () => typeof timestamp === 'function' && timestamp() > 0 },
+        { name: 'newDate()', check: () => typeof newDate === 'function' && !!newDate() },
+        { name: 'year / month / week / day / hour / now', check: () => year('2024-01-02') === 2024 && month('2024-01-02') === 1 && day('2024-01-02') === 2 && hour('2024-01-02 03:04:05') === 3 && week('2024-01-02') >= 0 && week('2024-01-02') <= 6 && now('2024-01-02 03:04:05') === '2024-01-02 03:04:05' },
+        { name: 'getTime2Time / getLeftTime / getPassTime / format', check: () => getTime2Time('2020-01-01 00:00:00') > 0 && getPassTime('2020-01-01') > 0 && getLeftTime('2099-01-01') > 0 && format(61) === '01:01' },
+        { name: 'Alexdate / FormatNum', check: () => Alexdate('2024-01-02') === '20240102' && Alexdate('2024-01-02', '-') === '2024-01-02' && FormatNum(7, 2) === '07' }
+      ]
+    }, {
+      title: '十、存储（4.10）',
+      items: [
+        { name: 'localStorageSupported', check: () => typeof localStorageSupported === 'function' && localStorageSupported() === true },
+        {
+          name: 'setData / getData', note: '不支持 localStorage 时跳过', check: () => {
+            if (!localStorageSupported()) return null
+            setData('__atu_t', 'v1')
+            var ok = getData('__atu_t') === 'v1'
+            try { localStorage.removeItem('__atu_t') } catch (e) { }
+            return ok
+          }
+        },
+        { name: 'getCookie / setCookie / delCookie', note: 'file:// 下 Cookie 不可用则仅校验存在性', check: () => {
+          if (typeof getCookie !== 'function' || typeof setCookie !== 'function') return false
+          if (location.protocol === 'file:') return typeof delCookie === 'function'
+          setCookie('__atu_c', 'v1')
+          var ok = getCookie('__atu_c') === 'v1'
+          delCookie('__atu_c')
+          return ok
+        } }
+      ]
+    }, {
+      title: '十一、Atu 业务扩展（4.11）',
+      items: [
+        { name: 'Atu.ini', note: '打桩 $.loadFile，避免真去加载微信 JS', check: () => { var orig = $.loadFile, loaded = null; $.loadFile = function (u) { loaded = u }; try { Atu.ini('__atu_test') } finally { $.loadFile = orig } return Atu.evtUrl === location.href && /atuad\.cn/.test(Atu.wxUrl) && Atu.site === '' && Atu.ua === '' && (typeof window.wx !== 'undefined' || loaded === 'http://res.wx.qq.com/open/js/jweixin-1.4.0.js') } },
+        { name: 'Atu.iniUser', note: '打桩 $.get：校验上报 act=ini', check: () => { var orig = $.get, cap = null, openid = Atu.openid; $.get = function (u, d, cb) { cap = { url: u, data: d }; cb && cb({}) }; try { Atu.openid = ''; Atu.iniUser(function () { }) } finally { $.get = orig; Atu.openid = openid } return !!cap && cap.data.act.act === 'ini' } },
+        { name: 'Atu.act 组装上报参数', note: '打桩 $.get：act + 自定义字段', check: () => { var orig = $.get, cap = null; $.get = function (u, d) { cap = { url: u, data: d } }; try { Atu.act('pv', { x: 1 }) } finally { $.get = orig } return !!cap && cap.url === Atu.api && cap.data.act.act === 'pv' && cap.data.x === 1 } },
+        { name: 'act / sendDataBack / sendMsgBack 同一函数', check: () => Atu.act === Atu.sendDataBack && Atu.act === Atu.sendMsgBack },
+        { name: 'Atu.iniWx + Atu.iniShare', note: '打桩 $.get 与 wx 对象', check: () => { var origGet = $.get, origWx = window.wx, cfg = null, shared = {}; window.wx = { config: function (o) { cfg = o }, ready: function (fn) { fn() }, error: function () { }, updateAppMessageShareData: function (o) { shared.app = o }, onMenuShareAppMessage: function (o) { shared.app2 = o }, updateTimelineShareData: function (o) { shared.t = o }, onMenuShareTimeline: function (o) { shared.t2 = o } }; $.get = function (u, d, cb) { cb({ appId: 'a', timestamp: 1, nonceStr: 'n', signature: 's' }) }; try { Atu.wxUrl = '//atuad.cn/wx/'; Atu.iniWx({ title: 't', desc: 'd', link: 'l', imgUrl: 'i' }) } finally { $.get = origGet; window.wx = origWx } return !!cfg && cfg.appId === 'a' && !!shared.app && shared.app.title === 't' && !!shared.t } },
+        { name: 'Atu.iniClick + Atu.addClick', note: '打桩 $.get：校验统计参数', check: () => { var orig = $.get, cap = null; $.get = function (u, d) { cap = { url: u, data: d } }; try { Atu.iniClick('__atu_site'); Atu.addClick('x') } finally { $.get = orig } return !!cap && cap.url.indexOf('tongji') > -1 && cap.data.site === '__atu_site' && cap.data.title === 'x' && cap.data.type === 1 } }
+      ]
+    }, {
+      title: '十二、其它全局工具（4.12）',
+      items: [
+        { name: 'trim', check: () => typeof trim === 'function' && trim('  a  ') === 'a' },
+        { name: 'capitalizeFirstLetter', check: () => capitalizeFirstLetter('abc') === 'Abc' },
+        { name: 'ce', check: () => ce('div').tagName === 'DIV' },
+        { name: 'at', check: () => { var d = el('<div id="__atu_x"></div>'); return at('__atu_x') === d } },
+        { name: 'urlencode / urldecode', check: () => urldecode(urlencode('a b')) === 'a b' },
+        {
+          name: 'arrRand / RandArr（数组乱序）', note: '返回打乱后的新数组，不改动原数组',
+          check: () => {
+            var a = [1, 2, 3]
+            var r = arrRand(a)
+            return Array.isArray(r) && r.length === 3 && r.slice().sort().join(',') === '1,2,3' && a.join(',') === '1,2,3'
+          }
+        },
+        { name: 'arrRemove / arrDelete', note: '移除指定项并返回新数组，不影响原数组', check: () => { var a = [1, 2, 3]; var r = arrRemove(a, 2); return r.join(',') === '1,3' && a.join(',') === '1,2,3' && arrDelete([1, 2, 3], 2).join(',') === '1,3' } },
+        { name: 'get / getXY / newImg / getEvtUrl', check: () => { var img = newImg('data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='); var xy = getXY({ clientX: 3, clientY: 4, pageX: 3, pageY: 4 }); return img instanceof HTMLImageElement && img.src.indexOf('data:image/gif') > -1 && get('__atu_no_such__') === '' && getEvtUrl() === location.href.substring(0, location.href.lastIndexOf('/') + 1) && !!xy && xy.x === 3 && xy.y === 4 } },
+        { name: 'copy / download / click / e', note: 'copy 会临时插入隐藏 textarea，测完移除', check: () => { var d = el('<i></i>'); var n = 0; d.addEventListener('click', function () { n++ }); click(d); var okE = e('result') === document.getElementById('result'); copy('__atu_copy__'); var okCopy = $('#atuCopyInput').val() === '__atu_copy__'; $('#atuCopyInput').remove(); return n === 1 && okE && okCopy && typeof download === 'function' } },
+        { name: 'convertCanvasToImage / convertCanvasToImgData', check: () => { var c = document.createElement('canvas'); c.width = 2; c.height = 2; var img = convertCanvasToImage(c); var data = convertCanvasToImgData(c); return img instanceof HTMLImageElement && img.src.indexOf('data:image/png') === 0 && typeof data === 'string' && data.indexOf('data:image/jpeg') === 0 } }
+      ]
+    }]
+
+    /* ---------- 执行器（原生 DOM 渲染，保证 Atu 挂了也能出报告） ---------- */
+    var result = document.getElementById('result')
+    var summary = document.getElementById('summary')
+
+    function itemNode(item) {
+      var div = document.createElement('div')
+      div.className = 'feature-item'
+      var name = document.createElement('span')
+      name.className = 'feature-name'
+      name.textContent = item.name
+      if (item.note) {
+        var small = document.createElement('small')
+        small.textContent = item.note
+        name.appendChild(small)
+      }
+      var status = document.createElement('span')
+      status.className = 'status'
+      div.appendChild(name)
+      div.appendChild(status)
+      return { div: div, status: status }
+    }
+
+    function setStatus(node, kind, text) {
+      node.status.className = 'status ' + kind
+      node.status.textContent = text
+    }
+
+    async function runAll() {
+      result.innerHTML = ''
+      summary.innerHTML = ''
+      var total = 0, passed = 0, failed = 0, skipped = 0
+      var failNames = []
+
+      for (var g of GROUPS) {
+        var h = document.createElement('h2')
+        h.className = 'group-title'
+        h.textContent = g.title
+        result.appendChild(h)
+
+        var grid = document.createElement('div')
+        grid.className = 'list feature-grid'
+        result.appendChild(grid)
+
+        for (var item of g.items) {
+          total++
+          var node = itemNode(item)
+          grid.appendChild(node.div)
+
+          var r
+          try {
+            r = item.check()
+            if (r && typeof r.then === 'function') r = await r
+          } catch (e) {
+            setStatus(node, 'not-supported', '❌ ' + (e && e.message ? e.message : e))
+            failed++
+            failNames.push(item.name)
+            continue
+          }
+
+          if (r === null) {
+            setStatus(node, 'skipped', '⚠️ 跳过')
+            skipped++
+          } else if (r) {
+            setStatus(node, 'supported', '✅ 通过')
+            passed++
+          } else {
+            setStatus(node, 'not-supported', '❌ 失败')
+            failed++
+            failNames.push(item.name)
+          }
+        }
+      }
+
+      // 清理沙箱
+      var h2 = document.getElementById('__atu_host')
+      if (h2) h2.parentNode.removeChild(h2)
+
+      summary.innerHTML =
+        '<span>共 ' + total + ' 项</span>' +
+        '<span style="background:#c6f6d5;color:#22543d">通过 ' + passed + '</span>' +
+        '<span style="background:#fed7d7;color:#742a2a">失败 ' + failed + '</span>' +
+        '<span style="background:#feebc8;color:#7b341e">跳过 ' + skipped + '</span>'
+
+      if (failNames.length) console.warn('[atu test] 失败项：', failNames)
+      console.log('[atu test] 共 ' + total + '，通过 ' + passed + '，失败 ' + failed + '，跳过 ' + skipped)
+    }
+
+    document.getElementById('checkBtn').addEventListener('click', runAll)
+    window.addEventListener('load', runAll)
+  </script>
+</body>
+
+</html>

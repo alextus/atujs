@@ -308,23 +308,26 @@ var Atu = (function () {
   $.isIdcard = function (s) {
     if (!s) return false;
     s = String(s).trim();
-    // 15位老身份证 / 18位二代身份证 格式正则
+    // 15位老身份证 / 18位二代身份证
     const reg = /(^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$)|(^[1-9]\d{5}\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}$)/;
     if (!reg.test(s)) return false;
 
-    // 18位 校验码校验
+    // 18位校验码校验
     if (s.length === 18) {
       const weight = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];
       const checkCode = "10X98765432";
       let sum = 0;
       for (let i = 0; i < 17; i++) {
-        sum += s.charCodeAt(i) * weight[i];
+        const num = parseInt(s[i], 10);
+        sum += num * weight[i];
       }
-      return s[17].toUpperCase() === checkCode[(sum - 48 * 153) % 11];
+      const mod = sum % 11;
+      return s[17].toUpperCase() === checkCode[mod];
     }
+    // 15位：无校验码，正则通过即返回true
     return true;
-  }
-   $.isQQ = function (s) {
+  };
+  $.isQQ = function (s) {
     const patrn = /^[1-9][0-9]{4,10}$/;
     return patrn.exec(s) ? true : false;
   }
@@ -897,14 +900,14 @@ var Atu = (function () {
       return el[dimension]() - parseFloat(el.css('padding-' + v1)) - parseFloat(el.css('padding-' + v2))
     }
     $.fn["outer" + dimensionProperty] = function (margin) {
-        var el = $(this), elem = this[0], v = 0
-        if (!elem) return 0
-        var v1 = dimension == 'width' ? 'left' : 'top'
-        var v2 = dimension == 'width' ? 'right' : 'bottom'
-        // ① 原生 offsetHeight/offsetWidth：布局尺寸，含 padding+border、不受 transform 影响
-        v = dimension == 'width' ? elem.offsetWidth : elem.offsetHeight
-        // ② 不再手动加 border（offset 已含）；margin 仅当传 true 时加
-        return v + (margin ? parseFloat(el.css('margin-' + v1)) + parseFloat(el.css('margin-' + v2)) : 0)
+      var el = $(this), elem = this[0], v = 0
+      if (!elem) return 0
+      var v1 = dimension == 'width' ? 'left' : 'top'
+      var v2 = dimension == 'width' ? 'right' : 'bottom'
+      // ① 原生 offsetHeight/offsetWidth：布局尺寸，含 padding+border、不受 transform 影响
+      v = dimension == 'width' ? elem.offsetWidth : elem.offsetHeight
+      // ② 不再手动加 border（offset 已含）；margin 仅当传 true 时加
+      return v + (margin ? parseFloat(el.css('margin-' + v1)) + parseFloat(el.css('margin-' + v2)) : 0)
     }
     $.fn["origin" + dimensionProperty] = function () {
       let e = $(this).clone().css("display", "block").appendTo("body");

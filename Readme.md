@@ -4,6 +4,18 @@
 
 	2026-03-18 $("..").show/hide()  元素过多时性能骤降 fix
   2026-04-13 $.get(),$.post() 等支持then,fail
+  2026-09-12 删除Array.prototype.indexOf
+  2026-09-19
+    #.css() 优化 
+    $.isIdcard bug fix
+    animate.js 中dasherize 函数复用$.dasherize
+    common.js中的trim 函数复用$.trim
+    function dasherize(str) {
+      return str.replace(/([A-Z])/g, "-$1").toLowerCase();
+    }
+    精简函数写法：$.scrollTop().$.scrollLeft(),year(),month(),week(),day(),hour(),now()
+    精简事件写法  touchLeft,touchRight,touchUp,touchDown,优化事件写法 longPress\ScrollEnd
+    删除ie浏览器版本检测
 
 
 # 1.2.5 2025.08.15

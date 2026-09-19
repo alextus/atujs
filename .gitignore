@@ -15,3 +15,4 @@ package-lock.json
 /build
 /node_modules
 gulpfile.js
+gulp.log
