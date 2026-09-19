@@ -283,7 +283,9 @@ var Atu = (function () {
     return emptyArray.indexOf.call(array, elem, i)
   }
   $.camelCase = camelize
+  $.dasherize = dasherize
   $.trim = function (str) {
+    //return str.replace(/(^\s*)|(\s*$)/g, ""); 
     return str == null ? "" : String.prototype.trim.call(str)
   }
   $.isTel = function (s) {
@@ -295,16 +297,32 @@ var Atu = (function () {
     return patrn.test(s)
   }
   $.isUrl = function (s) {
-    patrn = /(^[0-9]{3,4}\-[0-9]{7,8}$)|(^\([0-9]{3,4}\)[0-9]{3,8}$)|(^0{0,1}1[3-9]\d{9}$)|(1[3-9]\d{9}$)/;
-    return patrn.exec(s) ? true : false;
+    if (!s || typeof s !== 'string') return false;
+    var patrn = /^(https?|ftp):\/\/([a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)*|\d{1,3}(\.\d{1,3}){3})(:\d+)?(\/[^#]*)?$/;
+    return patrn.test(s);
   }
   $.isEmail = function (s) {
     var patrn = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
     return patrn.exec(s) ? true : false;
   }
   $.isIdcard = function (s) {
-    patrn = /(^[0-9]{3,4}\-[0-9]{7,8}$)|(^\([0-9]{3,4}\)[0-9]{3,8}$)|(^0{0,1}1[3-9]\d{9}$)|(1[3-9]\d{9}$)/;
-    return patrn.exec(s) ? true : false;
+    if (!s) return false;
+    s = String(s).trim();
+    // 15位老身份证 / 18位二代身份证 格式正则
+    var reg = /(^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$)|(^[1-9]\d{5}\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}$)/;
+    if (!reg.test(s)) return false;
+
+    // 18位 校验码校验
+    if (s.length === 18) {
+      const weight = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];
+      const checkCode = "10X98765432";
+      let sum = 0;
+      for (let i = 0; i < 17; i++) {
+        sum += s.charCodeAt(i) * weight[i];
+      }
+      return s[17].toUpperCase() === checkCode[(sum - 48 * 153) % 11];
+    }
+    return true;
   }
   $.isQQ = function (s) {
     var patrn = /^[1-9][0-9]{4,10}$/;
@@ -346,6 +364,18 @@ var Atu = (function () {
   $.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function (i, name) {
     class2type["[object " + name + "]"] = name.toLowerCase()
   })
+
+  // axis: 0 纵向（scrollTop），1 横向（scrollLeft）
+  function makeScrollFn(prop, offset, axis) {
+    return function (value) {
+      if (!this.length) return
+      var has = prop in this[0]
+      if (value === undefined) return has ? this[0][prop] : this[0][offset]
+      return this.each(has ?
+        function () { this[prop] = value } :
+        function () { axis ? this.scrollTo(value, this.scrollY) : this.scrollTo(this.scrollX, value) })
+    }
+  }
 
   $.fn = {
     constructor: atu.Z,
@@ -403,8 +433,8 @@ var Atu = (function () {
     },
     isVisible: function () {
       const style = getComputedStyle(this[0]);
-      const isVisible = style.display !== 'none' && !!(style.width && style.height && style.opacity !== '0' && style.visibility !== 'hidden');
-      return isVisible;
+      const _visible = style.display !== 'none' && !!(style.width && style.height && style.opacity !== '0' && style.visibility !== 'hidden');
+      return _visible;
     },
     not: function (selector) {
       var nodes = []
@@ -690,12 +720,19 @@ var Atu = (function () {
     },
 
     css: function (property, value) {
+      if (this.length === 0) return
       if (arguments.length < 2) {
         var element = this[0]
         if (!element) return
-        if (typeof property == 'string')
+        if (typeof property == 'string') {
+          const transformProps = ['translateX', 'translateY', 'translateZ', 'scale', 'scaleX', 'scaleY', 'scaleZ', 'rotate', 'rotateX', 'rotateY', 'rotateZ'];
+          if (transformProps.includes(property)) {
+            const transformStr = this.styleValue(element, 'transform');
+            const transform = parseTransform(transformStr);
+            return transform[property];
+          }
           return this.styleValue(element, property)
-        else if (isArray(property)) {
+        } else if (isArray(property)) {
           var props = {}
           $.each(property, function (_, prop) {
             props[prop] = this.styleValue(element, prop)
@@ -763,11 +800,12 @@ var Atu = (function () {
       })
     },
     scale: function () {
-      let sx = sy = 1, pxy = 'center center', i1 = i2 = 0
-      if (arguments.length == 2) {
+      let sx = 1, sy = 1, pxy = 'center center', i1 = 0, i2 = 0;
+      const len = arguments.length;
+      if (len == 2) {
         isString(arguments[1]) ? pxy = arguments[1] : i2 = 1;
       }
-      if (arguments.length == 3) { i2 = 2; pxy = arguments[2]; }
+      if (len == 3) { i2 = 1; pxy = arguments[2]; }
       sx = arguments[i1];
       sy = arguments[i2];
       let s = "scale(" + sx + "," + sy + ")"
@@ -778,22 +816,8 @@ var Atu = (function () {
         })
       })
     },
-    scrollTop: function (value) {
-      if (!this.length) return
-      var hasScrollTop = 'scrollTop' in this[0]
-      if (value === undefined) return hasScrollTop ? this[0].scrollTop : this[0].pageYOffset
-      return this.each(hasScrollTop ?
-        function () { this.scrollTop = value } :
-        function () { this.scrollTo(this.scrollX, value) })
-    },
-    scrollLeft: function (value) {
-      if (!this.length) return
-      var hasScrollLeft = 'scrollLeft' in this[0]
-      if (value === undefined) return hasScrollLeft ? this[0].scrollLeft : this[0].pageXOffset
-      return this.each(hasScrollLeft ?
-        function () { this.scrollLeft = value } :
-        function () { this.scrollTo(value, this.scrollY) })
-    },
+    scrollTop: makeScrollFn('scrollTop', 'pageYOffset', 0),
+    scrollLeft: makeScrollFn('scrollLeft', 'pageXOffset', 1),
     position: function () {
       if (!this.length) return
 
@@ -822,10 +846,10 @@ var Atu = (function () {
       })
     },
     autoHeight: function () {
-
+      if (!this.length) return
       let minHeight = this.attr("minHeight"), obj = this[0]
-      $.log(this.css("height").replace("px", ''), minHeight, this.css("height").replace("px", '') < minHeight)
-      if (minHeight && this.css("height").replace("px", '') < minHeight) {
+      $.log(this.height(), minHeight, this.height() < minHeight)
+      if (minHeight && this.height() < minHeight) {
         obj.style.height = minHeight + 'px'
       }
       obj.addEventListener('input', () => {
@@ -872,11 +896,15 @@ var Atu = (function () {
       v2 = dimension == 'width' ? 'right' : 'bottom'
       return el[dimension]() - parseFloat(el.css('padding-' + v1)) - parseFloat(el.css('padding-' + v2))
     }
-    $.fn["outer" + dimensionProperty] = function () {
-      var el = $(this), v1, v2
-      v1 = dimension == 'width' ? 'left' : 'top'
-      v2 = dimension == 'width' ? 'right' : 'bottom'
-      return el[dimension]() + parseFloat(el.css('margin-' + v1)) + parseFloat($(this).css('margin-' + v2)) + parseFloat(el.css('border-' + v1 + "-" + dimension)) + parseFloat($(this).css('border-' + v2 + "-" + dimension))
+    $.fn["outer" + dimensionProperty] = function (margin) {
+        var el = $(this), elem = this[0], v = 0
+        if (!elem) return 0
+        var v1 = dimension == 'width' ? 'left' : 'top'
+        var v2 = dimension == 'width' ? 'right' : 'bottom'
+        // ① 原生 offsetHeight/offsetWidth：布局尺寸，含 padding+border、不受 transform 影响
+        v = dimension == 'width' ? elem.offsetWidth : elem.offsetHeight
+        // ② 不再手动加 border（offset 已含）；margin 仅当传 true 时加
+        return v + (margin ? parseFloat(el.css('margin-' + v1)) + parseFloat(el.css('margin-' + v2)) : 0)
     }
     $.fn["origin" + dimensionProperty] = function () {
       let e = $(this).clone().css("display", "block").appendTo("body");
@@ -885,6 +913,41 @@ var Atu = (function () {
       return v;
     }
   })
+  function parseTransform(transformStr) {
+    const result = {
+      translateX: 0, translateY: 0, translateZ: 0,
+      scale: 1, scaleX: 1, scaleY: 1, scaleZ: 1,
+      rotate: 0, rotateX: 0, rotateY: 0, rotateZ: 0
+    };
+    if (!transformStr || transformStr === 'none') return result;
+
+    const matrix2D = transformStr.match(/matrix\((.+)\)/);
+    const matrix3D = transformStr.match(/matrix3d\((.+)\)/);
+
+    if (matrix2D) {
+      const [a, b, c, d, tx, ty] = matrix2D[1].split(',').map(Number);
+      result.translateX = tx;
+      result.translateY = ty;
+      result.scaleX = a;
+      result.scaleY = d;
+      result.scale = Math.sqrt(a * a + b * b);
+      result.rotate = result.rotateZ = Math.atan2(b, a) * 180 / Math.PI;
+    }
+
+    if (matrix3D) {
+      const v = matrix3D[1].split(',').map(Number);
+      result.translateX = v[12];
+      result.translateY = v[13];
+      result.translateZ = v[14];
+      result.scaleX = Math.hypot(v[0], v[1], v[2]);
+      result.scaleY = Math.hypot(v[4], v[5], v[6]);
+      result.scaleZ = Math.hypot(v[8], v[9], v[10]);
+      result.rotateZ = Math.atan2(v[1], v[0]) * 180 / Math.PI;
+      result.rotate = result.rotateZ;
+    }
+    Object.keys(result).forEach(k => result[k] = parseFloat(result[k].toFixed(2)));
+    return result;
+  }
   function traverseNode(node, fun) {
     fun(node)
     for (var i = 0, len = node.childNodes.length; i < len; i++)
